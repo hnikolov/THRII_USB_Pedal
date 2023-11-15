@@ -24,7 +24,7 @@ void drawStatusMask(uint8_t x, uint8_t y);
 void send_patch(uint8_t patch_id);
 void drawPatchID(uint16_t fgcolour, int patchID);
 void drawPatchIcon(int x, int y, int w, int h, uint16_t colour, int patchID);
-void drawPatchName(uint16_t fgcolour, String patchname);
+void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false);
 void send_dump_request();
 void solo_deactivate(bool restore);
 void solo_activate();

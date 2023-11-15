@@ -3,6 +3,8 @@
 * 
 * Heavily modified by Buhjuhwuh
 *
+* Further modified by hnnikolov
+*
 * Prerequesites:
 *  - Library "USBHost_t3" for Teensy 3.6  
 *  - Variant "2_8_Friendly_t3" of Library "ST7789_t3" for Teensy 3.6
@@ -131,10 +133,10 @@ File32 file;
 
 // Define other input/output pins ///// TO BE REMOVED //////////
 //#define LED_PIN       		12
-#define PEDAL_1_PIN       	24
-#define PEDAL_2_PIN       	25
-#define PEDAL_1_SENSE_PIN 	26
-#define PEDAL_2_SENSE_PIN 	27
+//#define PEDAL_1_PIN       	24
+//#define PEDAL_2_PIN       	25
+//#define PEDAL_1_SENSE_PIN 	26
+//#define PEDAL_2_SENSE_PIN 	27
 
 //const uint8_t pedal_buf_size = 10;
 //uint16_t pedal_1_buf[pedal_buf_size];
@@ -182,7 +184,12 @@ String preSelName; // Global variable: Name of the pre selected patch
 
 class THR30II_Settings THR_Values;			     // Actual settings of the connected THR30II
 class THR30II_Settings stored_THR_Values;    // Stored settings, when applying a patch (to be able to restore them later on)
-class THR30II_Settings stored_Patch_Values;  // Stored settings of a (modified) patch, when applying a solo (to be able to restore them later on)
+//class THR30II_Settings stored_Patch_Values;  // Stored settings of a (modified) patch, when applying a solo (to be able to restore them later on)
+
+// Initialize in the beginning with the stored presets in the THRII. Use them to switch between them from the pedal board
+// TODO: Can we just send command to activate a stored in the THRII preset?
+class THR30II_Settings THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5;
+std::array< THR30II_Settings, 5 > thr_user_presets = {{ THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5 }};
 
 static volatile int16_t presel_patch_id;   	 // ID of actually pre-selected patch (absolute number)
 static volatile int16_t active_patch_id;   	 // ID of actually selected patch     (absolute number)
@@ -384,7 +391,7 @@ void setup() // Do preparations
 	if( npatches > 0 ) { presel_patch_id =  1; } // Preselect the first available patch
 	else               { presel_patch_id = -1; } // No preselected patch possible because no available patches
 
-	active_patch_id =-1; // Always start up with local settings
+	active_patch_id = presel_patch_id; // Always start up with local settings, however show the patch number of the preselected patch
 
 	TRACE_THR30IIPEDAL(Serial.printf(F("\n\rThere are %d JSON patches in patches.h / patches.txt.\n\r"), npatches);)
 	TRACE_THR30IIPEDAL(Serial.println(F("Fetching Library Patch Names:")); )
@@ -422,15 +429,20 @@ void setup() // Do preparations
 // BUTTONS EVENT HANDLER 
 /////////////////////////////////////////////////////////////////////////////////////////
 void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
+  uint8_t button_pressed =  button->getPin() - 13; // Buttons logical numbers starts from 1
   switch (eventType) {
-    //case AceButton::kEventPressed:
+    case AceButton::kEventPressed:
+      // Only the tap-echo time button reacts on key pressed event
+      if( button_pressed == 3 ) { button_state = button_pressed; }
+      break;
+
     //case AceButton::kEventReleased:    
     case AceButton::kEventClicked:
-      button_state = button->getPin() - 13; // Buttons logical numbers starts from 1
+      if( button_pressed != 3 ) { button_state = button_pressed; } // Skip button #3
       break;
-    //case AceButton::kEventReleased:
+
     case AceButton::kEventLongPressed:
-      button_state = (button->getPin() - 13) + 10; // Buttons logical numbers starts from 1, add 10 for long press
+      button_state = button_pressed + 10; // Buttons logical numbers starts from 1, add 10 for long press
       break;
 //    case AceButton::kEventDoubleClicked:
 //      button_state = (button->getPin() - 13) + 20; // Buttons logical numbers starts from 1, add 20 for double click
@@ -663,9 +675,10 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 									case BOUTIQUE: THR_Values.col = MODERN; 	break;
 									case MODERN:	 THR_Values.col = CLASSIC; 	break;
 								}
-                //THR_Values.sendChangestoTHR = true;
                 // TODO
+                //THR_Values.sendChangestoTHR = true;
                 //THR_Values.SetColAmp(THR_Values.col, THR_Values.amp);
+                //THR_Values.SendColAmp();
                 //THR_Values.sendChangestoTHR = false;
                 Serial.println("Amp collection switched to: " + String(THR_Values.col));
 							break;
@@ -682,8 +695,8 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 									case ACO:		  THR_Values.amp = FLAT;		break;
 									case FLAT:		THR_Values.amp = CLEAN;		break;
 								}
-                //THR_Values.sendChangestoTHR = true;
                 // TODO
+                //THR_Values.sendChangestoTHR = true;
                 //THR_Values.SetColAmp(THR_Values.col, THR_Values.amp);
                 //THR_Values.sendChangestoTHR = false;
                 Serial.println("Amp type switched to: " + String(THR_Values.amp));
@@ -712,7 +725,7 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 								}
                 // TODO: To be removed if THR_Values.createPatch() to be used or do not call THR_Values.createPatch() when changing cabinet
                 //THR_Values.sendChangestoTHR = true;
-                //THR_Values.SendCab();
+                //THR_Values.SendCab(); // This works
                 //THR_Values.sendChangestoTHR = false;
 								Serial.println("Cabinet switched to: " + String(THR_Values.cab));
 							break;
@@ -722,10 +735,10 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 						button_state=0;  //remove flag, because it is handled
 					break;
 
-					case 3: // Tap tempo (DISABLED)
-						THR_Values.EchoTempoTap();	//get tempo tap input and apply to echo unit
-						maskUpdate=true;  //request display update to show new states quickly
-						button_state=0;  //remove flag, because it is handled
+					case 3: // Tap tempo
+						THR_Values.EchoTempoTap(); // Get tempo tap input and apply to echo unit
+						maskUpdate = true;         // Request display update to show new states quickly
+						button_state = 0;          // Remove flag, because it is handled
 					break;
 
 					case 4: // Decrement patch
@@ -1118,7 +1131,7 @@ void updatemastervolume(int mastervolume)
 void do_gain_boost()
 {
   do_volume_patch();
-	//std::copy( THR_Values.control.begin(),THR_Values.control.end(),THR_Values.control_store.begin());  //save volume and tone related settings
+	//std::copy(THR_Values.control.begin(),THR_Values.control.end(),THR_Values.control_store.begin());  //save volume and tone related settings
 
 	//THR_Values.sendChangestoTHR=true;
 	//THR_Values.SetControl(CTRL_GAIN, min(THR_Values.GetControl(CTRL_GAIN)+40, 100));
@@ -1135,49 +1148,49 @@ void undo_gain_boost()
 	boost_activated = false;
 }
 
-void do_volume_patch()   //increases Volume and/or Tone settings for SOLO to be louder than actual patch
+void do_volume_patch() // Increases Volume and/or Tone settings for SOLO to be louder than actual patch
 {
-	std::copy( THR_Values.control.begin(),THR_Values.control.end(),THR_Values.control_store.begin());  //save volume and tone related settings
+	std::copy(THR_Values.control.begin(), THR_Values.control.end(), THR_Values.control_store.begin());  //save volume and tone related settings
 
-	if(THR_Values.GetControl(CTRL_MASTER)<100/1.333333)  //is there enough headroom to increase Master Volume by 33% ?
+	if( THR_Values.GetControl(CTRL_MASTER) < 100 / 1.333333 ) // Is there enough headroom to increase Master Volume by 33%?
 	{
-		THR_Values.sendChangestoTHR=true;
-		THR_Values.SetControl(CTRL_MASTER, THR_Values.GetControl(CTRL_MASTER)*1.333333);  //do it
-		THR_Values.sendChangestoTHR=false;
+		THR_Values.sendChangestoTHR = true;
+		THR_Values.SetControl(CTRL_MASTER, THR_Values.GetControl(CTRL_MASTER) * 1.333333); // Do it
+		THR_Values.sendChangestoTHR = false;
 	}
-	else //try to increase volume by simultaneously increasing MID/TREBLE/BASS
+	else // Try to increase volume by simultaneously increasing MID/TREBLE/BASS
 	{
-		THR_Values.sendChangestoTHR=true;
-		double margin=(100.0-THR_Values.GetControl(CTRL_MASTER))/THR_Values.GetControl(CTRL_MASTER);  //maxi MASTER multiplier? (e.g. 0.17)
-		THR_Values.SetControl(CTRL_MASTER,100); //use maximum MASTER
-		double max_tone= std::max(std::max(THR_Values.GetControl(CTRL_BASS),THR_Values.GetControl(CTRL_MID)),THR_Values.GetControl(CTRL_TREBLE)) ; //highest value of the tone settings 
-		double tone_margin=(100.0-max_tone)/max_tone;  //maxi equal TONE-Settings multiplier? (e.g. 0.28)
-		if(tone_margin > 0.333333-margin)  //can we increase the TONE settings simultaneously to reach the missing MASTER-increasement?
+		THR_Values.sendChangestoTHR = true;
+		double margin = (100.0 - THR_Values.GetControl(CTRL_MASTER)) / THR_Values.GetControl(CTRL_MASTER); // Maximum MASTER multiplier? (e.g. 0.17)
+		THR_Values.SetControl(CTRL_MASTER, 100); // Use maximum MASTER
+		double max_tone = std::max(std::max(THR_Values.GetControl(CTRL_BASS), THR_Values.GetControl(CTRL_MID)), THR_Values.GetControl(CTRL_TREBLE)); // Highest value of the tone settings 
+		double tone_margin=(100.0-max_tone)/max_tone; // Maximum equal TONE-Settings multiplier? (e.g. 0.28)
+		if( tone_margin > 0.333333 - margin ) // Can we increase the TONE settings simultaneously to reach the missing MASTER-increasement?
 		{
-			THR_Values.SetControl(CTRL_BASS,THR_Values.GetControl(CTRL_BASS)*(1+0.333333-margin));
-			THR_Values.SetControl(CTRL_MID, THR_Values.GetControl(CTRL_MID)*(1+0.333333-margin));
-			THR_Values.SetControl(CTRL_TREBLE,THR_Values.GetControl(CTRL_TREBLE)*(1+0.333333-margin));
+			THR_Values.SetControl(CTRL_BASS,   THR_Values.GetControl(CTRL_BASS)   * (1+0.333333 - margin));
+			THR_Values.SetControl(CTRL_MID,    THR_Values.GetControl(CTRL_MID)    * (1+0.333333 - margin));
+			THR_Values.SetControl(CTRL_TREBLE, THR_Values.GetControl(CTRL_TREBLE) * (1+0.333333 - margin));
 		} 
-		else //increase as much as simultaneously possible (one tone setting reaches 100% this way)
+		else // Increase as much as simultaneously possible (one tone setting reaches 100% this way)
 		{
-			THR_Values.SetControl(CTRL_BASS,THR_Values.GetControl(CTRL_BASS)*(1+tone_margin));
-			THR_Values.SetControl(CTRL_MID, THR_Values.GetControl(CTRL_MID)*(1+tone_margin));
-			THR_Values.SetControl(CTRL_TREBLE,THR_Values.GetControl(CTRL_TREBLE)*(1+tone_margin));
+			THR_Values.SetControl(CTRL_BASS,   THR_Values.GetControl(CTRL_BASS)   * (1 + tone_margin));
+			THR_Values.SetControl(CTRL_MID,    THR_Values.GetControl(CTRL_MID)    * (1 + tone_margin));
+			THR_Values.SetControl(CTRL_TREBLE, THR_Values.GetControl(CTRL_TREBLE) * (1 + tone_margin));
 		}
-		THR_Values.sendChangestoTHR=false;
+		THR_Values.sendChangestoTHR = false;
 	}
 }
 
 void undo_volume_patch()
 {
-	THR_Values.sendChangestoTHR=true;
-	//restore volume related settings
+	THR_Values.sendChangestoTHR = true;
+	// Restore volume related settings
 	THR_Values.SetControl( CTRL_MASTER, THR_Values.control_store[CTRL_MASTER] );
-	//THR_Values.SetControl( CTRL_GAIN, THR_Values.control_store[CTRL_GAIN] ); //Gain is not involved in Volume-Patch
+	// THR_Values.SetControl( CTRL_GAIN, THR_Values.control_store[CTRL_GAIN] ); // Gain is not involved in Volume-Patch
 	THR_Values.SetControl( CTRL_BASS,   THR_Values.control_store[CTRL_BASS] );
 	THR_Values.SetControl( CTRL_MID,    THR_Values.control_store[CTRL_MID] );
 	THR_Values.SetControl( CTRL_TREBLE, THR_Values.control_store[CTRL_TREBLE] );
-	THR_Values.sendChangestoTHR=false;
+	THR_Values.sendChangestoTHR = false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1186,7 +1199,7 @@ void undo_volume_patch()
 uint32_t tempotaptime0 = 0;
 uint32_t tempotaptime1 = 0;
 uint32_t tempotapint = 1000;
-uint32_t tempotaptimeout = 2000;
+uint32_t tempotaptimeout = 1500;
 uint8_t tempotapbpm = 0;
 uint8_t tempotapsetting = 50;
 
@@ -1497,7 +1510,7 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 	std::array<byte, 300> sb2;
 	auto sb2last = sb2.begin(); // Iterator to last element (starts on begin!)
 
-	std::map<String,uint16_t> &glob = Constants::glo;
+	std::map<String, uint16_t> &glob = Constants::glo;
 	
 	std::array<byte, 4> toInsert4;
 	std::array<byte, 6> toInsert6;
@@ -1516,7 +1529,7 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 	datback(tokens["Meta"] ) ;          
 	datback(tokens["TokenMeta"] );
 	toInsert6 = { 0x00, 0x00, 0x00, 0x00, 0x04, 0x00 };
-	datlast=std::copy(std::begin(toInsert6),std::end(toInsert6),datlast); // Number 0x0000, type 0x00040000 (String)
+	datlast = std::copy(std::begin(toInsert6), std::end(toInsert6), datlast); // Number 0x0000, type 0x00040000 (String)
 	
 	conbyt4( patchNames[0].length() + 1 ) // Length of patchname (incl. '\0')
 	// 32Bit-Value (little endian; low byte first) 
@@ -1865,6 +1878,7 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 	//                 (len +8+12)   (1st length field = total length = data length + 3 values + type field/netto length )
 	conbyt4s(lengthfield1);
 	//                 FF FF FF FF   (number of user patch to overwrite / 0xFFFFFFFF for actual patch)
+  // TODO: Write to user presets (0-4) when deactivating patches...
 	conbyt4s(0xFFFFFFFFu);
 	//                 (len   +12)   (2nd length field = netto length = data length + the following 3 values)
 	conbyt4s(lengthfield2);
@@ -1953,7 +1967,7 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 	TRACE_THR30IIPEDAL(Serial.println(F("\n\rCreate_patch(): Ready outsending."));)
 
 	userSettingsHaveChanged = false;
-	activeUserSetting = -1;
+	//activeUserSetting = -1; // Commented to fix the issue of not showing the user preset number when in UI_HOME_AMP
 
 	// Now we have to await acknowledgment for the last frame
 	// on_ack_queue.enqueue(std::make_tuple(101+numslices,Outmessage(SysExMessage((const byte[29]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x3c, 0x00, 0x7f, 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0xf7 },29), 
@@ -3394,14 +3408,15 @@ void THR30II_Settings::SendColAmp() // Send COLLLECTION/AMP setting to THR
 
     //std::array<byte, 7 + 2 + 3 + 16 + 1> sendbuf_head = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x00, 0x03, 0x00, 0x00, 0x07, 0x00, 0x08, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};  //29 Bytes
     //std::array<byte, 29>                 sendbuf_body = {0xf0, 0x00, 0x01, 0x00, 0x24, 0x00, 0x4d, 0x00, 0x04, 0x00, 0x00, 0x07, 0x04, 0x0c, 0x01, 0x00, 0x00, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
-    //SysExMessage m = SysExMessage(b, 29);
+    //SysExMessage m = SysExMessage(sendbuf_head.data(), sendbuf_head.size());
     //hexdump(sendbuf_head, sendbuf_head.size());
 
     // FIXME: Buffer content is OK but setting amp/col is not successful 
     // Header to set amp/collection
     //outqueue.enqueue(Outmessage(SysExMessage((const byte[29]){ 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x00, 0x03, 0x00, 0x00, 0x07, 0x00, 0x08, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7 },29), 1111, false, false)); // no ack/answ for the header  
     // Classic Lead
-    //outqueue.enqueue(Outmessage(SysExMessage((const byte[29]){ 0xf0, 0x00, 0x01, 0x0, 0x24, 0x0, 0x4d, 0x00, 0x04, 0x00, 0x00, 0x07, 0x04, 0x0c, 0x01, 0x00, 0x00, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7 },29), 1111, false, false)); // answ  
+    ////delay(1000);
+    //outqueue.enqueue(Outmessage(SysExMessage((const byte[29]){ 0xf0, 0x00, 0x01, 0x0, 0x24, 0x0, 0x4d, 0x00, 0x04, 0x00, 0x00, 0x07, 0x04, 0x0c, 0x01, 0x00, 0x00, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7 },29), 1112, true, true)); // ack/answ  
 }
 
 //--------- FUNCTION FOR SENDING CAB SETTING TO THR30II -----------------
@@ -3678,15 +3693,21 @@ void drawConnIcon(bool THRconnected)
   spr.deleteSprite();
 }
 
-void drawPatchName(uint16_t fgcolour, String patchname)
+void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
 {
   int x = 80, y = 20, w = 240, h = 60;
-  uint16_t bgcolour = TFT_THRVDARKGREY; 
+  uint16_t fg_colour = fgcolour;
+  uint16_t bg_colour = TFT_THRVDARKGREY;
+  if( inverted )
+  {
+    fg_colour = TFT_THRVDARKGREY;
+    bg_colour = fgcolour;
+  }
   spr.createSprite(w, h);
-  spr.fillSmoothRoundRect(0, 0, w, h-1, 3, bgcolour, TFT_BLACK);
+  spr.fillSmoothRoundRect(0, 0, w, h-1, 3, bg_colour, TFT_BLACK);
   spr.loadFont(AA_FONT_LARGE);
   spr.setTextDatum(MC_DATUM);
-  spr.setTextColor(fgcolour, bgcolour);
+  spr.setTextColor(fg_colour, bg_colour);
   spr.drawString(patchname, w/2, h/2);
   spr.pushSprite(x, y);
   spr.unloadFont();
@@ -3951,15 +3972,14 @@ void THR30II_Settings::updateStatusMask(uint8_t x, uint8_t y)
 	uint8_t selectedFXparam = 0;
 
 	// Gain, Master, and EQ (B/M/T) ---------------------------------------------------------
+  drawBarChart( 0, 80, 15, 160, TFT_THRBROWN, TFT_THRCREAM,  "G", control[CTRL_GAIN]);
   if( boost_activated )
   {
-    drawBarChart( 0, 80, 15, 160, TFT_THRDIMORANGE, TFT_THRORANGE,  "G", control[CTRL_GAIN]);
     drawBarChart(15, 80, 15, 160, TFT_THRDIMORANGE, TFT_THRORANGE,  "M", control[CTRL_MASTER]);
    	drawEQChart( 30, 80, 30, 160, TFT_THRDIMORANGE, TFT_THRORANGE, "EQ", control[CTRL_BASS], control[CTRL_MID], control[CTRL_TREBLE]);
   }
   else
   {
-    drawBarChart( 0, 80, 15, 160, TFT_THRBROWN, TFT_THRCREAM,  "G", control[CTRL_GAIN]);
     drawBarChart(15, 80, 15, 160, TFT_THRBROWN, TFT_THRCREAM,  "M", control[CTRL_MASTER]);
    	drawEQChart( 30, 80, 30, 160, TFT_THRBROWN, TFT_THRCREAM, "EQ", control[CTRL_BASS], control[CTRL_MID], control[CTRL_TREBLE]);
   }
@@ -4229,18 +4249,18 @@ void THR30II_Settings::updateStatusMask(uint8_t x, uint8_t y)
     	if( THR_Values.thrSettings )
 			{
 				s2 = "THR Panel";
-				drawPatchName(TFT_SKYBLUE, s2);
+				drawPatchName(TFT_SKYBLUE, s2, boost_activated);
 			}
 			else if( THR_Values.getUserSettingsHaveChanged() )
 			{
-				s2 = THR_Values.getPatchName() + "(*)";
-				drawPatchName(ST7789_ORANGERED, s2);
+				s2 = THR_Values.getPatchName(); // "(*)" removed to save space
+				drawPatchName(ST7789_ORANGERED, s2, boost_activated);
 			}
 			else
 			{
 				// Update GUI status line
 				s2 = THR_Values.getPatchName();
-				drawPatchName(TFT_SKYBLUE, s2);
+				drawPatchName(TFT_SKYBLUE, s2, boost_activated);
 			}
 	 	break;
     /*    
@@ -4271,18 +4291,18 @@ void THR30II_Settings::updateStatusMask(uint8_t x, uint8_t y)
 				if( presel_patch_id != active_patch_id )
 				{
 					s2 = libraryPatchNames[presel_patch_id - 1]; // libraryPatchNames is 0-indexed
-					drawPatchName(ST7789_ORANGE, s2);
+					drawPatchName(ST7789_ORANGE, s2, boost_activated);
 				}
 				else
 				{
 					s2 = libraryPatchNames[active_patch_id - 1];
-					drawPatchName(TFT_THRCREAM, s2);
+					drawPatchName(TFT_THRCREAM, s2, boost_activated);
 				}
 			}
 			else
 			{
-				s2 = libraryPatchNames[active_patch_id - 1] + "(*)"; // libraryPatchNames is 0-indexed
-				drawPatchName(ST7789_ORANGERED, s2);
+				s2 = libraryPatchNames[active_patch_id - 1]; // libraryPatchNames is 0-indexed; "(*)" removed to save space
+				drawPatchName(ST7789_ORANGERED, s2, boost_activated);
 			}
 		break;
 

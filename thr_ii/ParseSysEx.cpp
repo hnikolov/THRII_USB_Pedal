@@ -817,7 +817,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             {
                                 int id = outqueue.getHeadPtr()->_id;
                                 result+=("(Tuner Enabled?) 3:0x"+String(msgVals[3],HEX)+ " 4:0x"+String(msgVals[4],HEX));
-                                if (id == 21) //this reaction only, if it came from boot-up-question #S21 (Glob.Read:TunerEnabled)
+                                if(id == 21 ) //this reaction only, if it came from boot-up-question #S21 (Glob.Read:TunerEnabled)
                                 {   //otherwise we get a 24-Byte glob.param change report, no 20-Byte answer!
                                     
                                     //THR: 									    #R19
@@ -931,7 +931,10 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 //Request actual user settings (Expect several frames - settings dump)
                                 
                                 //ZWE:->should be a different id than #8 here, because in this case the request does not come from settings dialogue
-                                
+
+// DEBUG ASK FOR USER SETTINGS #4
+//                                outqueue.enqueue(Outmessage(SysExMessage((const byte[29]){ 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7 },29), 88, false, true)); //answer will be the settings dump for actual settings
+
                                 outqueue.enqueue(Outmessage(SysExMessage((const byte[29]){ 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x3c, 0x00, 0x7f, 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0xf7 },29), 88, false, true)); //answer will be the settings dump for actual settings
                                 //outqueue.enqueue(Outmessage(SysExMessage((const byte[29]){ 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x3c, 0x00, 0x7f, 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0xf7 },29), 88, false, true)); //answer will be the settings dump for actual settings
                             }

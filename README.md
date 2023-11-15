@@ -31,7 +31,7 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
 - ST7789 controller is selected and SPI is configured in User_Setup.h of TFT_eSPI library source!
 
 
-**CURRENT BEHAVIOUR**
+**BEHAVIOUR AFTER INITIAL COMMIT**
 - No analogue input support (for now)
 - The AudioVolume and GuitarVolume parameters are shown as bars (GA) on the right part of the TFT screen i.s.o. the analogue pedals values (P).
 - At start-up and connection with THR, GUI shows "THR Local". It changes to a User preset name when selected from the THRII amp
@@ -64,20 +64,20 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
 
 
 **KNOWN ISSUES**
-- Selecting different effects/echoes/reverbs does not change patch name color and does not add '(\*)' to patch name
-- When changing what to switch (COMP/GATE/BOOST), it is not clear if/what is selected
+- Selecting different effects/echoes/reverbs does not change patch name color and does not add '(\*)'
+- When changing what to switch (COMP/GATE/BOOST), it is not clear what has been selected
 - Font size of the patch name is not ideal (currently, using smaller font size instead)
 
 
+**DONE**
+- Use button press event only for the tap echo time button/feature
+- Remove '(\*)' from modified patch to save space on screen - change only the color of the patch name
+- Invert patch name font color and background when Solo switch on
+- When switching from patch to the THRII settings, the THRII (user preset) patch name is shown but the small-font number (0-4) was not
+- At connection, start with 'THR Local' and show the (large-font) number of the preselected patch (1), was (-1)
+
+
 **TODOs**
-- Use button press event only for the tap echo time button/feature (TB DONE)
-- Remove '(\*)' from modified patch to save space on screen - change only the color of the patch name (TB DONE)
-- Invert patch name/background when Solo switch on (TB DONE)
-- When switching from patch the amp settings, the amp patch name is shown but the patch number (0-4) is not (TB Fixed)
-  - At connection, start with 'THR Local' and show the number of the preselected patch (1), was (-1) (TB DONE)
-- Add new fonts - currently facing problems with this :(
-- Cannot switch THRII amp/col without calling createPatch() 
-  - Can switch from Boom SendSX Midi SW sending hex data. The 'same' data does not switch amp/col when sent from Teensy
 - Refactor: Move code to different files: SDCard, FSM, etc.
 - Introduce button mapping (it has been removed)
 - Define different FSMs as functions, currently fsm is in the loop() function
@@ -85,6 +85,9 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
   - In this way, all THRxII flavour should be supported
 - Select User presets from the pedal board (number of preset to be on the THR display)
   - Currently sends a complete patch to be loaded as active settings
+- Add new fonts - currently facing problems with this :(
+- Cannot switch THRII amp/col without calling createPatch() 
+  - Can switch from Boom SendSX Midi SW sending hex data. The 'same' data does not switch amp/col when sent from Teensy
 - Use Guitar volume for Boost (Solo switch). Currently uses Master+EQ. Make it selectable?
 - Define useable settings for all parameters/effects and initialize them at startup. I
   - In this case even if nothing is loaded from the amp, effects can be switched and used. Currently, they can be switched but not very usable
