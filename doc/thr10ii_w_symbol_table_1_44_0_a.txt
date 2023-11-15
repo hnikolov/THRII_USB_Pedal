@@ -1,0 +1,747 @@
+THR10-II-W Symbol table
+
+7BandSpkEq : 0
+
+PreGain : 1
+
+PostGain : 2
+
+EQ1Type : 3
+
+units : 4
+
+SpkEQ1Type : 5
+
+displayName : 6
+
+EQ1Fc : 7
+
+SpkEQ1Fc : 8
+
+EQ1Gain : 9
+
+SpkEQ1Gain : 10
+
+EQ1Q : 11
+
+SpkEQ1Q : 12
+
+SpkEQPreGain : 13
+
+SpkEQPostGain : 14
+
+EQ2Fc : 15
+
+SpkEQ2Fc : 16
+
+EQ2Gain : 17
+
+SpkEQ2Q : 18
+
+EQ2Q : 19
+
+EQ2Type : 20
+
+SpkEQ2Type : 21
+
+EQ3Fc : 22
+
+SpkEQ3Fc : 23
+
+EQ3Gain : 24
+
+SpkEQ3Gain : 25
+
+EQ3Q : 26
+
+SpkEQ3Q : 27
+
+EQ3Type : 28
+
+SpkEQ3Type : 29
+
+EQ4Fc : 30
+
+SpkEQ4Fc : 31
+
+EQ4Gain : 32
+
+SpkEQ4Gain : 33
+
+EQ4Q : 34
+
+SpkEQ4Q : 35
+
+EQ4Type : 36
+
+SpkEQ4Type : 37
+
+EQ5Fc : 38
+
+SpkEQ5Fc : 39
+
+EQ5Gain : 40
+
+SpkEQ5Gain : 41
+
+EQ5Q : 42
+
+SpkEQ5Q : 43
+
+EQ5Type : 44
+
+SpkEQ5Type : 45
+
+EQ6Fc : 46
+
+SpkEQ6Fc : 47
+
+EQ6Gain : 48
+
+SpkEQ6Gain : 49
+
+EQ6Q : 50
+
+SpkEQ6Q : 51
+
+EQ6Type : 52
+
+SpkEQ6Type : 53
+
+EQ7Fc : 54
+
+SpkEQ7Fc : 55
+
+EQ7Gain : 56
+
+SpkEQ7Gain : 57
+
+EQ7Q : 58
+
+SpkEQ7Q : 59
+
+EQ7Type : 60
+
+SpkEQ7Type : 61
+
+Dynamic_EQ : 62
+
+DEQ_FilterType : 63
+
+DEQ_FC : 64
+
+DEQ_H_TH : 65
+
+DEQ_L_TH : 66
+
+DEQ_L_G : 67
+
+DEQ_H_G : 68
+
+DEQ_ATK : 69
+
+DEQ_REL : 70
+
+DEQ_Q : 71
+
+DEQ_G_PRD : 72
+
+Dynamic EQ : 73
+
+THR10C_Deluxe : 74
+
+AUDIOBLOCK_YAMAHA_IIR2 : 75
+
+Master : 76
+
+Resonance : 77
+
+Presence : 78
+
+BassState : 79
+
+MidState : 80
+
+TrebleState : 81
+
+DriveState : 82
+
+MasterState : 83
+
+Bass : 84
+
+Hide : 85
+
+Mid : 86
+
+Treble : 87
+
+Drive : 88
+
+Percent : 89
+
+ResonanceFc : 90
+
+ResonanceGain : 91
+
+ResonanceQ : 92
+
+PresenceFc : 93
+
+PresenceQ : 94
+
+PresenceGain : 95
+
+PAmpVolumeGain : 96
+
+AmpCategory : 97
+
+GuitarAmp : 98
+
+CenterVol : 99
+
+0.8 : 100
+
+Cabinet : 101
+
+SPKSIM_Deluxe112 : 102
+
+Gate : 103
+
+GateDisabled : 104
+
+Thresh : 105
+
+-38.0 : 106
+
+Decay : 107
+
+0.5 : 108
+
+AmpMode : 109
+
+Classic : 110
+
+PanelLEDIdx : 111
+
+CLEAN : 112
+
+THR10C_Mini : 113
+
+0.68 : 114
+
+SPKSIM_Fs112 : 115
+
+-58.0 : 116
+
+0.6 : 117
+
+Boutique : 118
+
+CRUNCH : 119
+
+THR10X_Brown1 : 120
+
+0.7 : 121
+
+SPKSIM_Bogner412 : 122
+
+GateEnabled : 123
+
+0.205 : 124
+
+Modern : 125
+
+LEAD : 126
+
+THR10_Modern : 127
+
+0.59 : 128
+
+SPKSIM_Boogie412 : 129
+
+-32.0 : 130
+
+HIGAIN : 131
+
+THR10X_South : 132
+
+0.69 : 133
+
+SPKSIM_Orange412 : 134
+
+SPECIAL : 135
+
+THR10C_DC30 : 136
+
+0.9 : 137
+
+SPKSIM_DC30 : 138
+
+THR10X_Brown2 : 139
+
+0.65 : 140
+
+SPKSIM_Peavey5150 : 141
+
+-35.0 : 142
+
+THR10_Flat : 143
+
+FlatAmp : 144
+
+SPKSIM_Bypass : 145
+
+FLAT : 146
+
+THR10_Aco_Condenser1 : 147
+
+AcousticAmp : 148
+
+0.74 : 149
+
+ACO : 150
+
+THR10_Aco_Dynamic1 : 151
+
+THR10_Aco_Tube1 : 152
+
+THR10_Lead : 153
+
+0.46 : 154
+
+SPKSIM_Marshall1960 : 155
+
+THR30_Stealth : 156
+
+visible : 157
+
+true : 158
+
+TSGain : 159
+
+TSTone : 160
+
+TSDrive : 161
+
+-28.0 : 162
+
+THR30_SR101 : 163
+
+0.51 : 164
+
+SPKSIM_MesaMK3 : 165
+
+THR30_Hairy : 166
+
+0.39 : 167
+
+THR30_Blondie : 168
+
+0.32 : 169
+
+-58 : 170
+
+THR10_Bass_Mesa : 171
+
+BassAmp : 172
+
+0.52 : 173
+
+BASS : 174
+
+THR30_FLead : 175
+
+0.34 : 176
+
+SPKSIM_Diezel412 : 177
+
+THR30_Carmen : 178
+
+0.48 : 179
+
+THR10_Flat_B : 180
+
+THR10_Flat_V : 181
+
+THR10C_BJunior2 : 182
+
+THR10_Bass_Eden_Marcus : 183
+
+THR30_JKBass2 : 184
+
+0.62 : 185
+
+SPKSIM_FenderTwin : 186
+
+THR10_Brit : 187
+
+Guitar : 188
+
+RedComp : 189
+
+SustainState : 190
+
+LevelState : 191
+
+Sustain : 192
+
+Level : 193
+
+Smart : 194
+
+xtCategory : 195
+
+Stomp : 196
+
+quickEditCategory : 197
+
+Dynamics : 198
+
+Red Comp : 199
+
+mix : 200
+
+mixDefault : 201
+
+1 : 202
+
+WetDry : 203
+
+0 : 204
+
+ModWetDry : 205
+
+Wet : 206
+
+2 : 207
+
+Phaser : 208
+
+SpeedState : 209
+
+FeedbackState : 210
+
+SyncSelectState : 211
+
+Speed : 212
+
+ModHz : 213
+
+Feedback : 214
+
+SyncSelect : 215
+
+Note : 216
+
+Modulation : 217
+
+Phaser Mono : 218
+
+Show : 219
+
+BiasTremolo : 220
+
+DepthState : 221
+
+Shape : 222
+
+Wave : 223
+
+Depth : 224
+
+Bias Tremolo : 225
+
+L6Flanger : 226
+
+FreqState : 227
+
+Freq : 228
+
+L6 Flanger : 229
+
+StereoSquareChorus : 230
+
+PreState : 231
+
+Pre : 232
+
+Pre Delay : 233
+
+Str Sqr Chorus : 234
+
+TapeEcho : 235
+
+TimeState : 236
+
+Time : 237
+
+DelayTime : 238
+
+Delay : 239
+
+Tape Echo : 240
+
+L6DigitalDelay : 241
+
+Digital : 242
+
+StandardSpring : 243
+
+ToneState : 244
+
+Dwell : 245
+
+Tone : 246
+
+Reverb : 247
+
+Spring : 248
+
+LargePlate1 : 249
+
+DecayState : 250
+
+PreDelayState : 251
+
+PreDelay : 252
+
+Large Plate : 253
+
+ReallyLargeHall : 254
+
+Large Hall : 255
+
+SmallRoom1 : 256
+
+Small Room : 257
+
+SpkSimSubR : 258
+
+dB : 259
+
+GateEnable : 260
+
+SpkSimEnable : 261
+
+SpkSimInGain : 262
+
+SpkSimType : 263
+
+Y2GuitarFlow : 264
+
+FX1 : 265
+
+FX1Mute : 266
+
+FX1Mix : 267
+
+Amp : 268
+
+AmpMute : 269
+
+FX2 : 270
+
+FX2Mute : 271
+
+FX2Mix : 272
+
+FX3 : 273
+
+FX3Mute : 274
+
+FX3Mix : 275
+
+FX4 : 276
+
+FX4Mute : 277
+
+FX4Mix : 278
+
+FX1MixState : 279
+
+FX1EnableState : 280
+
+FX1MixTypeState : 281
+
+FX2MixState : 282
+
+FX2EnableState : 283
+
+FX2MixTypeState : 284
+
+FX3MixState : 285
+
+FX3EnableState : 286
+
+FX3MixTypeState : 287
+
+FX4MixState : 288
+
+FX4EnableState : 289
+
+AmpEnableState : 290
+
+GateEnableState : 291
+
+SpkSimEnableState : 292
+
+FX4MixTypeState : 293
+
+SpkSimTypeState : 294
+
+ThreshState : 295
+
+FX4WetSendState : 296
+
+AmpStereoToggle : 297
+
+FX4WetSend : 298
+
+AmpEnable : 299
+
+FX3MixType : 300
+
+FX2MixType : 301
+
+FX3Enable : 302
+
+FX2Enable : 303
+
+FX1Enable : 304
+
+FX1MixType : 305
+
+FX4Enable : 306
+
+FX4MixType : 307
+
+Tuner : 308
+
+ReferenceState : 309
+
+PeriodState : 310
+
+EnableState : 311
+
+Reference : 312
+
+Period : 313
+
+Enable : 314
+
+Y2Main : 315
+
+GuitarProc : 316
+
+GuitarEQL : 317
+
+DEQ_L_GT : 318
+
+AudioEQL : 319
+
+DEQ_L : 320
+
+AudioEQR : 321
+
+DEQ_R : 322
+
+GuitarEQR : 323
+
+DEQ_R_GT : 324
+
+TunerReferenceState : 325
+
+OutputLimiterGain : 326
+
+GuitInputGain : 327
+
+MasterVolume : 328
+
+GuitarProcEnable : 329
+
+AudioMixLevel : 330
+
+AudioVolume : 331
+
+UsbInSel : 332
+
+GuitProcInputGain : 333
+
+TunerReference : 334
+
+TunerEnable : 335
+
+GuitProcOutputGain : 336
+
+USBOutLevel : 337
+
+USBInLevel : 338
+
+AudioEQEnable : 339
+
+HPOutputLimiterGain : 340
+
+GuitarVolume : 341
+
+OutputLimiterEnable : 342
+
+DEQEnable : 343
+
+DEQGTEnable : 344
+
+ExtendedStereoEnable : 345
+
+GuitarVolPad : 346
+
+OutputLimiterDecay : 347
+
+OutputLimiterAtk : 348
+
+OutputLimiterTh : 349
+
+HPEnable : 350
+
+GuitarMute : 351
+
+HPOutputLimiterTubeGain : 352
+
+WideStereoWidth : 353
+
+GuitarDIEnable : 354
+
+GtInAdjGain : 355
+
+BluetoothInLevel : 356
+
+AuxInLevel : 357
+
+GuitarCenter : 358
+
+UsbOutSel : 359
+
+GuitarEQEnable : 360
+
+UsbEchoBackEnable : 361
+
+Order : 362
+
+Connection : 363
+
+Type1 : 364
+
+Fc : 365
+
+Gain1_dB : 366
+
+Q : 367
+
+Level1 : 368
+
+Type2 : 369
+
+Gain2_dB : 370
+
+Level2 : 371
+
+SHIFT : 372
