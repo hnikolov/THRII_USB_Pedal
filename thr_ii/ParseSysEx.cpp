@@ -1422,7 +1422,8 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 result+="\n\rDoing Patch Set All:\n\r";
                                 _state = States::St_idle;
                                 //Set constans from symbol table
-                                patch_setAll(dump,dump_len); //using dump_len, that does not include the 4  32-Bit-values 0 0 1 0 )
+                                patch_setAll(dump, dump_len); // Using dump_len, that does not include the 4  32-Bit-values 0 0 1 0 )
+                                userPresetDownloaded = true;  // Flag that this settings have to be copied to the local array of 5 user presets
                             }
                             else if (symboldump)
                             {

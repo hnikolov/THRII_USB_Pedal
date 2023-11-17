@@ -191,6 +191,7 @@ class THR30II_Settings stored_THR_Values;    // Stored settings, when applying a
 class THR30II_Settings THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5;
 std::array< THR30II_Settings, 5 > thr_user_presets = {{ THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5 }};
 
+// TODO: Why static volatile?
 static volatile int16_t presel_patch_id;   	 // ID of actually pre-selected patch (absolute number)
 static volatile int16_t active_patch_id;   	 // ID of actually selected patch     (absolute number)
 static volatile bool send_patch_now = false; // pre-select patch to send (false) or send immediately (true)
@@ -198,6 +199,8 @@ static volatile bool send_patch_now = false; // pre-select patch to send (false)
 static std::vector <String> libraryPatchNames; // All the names of the patches stored on SD-card or in PROGMEN
 
 static volatile uint16_t npatches = 0; // Counts the patches stored on SD-card or in PROGMEN
+
+int8_t nUserPreset = -1; // Used to cycle the THRII User presets
 
 #if USE_SDCARD
 	std::vector<std::string> patchesII; // patches are read in dynamically, not as a static PROGMEM array
@@ -774,6 +777,22 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 					break;
 
 					case 6:
+            // TODO: Checking the approach
+            nUserPreset++;
+            if( nUserPreset > 4 ) { nUserPreset = 0; }
+            if( thr_user_presets[nUserPreset].getActiveUserSetting() == -1 )
+            {
+              Serial.println("No data available for a User preset " + String(nUserPreset));
+            }
+            else
+            {
+              // Switch to the selected user preset by creating a patch and uploading to the THRII
+              stored_THR_Values = thr_user_presets[nUserPreset];
+              Serial.println("To upload User preset #" + String(stored_THR_Values.getActiveUserSetting()) + " " + stored_THR_Values.getPatchName());
+              // Setting this should not be needed
+              //THR_Values.thrSettings = false; // Important only during the first user setting activation (or by pressing one of the user memory buttond on the amp)
+              patch_deactivate();
+            }
 						maskUpdate=true;  //request display update to show new states quickly
 						button_state=0;  //remove flag, because it is handled
 					break;
@@ -4318,8 +4337,20 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
 	if (inqueue.item_count() > 0)
 	{
 		SysExMessage msg (inqueue.dequeue());
+    // CHECK: If ParseSysEx() is called without printing the result, some timeout occurs, Are we too quick?
 		Serial.println("Work. Tmr: " + THR_Values.ParseSysEx(msg.getData(), msg.getSize()));
 		//THR_Values.ParseSysEx(msg.getData(),msg.getSize());
+    if( THR_Values.userPresetDownloaded )
+    {
+      THR_Values.userPresetDownloaded = false;
+      int idx = THR_Values.getActiveUserSetting();
+      Serial.println("Work. Tmr: User preset #" + String(idx) + " " + THR_Values.getPatchName() + " to be copied");
+      if( idx >= 0 && idx <= 5 )
+      {
+        thr_user_presets[idx] = THR_Values; // THR30II_Settings class is deep copyable
+        Serial.println("Done");
+      }
+    }
 
 		if( !maskActive )
 		{

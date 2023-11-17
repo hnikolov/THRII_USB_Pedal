@@ -481,6 +481,9 @@ class THR30II_Settings
   THR30II_CAB cab = British_4x12; // Field for the simulated cabinet
 
   bool thrSettings = true; // When first connected, before any user preset is selected from the THR amp, the GUI shows: "THR Panel"
+  // Use this to copy current settings (just downloaded from thrii) to one of the 5 local settings
+  // Set after patch_setAll() and cleared after the copy in WorkingTimer_Tick()
+  bool userPresetDownloaded = false;
 
   private:
 	bool MIDI_Activated = false; // Set true, if MIDI unlocked by magic key (success checked by receiving first regular THR-SysEx)
@@ -506,7 +509,7 @@ class THR30II_Settings
   // THR30II_COL col; // Field for the simulation collection (BOUTIQUE, CLASSIC, MODERN)
   // THR30II_CAB cab; // Field for the simulated cabinet
 
-  int8_t activeUserSetting;     // Field for the selected user preset's index (0..4 , -1 for none / actual)
+  int8_t activeUserSetting = -1;     // Field for the selected user preset's index (0..4 , -1 for none / actual)
   bool userSettingsHaveChanged; // Field for state of selected user preset
   //bool thrSettings = true;  // When first connected, before any user preset is selected from the THR amp, the GUI shows: "THR Panel"
 
