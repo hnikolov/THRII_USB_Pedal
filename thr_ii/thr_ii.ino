@@ -201,6 +201,7 @@ static std::vector <String> libraryPatchNames; // All the names of the patches s
 static volatile uint16_t npatches = 0; // Counts the patches stored on SD-card or in PROGMEN
 
 int8_t nUserPreset = -1; // Used to cycle the THRII User presets
+bool isUsrPreset = false;
 
 #if USE_SDCARD
 	std::vector<std::string> patchesII; // patches are read in dynamically, not as a static PROGMEM array
@@ -614,6 +615,9 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 	// STATE MACHINE
 	/////////////////////////////////////////////////////////////////////////////////////////
 
+  std::array<byte, 29> ask_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
+            
+
 	//                0        1            2              3        4        5        6                7
 	// enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_edit, UI_save, UI_name, UI_init_act_set, UI_act_vol_sol, UI_patch, UI_ded_sol, UI_pat_vol_sol};
 
@@ -777,24 +781,22 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 					break;
 
 					case 6:
-            // TODO: Checking the approach
             nUserPreset++;
             if( nUserPreset > 4 ) { nUserPreset = 0; }
-            if( thr_user_presets[nUserPreset].getActiveUserSetting() == -1 )
-            {
-              Serial.println("No data available for a User preset " + String(nUserPreset));
-            }
-            else
-            {
-              // Switch to the selected user preset by creating a patch and uploading to the THRII
-              stored_THR_Values = thr_user_presets[nUserPreset];
-              Serial.println("To upload User preset #" + String(stored_THR_Values.getActiveUserSetting()) + " " + stored_THR_Values.getPatchName());
-              // Setting this should not be needed
-              //THR_Values.thrSettings = false; // Important only during the first user setting activation (or by pressing one of the user memory buttond on the amp)
-              patch_deactivate();
-            }
-						maskUpdate=true;  //request display update to show new states quickly
-						button_state=0;  //remove flag, because it is handled
+            
+            THR_Values.setActiveUserSetting(nUserPreset);
+            THR_Values.setUserSettingsHaveChanged(false);
+            THR_Values.thrSettings = false;
+            isUsrPreset = true;
+
+            Serial.println("Requesting data for User preset #" + String(nUserPreset));
+
+            ask_preset_buf[22] = (byte)nUserPreset;
+            // TODO: Id 88 leads to timeout during handling, needs to be fixed, I have no sufficient knowledge yet...
+            outqueue.enqueue(Outmessage(SysExMessage(ask_preset_buf.data(), ask_preset_buf.size()), 88, false, true));
+            
+						maskUpdate = true; // Request display update to show new states quickly
+						button_state = 0;  // Remove flag, because it is handled
 					break;
 
 					case 7: // Toggle dynamics
@@ -2008,6 +2010,11 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 byte THR30II_Settings::UseSysExSendCounter() // Returns the actual counter value and increments it afterwards
 {
   return (SysExSendCounter++) % 0x80;  // Cycles to 0, if more than 0x7f
+}
+
+void THR30II_Settings::setActiveUserSetting(int8_t val) // Setter for number of the active user setting
+{
+	activeUserSetting = val;
 }
 
 int8_t THR30II_Settings::getActiveUserSetting() // Getter for number of the active user setting
@@ -4348,7 +4355,16 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
       if( idx >= 0 && idx <= 5 )
       {
         thr_user_presets[idx] = THR_Values; // THR30II_Settings class is deep copyable
+        nUserPreset = idx;
         Serial.println("Done");
+
+        // Activate the patch
+        if( isUsrPreset )
+        {
+          isUsrPreset = false;
+          stored_THR_Values = THR_Values;
+          patch_deactivate();
+        }
       }
     }
 

@@ -302,6 +302,7 @@ class THR30II_Settings
 	String getPatchName();
 	void updateStatusMask(uint8_t x, uint8_t y);
 	void updateConnectedBanner();  // Show the connected Model 
+	void setActiveUserSetting(int8_t val); // Setter for number of the active user setting
 	int8_t getActiveUserSetting(); // Getter for number of the active user setting
 	bool getUserSettingsHaveChanged(); // Getter for state of user Settings
   void setUserSettingsHaveChanged(bool changed);
@@ -317,6 +318,8 @@ class THR30II_Settings
   void SetGuitarVol(uint16_t _g_vol);
   void SetAudioVol(uint16_t _a_vol);
 
+  void obtain_user_presets();
+  
 	String ParseSysEx(const byte cur[], int cur_len);
 	
   // --------- FUNCTION FOR SENDING COL/AMP SETTING TO THR30II -----------------
