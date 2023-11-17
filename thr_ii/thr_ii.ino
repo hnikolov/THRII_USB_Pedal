@@ -787,14 +787,22 @@ void loop() // Infinite working loop:  check midi connection status, poll button
             THR_Values.setActiveUserSetting(nUserPreset);
             THR_Values.setUserSettingsHaveChanged(false);
             THR_Values.thrSettings = false;
-            isUsrPreset = true;
 
-            Serial.println("Requesting data for User preset #" + String(nUserPreset));
+            if(thr_user_presets[nUserPreset].getActiveUserSetting() == -1)
+            {
+              isUsrPreset = true;
 
-            ask_preset_buf[22] = (byte)nUserPreset;
-            // TODO: Id 88 leads to timeout during handling, needs to be fixed, I have no sufficient knowledge yet...
-            outqueue.enqueue(Outmessage(SysExMessage(ask_preset_buf.data(), ask_preset_buf.size()), 88, false, true));
-            
+              Serial.println("Requesting data for User preset #" + String(nUserPreset));
+
+              ask_preset_buf[22] = (byte)nUserPreset;
+              // TODO: Id 88 leads to timeout during handling, needs to be fixed, I have no sufficient knowledge yet...
+              outqueue.enqueue(Outmessage(SysExMessage(ask_preset_buf.data(), ask_preset_buf.size()), 88, false, true));
+            }
+            else
+            {
+              stored_THR_Values = thr_user_presets[nUserPreset];
+              patch_deactivate();
+            }
 						maskUpdate = true; // Request display update to show new states quickly
 						button_state = 0;  // Remove flag, because it is handled
 					break;
@@ -4354,6 +4362,7 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
       Serial.println("Work. Tmr: User preset #" + String(idx) + " " + THR_Values.getPatchName() + " to be copied");
       if( idx >= 0 && idx <= 5 )
       {
+        // Store latest user preset settings localy
         thr_user_presets[idx] = THR_Values; // THR30II_Settings class is deep copyable
         nUserPreset = idx;
         Serial.println("Done");
