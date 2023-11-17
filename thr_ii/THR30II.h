@@ -554,7 +554,7 @@ class THR30II_Settings
 	// THR30II_ECHO_TYPES echotype = TAPE_ECHO;
 
   // Yamaha THRII models names
-  String THRxxII_MODEL_NAME();
+  String THRII_MODEL_NAME();
 
 	uint32_t Tnid;          // Global from Patch dump
 	uint32_t UnknownGlobal; // Global from Patch dump

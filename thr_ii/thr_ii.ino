@@ -578,7 +578,7 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 				midi_connected = true;  // A Midi Device is connected now. Proof later, if it is a THR30II
 			
 				drawConnIcon(midi_connected);
-				drawPatchName(TFT_SKYBLUE, "THR Panel");
+				drawPatchName(TFT_SKYBLUE, "INITIALIZING");
 
 				maskActive=true;  // Tell GUI that it must show the settings mask
 				// drawStatusMask(0,85); //y-position results from height of the bar-diagram, that is drawn bound to lowest display line
@@ -3542,7 +3542,7 @@ void THR30II_Settings::SendTypeSetting(THR30II_UNITS unit, uint16_t val) //Send 
 // 00 24 00 01: THR10IIWireless = 235929710 ("device" in thrl6p-file)
 // 00 24 00 02: THR30IIWireless = 235929810 ("device" in thrl6p-file)
 // 00 24 00 03: THR30IIAcousticWireless = 235929910 ("device" in thral6p-file)
-String THR30II_Settings::THRxxII_MODEL_NAME()
+String THR30II_Settings::THRII_MODEL_NAME()
 { 
 	switch(ConnectedModel) 
 	{
@@ -3559,7 +3559,7 @@ String THR30II_Settings::THRxxII_MODEL_NAME()
 			break;
 		
 		case 0x00240003:
-			return String("THR10II-WA");
+			return String("THR30II-WA");
 			break;
 
 		default:
@@ -4282,7 +4282,10 @@ void THR30II_Settings::updateStatusMask(uint8_t x, uint8_t y)
 	  case UI_home_amp: // !patchActive
     	if( THR_Values.thrSettings )
 			{
-				s2 = "THR Panel";
+				//s2 = "THR Panel";
+        s2 = THRII_MODEL_NAME();
+        if( s2 != "None") { s2 += " PANEL";       }
+        else              { s2 = "NOT CONNECTED"; }
 				drawPatchName(TFT_SKYBLUE, s2, boost_activated);
 			}
 			else if( THR_Values.getUserSettingsHaveChanged() )

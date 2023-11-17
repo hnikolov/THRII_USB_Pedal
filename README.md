@@ -31,10 +31,12 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
 - ST7789 controller is selected and SPI is configured in User_Setup.h of TFT_eSPI library source!
 
 
-**BEHAVIOUR AFTER INITIAL COMMIT**
+**CURRENT BEHAVIOUR**
 - No analogue input support (for now)
 - The AudioVolume and GuitarVolume parameters are shown as bars (GA) on the right part of the TFT screen i.s.o. the analogue pedals values (P).
-- At start-up and connection with THR, GUI shows "THR Local". It changes to a User preset name when selected from the THRII amp
+- At start-up and connection with THR, GUI shows "INITIALIZING" and then "*THR* PANEL". 
+  It checks and prints the actual THR name, e.g., in my case *THR* = **THR10II-W**.   
+  It changes to a User preset name when selected from the THRII amp or by pressing Button 6.
 - The GUI continues to work even THR is disconnected after that (useful to test pure GUI features)
 - User preset name changes to orange + (*) when settings are changed
   - This status is remembered (in the original code it was not)
@@ -49,8 +51,10 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
   - If hold - switch to "load patch immediately" - no need to press button 1 to do so
 - Button 5: patch select increment by 1
   - If hold - patch select increment by 5
-- Button 6: N/A
-  - It was switching to the empty 'Edit' mode - removed for now
+- Button 6: Cycle through the User presets (1-5) in the THRII amp
+  - If (and initially) a User preset settings are not available on the pedal board, then it is requested, stored locally, and uploaded back as a patch (not ideal)
+  - If a User preset button on THRII is pressed, the preset settings are stored locally, so next time the same preset is selected (via Button 6), the settings are not requested again. Only a corresponding patch is uploaded to THRII
+  - TODO: How to activate User preset via the MIDI interface without the need to create a patch and loaded to THRII?
 - Button 7: On/off of selected: Comp/Gate/Boost switch
   - If hold - select (cycle through) Comp/Gate/Boost switch
 - Boost function uses Master (was Gain)
