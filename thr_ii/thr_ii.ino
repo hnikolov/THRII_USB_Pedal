@@ -590,8 +590,10 @@ void loop() // Infinite working loop:  check midi connection status, poll button
   {
     // Display "MIDI" icon in RED (because connection was lost)
 	 	midi_connected = false;  // This will lead to Re-Send-Out of activation SysEx's
-// Hristo		_uistate=UI_idle;        // Re-initialize UI state machine
-		THR_Values.ConnectedModel = 0x00000000;
+    // TODO: All this mechanism of re-connecting needs a review, WiP
+		THR_Values.ConnectedModel = 0x00000000; // TODO: This will lead to show "NOT CONNECTED"
+    _uistate = UI_home_amp;                 //
+    THR_Values.thrSettings = true;          //
 		drawConnIcon(midi_connected);
   } // of: if(midi_connected)
 		
@@ -795,7 +797,6 @@ void loop() // Infinite working loop:  check midi connection status, poll button
               Serial.println("Requesting data for User preset #" + String(nUserPreset));
 
               ask_preset_buf[22] = (byte)nUserPreset;
-              // TODO: Id 88 leads to timeout during handling, needs to be fixed, I have no sufficient knowledge yet...
               outqueue.enqueue(Outmessage(SysExMessage(ask_preset_buf.data(), ask_preset_buf.size()), 88, false, true));
             }
             else
@@ -3612,7 +3613,8 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id)
 			{
 				if( i == THR_Values.getActiveUserSetting() + 1 )
 				{
-					iconcolour = TFT_SKYBLUE; // Highlight active patch icon
+          // Note: if user preset is selected and parameter is changed via THRII, then getActiveUserSetting() returns -1
+					iconcolour = TFT_SKYBLUE; // Highlight active user preset patch icon
 				}
 				else if( i == presel_patch_id )
 				{
@@ -4300,27 +4302,7 @@ void THR30II_Settings::updateStatusMask(uint8_t x, uint8_t y)
 				drawPatchName(TFT_SKYBLUE, s2, boost_activated);
 			}
 	 	break;
-    /*    
-	  case UI_home_amp: // !patchActive
-		  // If unchanged User Memory setting is active:	
-			if( THR_Values.getActiveUserSetting() != -1 && !THR_Values.getUserSettingsHaveChanged() )
-			{
-				// Update GUI status line
-				s2 = THR_Values.getPatchName();
-				drawPatchName(TFT_SKYBLUE, s2);
-			}
-			else if( THR_Values.getUserSettingsHaveChanged() )
-			{
-				s2 = THR_Values.getPatchName() + "(*)";
-				drawPatchName(ST7789_ORANGERED, s2);
-			}
-			else
-			{
-				s2 = "THR Panel";
-				drawPatchName(TFT_SKYBLUE, s2);
-			}
-	 	break;
-    */
+
 		case UI_home_patch:	// Patch is active
 			// If unchanged User Memory setting is active:
 			if( !THR_Values.getUserSettingsHaveChanged() )

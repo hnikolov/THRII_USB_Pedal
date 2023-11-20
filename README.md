@@ -32,6 +32,7 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
 
 
 **CURRENT BEHAVIOUR**
+- LED strip support removed, was in BuhJuhWuh version
 - No analogue input support (for now)
 - The AudioVolume and GuitarVolume parameters are shown as bars (GA) on the right part of the TFT screen i.s.o. the analogue pedals values (P).
 - At start-up and connection with THR, GUI shows "INITIALIZING" and then "*THR* PANEL". 
