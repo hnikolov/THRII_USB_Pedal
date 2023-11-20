@@ -131,26 +131,8 @@ File32 file;
 #define TRACE_V_THR30IIPEDAL(x) x	 // trace on
 // #define TRACE_V_THR30IIPEDAL(x) // trace off
 
-// Define other input/output pins ///// TO BE REMOVED //////////
-//#define LED_PIN       		12
-//#define PEDAL_1_PIN       	24
-//#define PEDAL_2_PIN       	25
-//#define PEDAL_1_SENSE_PIN 	26
-//#define PEDAL_2_SENSE_PIN 	27
-
-//const uint8_t pedal_buf_size = 10;
-//uint16_t pedal_1_buf[pedal_buf_size];
-//uint16_t pedal_2_buf[pedal_buf_size];
-//uint16_t pedal_1_sum = 0;
-//uint16_t pedal_2_sum = 0;
-uint16_t pedal_1_val = 0; // TODO Used to represent Guitar Volume
-uint16_t pedal_2_val = 0; // TODO Used to represent Audio Volume
-//uint16_t pedal_1_old_val = 0;
-//uint16_t pedal_2_old_val = 0;
-//uint16_t pedal_margin = 1;
-//bool pedal_1_sense = 0;
-//bool pedal_2_sense = 0;
-////////////////////////////////////////////////
+uint16_t guitar_volume = 0;
+uint16_t audio_volume  = 0;
 
 // Used in the FSM
 enum ampSelectModes {COL, AMP, CAB};
@@ -212,7 +194,7 @@ int8_t nUserPreset = -1; // Used to cycle the THRII User presets
 
 uint32_t msgcount = 0;
 
-// Family-ID 24, Model-Nr: 1 = THR10II
+// Family-ID 24, Model-Nr: 1 = THR10II-W
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // SETUP
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -495,13 +477,13 @@ void timing()
 	{
 	  if( maskActive )
 		{
-		// THR_Values.updateConnectedBanner();
-		  THR_Values.updateStatusMask(0,85);
+		  THR_Values.updateStatusMask(0, 85);
 		  tick2 = millis(); // Start new waiting period
 		  return;
 		}
 	}
 
+/*
 	if( millis() - tick3 > 1500 ) // Switch back to mask or selected patchname after showing preselected patchname for a while
 	{		
 		if( preNameActive ) // NOT implemented yet
@@ -517,7 +499,7 @@ void timing()
 			return;	
 		}
 	}
-
+*/
 //	 if(millis()-tick4>3500)  //force to get all actual settings by dump request
 //	 {
 //	    if(maskActive)
@@ -608,12 +590,6 @@ void loop() // Infinite working loop:  check midi connection status, poll button
   // Should be called every 4-5ms or faster, for the default debouncing time of ~20ms.
   for (uint8_t i = 0; i < NUM_BUTTONS; i++) { buttons[i].check(); }
 	
-	//if (tickpedals >= 50)
-	//{
-	//	pollpedalinputs();
-	//	tickpedals = 0;
-	//}
-	
 	/////////////////////////////////////////////////////////////////////////////////////////
 	// STATE MACHINE
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -621,7 +597,10 @@ void loop() // Infinite working loop:  check midi connection status, poll button
   std::array<byte, 29> ask_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
   // Switch to preset #4 (__0x03__)
   std::array<byte, 29> switch_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x08, 0x00, 0x0e, 0x0b, 0x00, 0x0e, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
-            
+  // TODO: Switch col/amp:  Classic Lead
+  // std::array<byte, 29> sendbuf_head = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x00, 0x03, 0x00, 0x00, 0x07, 0x00, 0x08, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
+  // std::array<byte, 29> sendbuf_body = {0xf0, 0x00, 0x01, 0x00, 0x24, 0x00, 0x4d, 0x00, 0x04, 0x00, 0x00, 0x07, 0x04, 0x0c, 0x01, 0x00, 0x00, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
+q
 	//                0        1            2              3        4        5        6                7
 	// enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_edit, UI_save, UI_name, UI_init_act_set, UI_act_vol_sol, UI_patch, UI_ded_sol, UI_pat_vol_sol};
 
@@ -742,6 +721,8 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 							break;
 						}
 						THR_Values.createPatch();
+            //outqueue.enqueue(Outmessage(SysExMessage(sendbuf_head.data(), sendbuf_head.size()), 88, false, false));
+            //outqueue.enqueue(Outmessage(SysExMessage(sendbuf_body.data(), sendbuf_body.size()), 88, false, true));
 						maskUpdate=true;  //request display update to show new states quickly
 						button_state=0;  //remove flag, because it is handled
 					break;
@@ -794,7 +775,7 @@ void loop() // Infinite working loop:  check midi connection status, poll button
             THR_Values.setUserSettingsHaveChanged(false);
             THR_Values.thrSettings = false;
 
-            // Switch to User preset ASAP
+            // Switch to User preset ASAP, TODO: Check for timeouts...
             switch_preset_buf[22] = (byte)nUserPreset;
             outqueue.enqueue(Outmessage(SysExMessage(switch_preset_buf.data(), switch_preset_buf.size()), 88, false, true));
 
@@ -1112,49 +1093,6 @@ void send_init()  //Try to activate THR30II MIDI
 	//#S3 + #S4  will invoke #R4 (seems always the same) "MIDI activate" (works only after ID_Req!)														   
 
 }//end of send_init
-
-//void pollpedalinputs()	// Poll pedal inputs
-//{
-//	pedal_1_sense = !digitalRead(PEDAL_1_SENSE_PIN);  //sense whether pedal 1 present
-//	if (pedal_1_sense) {
-//		pedal_1_old_val = pedal_1_val;
-//		pedal_1_sum = 0;
-//		//for loop to read pedal_buf_size pedal inputs into pedal_1_buf, then average.
-//		for (int i=0; i<pedal_buf_size; i++) {
-//			pedal_1_buf[i] = 1023-analogRead(PEDAL_1_PIN);
-//			pedal_1_sum += pedal_1_buf[i];
-//		}
-//		pedal_1_val = pedal_1_sum/pedal_buf_size;
-//		// pedal_1_val = 1023-analogRead(PEDAL_1_PIN);   //read in pedal 1 input
-//	}
-//	else {
-//		pedal_1_val = 0;
-//	}
-//	if ((pedal_1_val > (pedal_1_old_val + pedal_margin)) || (pedal_1_val < (pedal_1_old_val - pedal_margin))) {
-//		maskUpdate=true;  //request display update to show new states quickly
-//	}
-//
-//  	pedal_2_sense = !digitalRead(PEDAL_2_SENSE_PIN);  //sense whether pedal 2 present
-//  	if (pedal_2_sense) {
-//		pedal_2_old_val = pedal_2_val;
-//		pedal_2_sum = 0;
-//		//for loop to read pedal_buf_size pedal inputs into pedal_2_buf, then average.
-//		for (int i=0; i<pedal_buf_size; i++) {
-//			pedal_2_buf[i] = 1023-analogRead(PEDAL_2_PIN);
-//			pedal_2_sum += pedal_2_buf[i];
-//		}
-//		pedal_2_val = pedal_2_sum/pedal_buf_size;
-//		// pedal_2_val = 1023-analogRead(PEDAL_2_PIN);   //read in pedal 2 input
-//	}
-//	else {
-//		pedal_2_val = 0;
-//	}
-//	if ((pedal_2_val > (pedal_2_old_val + pedal_margin)) || (pedal_2_val < (pedal_2_old_val - pedal_margin))) {
-//		updatemastervolume(pedal_2_val);
-//		// Serial.println(pedal_2_val);
-//		maskUpdate=true;  //request display update to show new states quickly
-//	}
-//}
 
 void updatemastervolume(int mastervolume)
 {
@@ -2759,12 +2697,12 @@ void THR30II_Settings::SetCab(THR30II_CAB _cab) // Setter for the Cabinet Simula
 
 void THR30II_Settings::SetGuitarVol(uint16_t _g_vol)
 {
-    pedal_1_val = _g_vol;
+    guitar_volume = _g_vol;
 }
 
 void THR30II_Settings::SetAudioVol(uint16_t _a_vol)
 {
-    pedal_2_val = _a_vol;
+    audio_volume = _a_vol;
 }
 
 void THR30II_Settings::EchoSetting(uint16_t ctrl, double value) // Setter for the Echo Parameters
@@ -4281,18 +4219,16 @@ void THR30II_Settings::updateStatusMask(uint8_t x, uint8_t y)
 	FXy = 140;
 	drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
 
-  // Exp/vol pedal positions
-  // NOTE: Used to show Guitar and Audio volume values
-  drawPPChart(300, 80, 20, 160, TFT_THRBROWN, TFT_THRCREAM, "VA", pedal_1_val, pedal_2_val);
+  // Show THRII Guitar and Audio volume values
+  drawPPChart(300, 80, 20, 160, TFT_THRBROWN, TFT_THRCREAM, "VA", guitar_volume, audio_volume);
 
-	String s2,s3;
+	String s2, s3;
 	
 	switch( _uistate )
 	{
 	  case UI_home_amp: // !patchActive
     	if( THR_Values.thrSettings )
 			{
-				//s2 = "THR Panel";
         s2 = THRII_MODEL_NAME();
         if( s2 != "None") { s2 += " PANEL";       }
         else              { s2 = "NOT CONNECTED"; }
@@ -4300,7 +4236,7 @@ void THR30II_Settings::updateStatusMask(uint8_t x, uint8_t y)
 			}
 			else if( THR_Values.getUserSettingsHaveChanged() )
 			{
-				s2 = THR_Values.getPatchName(); // "(*)" removed to save space
+				s2 = THR_Values.getPatchName();
 				drawPatchName(ST7789_ORANGERED, s2, boost_activated);
 			}
 			else
@@ -4346,8 +4282,8 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
 	{
 		SysExMessage msg (inqueue.dequeue());
     // CHECK: If ParseSysEx() is called without printing the result, some timeout occurs, Are we too quick?
+		// THR_Values.ParseSysEx(msg.getData(),msg.getSize());
 		Serial.println("Work. Tmr: " + THR_Values.ParseSysEx(msg.getData(), msg.getSize()));
-		//THR_Values.ParseSysEx(msg.getData(),msg.getSize());
     if( THR_Values.userPresetDownloaded )
     {
       THR_Values.userPresetDownloaded = false;
@@ -4365,7 +4301,6 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
 		if( !maskActive )
 		{
 			maskActive = true; // Tell GUI to show Settings mask
-			// drawStatusMask(0, 85);
 		}
 		maskUpdate = true; // Tell GUI to update mask one time because of changed settings       
 	}		
