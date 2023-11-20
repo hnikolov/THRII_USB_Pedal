@@ -39,8 +39,13 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
   It checks and prints the actual THR name, e.g., in my case *THR* = **THR10II-W**.   
   It changes to a User preset name when selected from the THRII amp or by pressing Button 6.
 - The GUI continues to work even THR is disconnected after that (useful to test pure GUI features)
-- User preset name changes to orange + (*) when settings are changed
-  - This status is remembered (in the original code it was not)
+- Patch name color changes to orange when parameter values are changed
+  - Switching patches discard the changes - nothing is stored
+- User preset name color changes to orange when parameter values are changed
+  - The status is remembered when switching between User presets and patches (in the original code it was not)
+  - In the original code '\*' was appended to the name when modified. To save space, this feature is removed
+
+*BUTTONS (Original Layout)*
 - Selecting a patch (Button 1), switches to a patch (white color)
   - Pressing Button 1 again switches to THR settings (THR Local, User preset, or User preset(*))
   - Pressing Button 1 again loads the preselected patch again (reloads, possible parameter changes are lost)
@@ -52,10 +57,11 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
   - If hold - switch to "load patch immediately" - no need to press button 1 to do so
 - Button 5: patch select increment by 1
   - If hold - patch select increment by 5
-- Button 6: Cycle through the User presets (1-5) in the THRII amp
-  - If (and initially) a User preset settings are not available on the pedal board, then it is requested, stored locally, and uploaded back as a patch (not ideal)
-  - If a User preset button on THRII is pressed, the preset settings are stored locally, so next time the same preset is selected (via Button 6), the settings are not requested again. Only a corresponding patch is uploaded to THRII
-  - TODO: How to activate User preset via the MIDI interface without the need to create a patch and loaded to THRII?
+- Button 6 (New): Cycle through the User presets (1-5) in the THRII amp
+  - User preset is selected by sending a command to THRII. The User preset number is shown on THRII display
+  - If (and initially) a User preset settings are not available on the pedal board, then settings are also requested and stored locally
+  - If a User preset button on THRII is pressed, the preset settings are also requested by the pedal board and stored locally
+  - When next time the same preset is selected via Button 6, the settings are not requested again. Only the command to switch to the User preset is sent to THRII. Locally stored settings are used to update the pedal board display. This gives better responsiveness of the GUI
 - Button 7: On/off of selected: Comp/Gate/Boost switch
   - If hold - select (cycle through) Comp/Gate/Boost switch
 - Boost function uses Master (was Gain)
@@ -69,8 +75,8 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
 
 
 **KNOWN ISSUES**
-- Selecting different effects/echoes/reverbs does not change patch name color and does not add '(\*)'
-- When changing what to switch (COMP/GATE/BOOST), it is not clear what has been selected
+- Selecting different effects/echoes/reverbs does not change patch name color
+- When changing what to switch (Button 7 - COMP/GATE/BOOST), it is not clear what has been selected
 - Font size of the patch name is not ideal (currently, using smaller font size instead)
 
 
@@ -80,7 +86,8 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
 - Invert patch name font color and background when Solo switch on
 - When switching from patch to the THRII settings, the THRII (user preset) patch name is shown but the small-font number (0-4) was not
 - At connection, start with 'THR Local' and show the (large-font) number of the preselected patch (1), was (-1)
-
+- Select User presets from the pedal board (number of preset to be on the THR display)
+  - Currently sends a complete patch to be loaded as active settings
 
 **TODOs**
 - Refactor: Move code to different files: SDCard, FSM, etc.
@@ -88,8 +95,6 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
 - Define different FSMs as functions, currently fsm is in the loop() function
 - Use Family ID and model number: obtain after connection and use in communication
   - In this way, all THRxII flavour should be supported
-- Select User presets from the pedal board (number of preset to be on the THR display)
-  - Currently sends a complete patch to be loaded as active settings
 - Add new fonts - currently facing problems with this :(
 - Cannot switch THRII amp/col without calling createPatch() 
   - Can switch from Boom SendSX Midi SW sending hex data. The 'same' data does not switch amp/col when sent from Teensy
