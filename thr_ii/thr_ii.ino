@@ -187,7 +187,9 @@ class THR30II_Settings stored_THR_Values;    // Stored settings, when applying a
 //class THR30II_Settings stored_Patch_Values;  // Stored settings of a (modified) patch, when applying a solo (to be able to restore them later on)
 
 // Initialize in the beginning with the stored presets in the THRII. Use them to switch between them from the pedal board
-// TODO: Can we just send command to activate a stored in the THRII preset?
+// NOTE: We can just send command to activate a stored in the THRII preset. However, still we need to obtain the parameters settings in ordert o update the display
+// Current behavior: The first time usere preset is selected from the pedal board, it switched the preset on the THRII and request the settings for the display
+//                   Next time, switch to the user preset via command and use the local THR_Values_x data to update the display - it is faster this way
 class THR30II_Settings THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5;
 std::array< THR30II_Settings, 5 > thr_user_presets = {{ THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5 }};
 
@@ -201,7 +203,6 @@ static std::vector <String> libraryPatchNames; // All the names of the patches s
 static volatile uint16_t npatches = 0; // Counts the patches stored on SD-card or in PROGMEN
 
 int8_t nUserPreset = -1; // Used to cycle the THRII User presets
-bool isUsrPreset = false;
 
 #if USE_SDCARD
 	std::vector<std::string> patchesII; // patches are read in dynamically, not as a static PROGMEM array
@@ -618,8 +619,9 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 	/////////////////////////////////////////////////////////////////////////////////////////
 
   std::array<byte, 29> ask_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
+  // Switch to preset #4 (__0x03__)
+  std::array<byte, 29> switch_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x08, 0x00, 0x0e, 0x0b, 0x00, 0x0e, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
             
-
 	//                0        1            2              3        4        5        6                7
 	// enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_edit, UI_save, UI_name, UI_init_act_set, UI_act_vol_sol, UI_patch, UI_ded_sol, UI_pat_vol_sol};
 
@@ -783,6 +785,8 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 					break;
 
 					case 6:
+            // Create a function activate_user_preset(nr)
+            _uistate = UI_home_amp;
             nUserPreset++;
             if( nUserPreset > 4 ) { nUserPreset = 0; }
             
@@ -790,19 +794,23 @@ void loop() // Infinite working loop:  check midi connection status, poll button
             THR_Values.setUserSettingsHaveChanged(false);
             THR_Values.thrSettings = false;
 
+            // Switch to User preset ASAP
+            switch_preset_buf[22] = (byte)nUserPreset;
+            outqueue.enqueue(Outmessage(SysExMessage(switch_preset_buf.data(), switch_preset_buf.size()), 88, false, true));
+
+            // Request User preset data if not already done
             if(thr_user_presets[nUserPreset].getActiveUserSetting() == -1)
             {
-              isUsrPreset = true;
-
               Serial.println("Requesting data for User preset #" + String(nUserPreset));
 
+              // Store to THR_Values and thr_user_presets[nUserPreset]
               ask_preset_buf[22] = (byte)nUserPreset;
               outqueue.enqueue(Outmessage(SysExMessage(ask_preset_buf.data(), ask_preset_buf.size()), 88, false, true));
             }
             else
             {
-              stored_THR_Values = thr_user_presets[nUserPreset];
-              patch_deactivate();
+              // Just update the display with the User preset data
+              THR_Values = thr_user_presets[nUserPreset];
             }
 						maskUpdate = true; // Request display update to show new states quickly
 						button_state = 0;  // Remove flag, because it is handled
@@ -4351,14 +4359,6 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
         thr_user_presets[idx] = THR_Values; // THR30II_Settings class is deep copyable
         nUserPreset = idx;
         Serial.println("Done");
-
-        // Activate the patch
-        if( isUsrPreset )
-        {
-          isUsrPreset = false;
-          stored_THR_Values = THR_Values;
-          patch_deactivate();
-        }
       }
     }
 
