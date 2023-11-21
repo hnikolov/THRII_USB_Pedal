@@ -131,8 +131,9 @@ File32 file;
 #define TRACE_V_THR30IIPEDAL(x) x	 // trace on
 // #define TRACE_V_THR30IIPEDAL(x) // trace off
 
-uint16_t guitar_volume = 0;
-uint16_t audio_volume  = 0;
+// Moved to the THR30II_Settings class
+//uint16_t guitar_volume = 0;
+//uint16_t audio_volume  = 0;
 
 // Used in the FSM
 enum ampSelectModes {COL, AMP, CAB};
@@ -659,6 +660,8 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 						switch(amp_select_mode)
 						{
 							case COL:
+                THR_Values.next_col();
+                /*
 								switch(THR_Values.col)
 								{
 									case CLASSIC:	 THR_Values.col = BOUTIQUE;	break;
@@ -670,11 +673,14 @@ void loop() // Infinite working loop:  check midi connection status, poll button
                 //THR_Values.SetColAmp(THR_Values.col, THR_Values.amp);
                 //THR_Values.SendColAmp();
                 //THR_Values.sendChangestoTHR = false;
+                */
                 Serial.println("Amp collection switched to: " + String(THR_Values.col));
 							break;
 
 							case AMP:
-								switch(THR_Values.amp)
+                THR_Values.next_amp();
+								/*
+                switch(THR_Values.amp)
 								{
 									case CLEAN:		THR_Values.amp = CRUNCH;	break;
 									case CRUNCH:	THR_Values.amp = LEAD;		break;
@@ -689,10 +695,13 @@ void loop() // Infinite working loop:  check midi connection status, poll button
                 //THR_Values.sendChangestoTHR = true;
                 //THR_Values.SetColAmp(THR_Values.col, THR_Values.amp);
                 //THR_Values.sendChangestoTHR = false;
+                */
                 Serial.println("Amp type switched to: " + String(THR_Values.amp));
 							break;
 
 							case CAB:
+                THR_Values.next_cab();
+                /*
 								switch(THR_Values.cab)
 								{
 									case British_4x12:		THR_Values.cab = American_4x12;		break;
@@ -717,7 +726,8 @@ void loop() // Infinite working loop:  check midi connection status, poll button
                 //THR_Values.sendChangestoTHR = true;
                 //THR_Values.SendCab(); // This works
                 //THR_Values.sendChangestoTHR = false;
-								Serial.println("Cabinet switched to: " + String(THR_Values.cab));
+								*/
+                Serial.println("Cabinet switched to: " + String(THR_Values.cab));
 							break;
 						}
 						THR_Values.createPatch();
@@ -3482,6 +3492,104 @@ void THR30II_Settings::SendTypeSetting(THR30II_UNITS unit, uint16_t val) //Send 
 
 	//ToDO:  Set Wait for ACK
  */
+}
+
+void THR30II_Settings::next_col()
+{
+  switch(col)
+  {
+    case CLASSIC:	 col = BOUTIQUE; break;
+    case BOUTIQUE: col = MODERN; 	 break;
+    case MODERN:	 col = CLASSIC;  break;
+  }
+}
+
+void THR30II_Settings::prev_col()
+{
+  switch(col)
+  {
+    case CLASSIC:	 col = MODERN;   break;
+    case BOUTIQUE: col = CLASSIC;  break;
+    case MODERN:	 col = BOUTIQUE; break;
+  }
+}
+
+void THR30II_Settings::next_amp()
+{
+  switch(amp)
+  {
+    case CLEAN:		amp = CRUNCH;	 break;
+    case CRUNCH:	amp = LEAD;		 break;
+    case LEAD:		amp = HI_GAIN; break;
+    case HI_GAIN:	amp = SPECIAL; break;
+    case SPECIAL:	amp = BASS;		 break;
+    case BASS:		amp = ACO;	   break;
+    case ACO:	    amp = FLAT;		 break;
+    case FLAT:		amp = CLEAN;   break;
+  }
+}
+
+void THR30II_Settings::prev_amp()
+{
+  switch(amp)
+  {
+    case CLEAN:		amp = FLAT;    break;
+    case CRUNCH:	amp = CLEAN;   break;
+    case LEAD:		amp = CRUNCH;  break;
+    case HI_GAIN:	amp = LEAD;	   break;
+    case SPECIAL:	amp = HI_GAIN; break;
+    case BASS:		amp = SPECIAL; break;
+    case ACO:		  amp = BASS;	   break;
+    case FLAT:		amp = ACO;	   break;
+  }
+}
+
+void THR30II_Settings::next_cab()
+{
+  switch(cab)
+  {
+    case British_4x12:	  cab = American_4x12;   break;
+    case American_4x12:	  cab = Brown_4x12;      break;
+    case Brown_4x12:	    cab = Vintage_4x12;	   break;
+    case Vintage_4x12:	  cab = Fuel_4x12;	     break;
+    case Fuel_4x12:		    cab = Juicy_4x12;	     break;
+    case Juicy_4x12:	    cab = Mods_4x12;       break;
+    case Mods_4x12:		    cab = American_2x12;   break;
+    case American_2x12:	  cab = British_2x12;	   break;
+    case British_2x12:	  cab = British_Blues;   break;
+    case British_Blues:	  cab = Boutique_2x12;   break;
+    case Boutique_2x12:	  cab = Yamaha_2x12;	   break;
+    case Yamaha_2x12:	    cab = California_1x12; break;
+    case California_1x12: cab = American_1x12;   break;
+    case American_1x12:	  cab = American_4x10;   break;
+    case American_4x10:	  cab = Boutique_1x12;   break;
+    case Boutique_1x12:	  cab = Bypass;		       break;
+    case Bypass:		      cab = British_4x12;	   break;
+  }
+}
+
+void THR30II_Settings::prev_cab()
+{
+  switch(cab)
+  {
+    case British_4x12:	  cab = Bypass;          break;
+    case American_4x12:	  cab = British_4x12;    break;
+    case Brown_4x12:	    cab = American_4x12;   break;
+    case Vintage_4x12:	  cab = Brown_4x12;      break;
+    case Fuel_4x12:		    cab = Vintage_4x12;	   break;
+    case Juicy_4x12:      cab = Fuel_4x12;	     break;
+    case Mods_4x12:	      cab = Juicy_4x12;	     break;
+    case American_2x12:	  cab = Mods_4x12;       break;
+    case British_2x12:	  cab = American_2x12;   break;
+    case British_Blues:	  cab = British_2x12;	   break;
+    case Boutique_2x12:	  cab = British_Blues;   break;
+    case Yamaha_2x12:	    cab = Boutique_2x12;   break;
+    case California_1x12: cab = Yamaha_2x12;	   break;
+    case American_1x12:	  cab = California_1x12; break;
+    case American_4x10:	  cab = American_1x12;   break;
+    case Boutique_1x12:	  cab = American_4x10;   break;
+    case Bypass:		      cab = Boutique_1x12;   break; 
+  }
 }
 
 // THRII Model:

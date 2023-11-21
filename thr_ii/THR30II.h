@@ -318,7 +318,12 @@ class THR30II_Settings
   void SetGuitarVol(uint16_t _g_vol);
   void SetAudioVol(uint16_t _a_vol);
 
-  void obtain_user_presets();
+  void next_col();
+  void prev_col();
+  void next_amp();
+  void prev_amp();
+  void next_cab();
+  void prev_cab();
   
 	String ParseSysEx(const byte cur[], int cur_len);
 	
@@ -487,6 +492,9 @@ class THR30II_Settings
   // Use this to copy current settings (just downloaded from thrii) to one of the 5 local settings
   // Set after patch_setAll() and cleared after the copy in WorkingTimer_Tick()
   bool userPresetDownloaded = false;
+
+  uint16_t guitar_volume = 0;
+  uint16_t audio_volume  = 0;
 
   private:
 	bool MIDI_Activated = false; // Set true, if MIDI unlocked by magic key (success checked by receiving first regular THR-SysEx)
