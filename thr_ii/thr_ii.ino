@@ -83,6 +83,7 @@ uint8_t button_state = 0;
 TFT_eSPI tft = TFT_eSPI(); // Declare object "tft"
 TFT_eSprite spr = TFT_eSprite(&tft); // Declare Sprite object "spr" with pointer to "tft" object
 
+/*
 // Include font definition file (belongs to Adafruit GFX Library )
 //#include <Fonts/FreeSansBold18pt7b.h>
 //#include <Fonts/FreeSansOblique24pt7b.h>
@@ -104,6 +105,7 @@ TFT_eSprite spr = TFT_eSprite(&tft); // Declare Sprite object "spr" with pointer
 //#define AA_FONT_LARGE NotoSansBold36
 #define AA_FONT_LARGE Latin_Hiragana_24
 #define AA_FONT_MONO  NotoSansMonoSCB20 // NotoSansMono-SemiCondensedBold 20pt
+*/
 
 // Set USE_SDCARD to 1 to use SD card reader to read from patch a patch txt file.
 // If USE_SDCARD is set to 0 then the file patches.h is included which needs to 
@@ -137,11 +139,11 @@ File32 file;
 
 // Used in the FSM
 //enum ampSelectModes {COL, AMP, CAB}; // moved to THR30II_Pedal.h
-ampSelectModes amp_select_mode = COL; // Currently used in updateStatusMask()
+//ampSelectModes amp_select_mode = COL; // Currently used in updateStatusMask()
 //enum dynModes {Boost, Comp, Gate};  // moved to THR30II_Pedal.h
 //dynModes dyn_mode = Comp; // declared in FSM_10B_1.cpp
 
-bool boost_activated = 0;
+//bool boost_activated = 0; Moved to the THR30II_Settings class
 //double scaledvolume = 0; // TODO: Can it be a local variable?
 
 USBHost Usb; // On Teensy3.6/4.1 this is the class for the native USB-Host-Interface  
@@ -1081,7 +1083,7 @@ void do_gain_boost()
 	//THR_Values.sendChangestoTHR=true;
 	//THR_Values.SetControl(CTRL_GAIN, min(THR_Values.GetControl(CTRL_GAIN)+40, 100));
 	//THR_Values.sendChangestoTHR=false;
-	boost_activated = true;
+	THR_Values.boost_activated = true;
 }
 
 void undo_gain_boost()
@@ -1090,7 +1092,7 @@ void undo_gain_boost()
 	//THR_Values.sendChangestoTHR=true;
 	//THR_Values.SetControl(CTRL_GAIN, THR_Values.control_store[CTRL_GAIN]);
 	//THR_Values.sendChangestoTHR=false;
-	boost_activated = false;
+	THR_Values.boost_activated = false;
 }
 
 void do_volume_patch() // Increases Volume and/or Tone settings for SOLO to be louder than actual patch
@@ -1137,7 +1139,7 @@ void undo_volume_patch()
 	THR_Values.SetControl( CTRL_TREBLE, THR_Values.control_store[CTRL_TREBLE] );
 	THR_Values.sendChangestoTHR = false;
 }
-
+/*
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // TEMPO TAP TIMING
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1172,7 +1174,7 @@ void THR30II_Settings::EchoTempoTap()
     //EchoSetting(DIGITAL_DELAY, glob["Time"], tempotapsetting);
 	}
 }
-
+*/
 //////////////////////////////////////////////
 // Manage patches activation
 //////////////////////////////////////////////
@@ -1205,7 +1207,7 @@ void patch_activate(uint16_t pnr) // Check patchnumber and send patch as a SysEx
 		TRACE_THR30IIPEDAL(Serial.printf("Patch_activate(): Activating patch #%d \n\r", pnr);)
 		send_patch( pnr ); // Now send this patch as a SysEx message to THR30II 
 		active_patch_id = pnr;
-		boost_activated = false;
+		THR_Values.boost_activated = false;
 		_uistate = UI_home_patch; // State "patch" reached
 	} 
 	else
@@ -1233,7 +1235,7 @@ void send_patch(uint8_t patch_id) // Send a patch from preset library to THRxxII
 		 TRACE_THR30IIPEDAL(Serial.println(F("Send_patch(): Error-Deserial"));)
 	}
 } // End of send_patch()
-
+/*
 int THR30II_Settings::SetLoadedPatch(const DynamicJsonDocument &djd ) // Invoke all settings from a loaded patch
 {
 	if (!MIDI_Activated)
@@ -1242,6 +1244,7 @@ int THR30II_Settings::SetLoadedPatch(const DynamicJsonDocument &djd ) // Invoke 
 		// return -1; // TODO: Shall we return?
 	}
 
+  // TODO: Is this assignment here needed? It is irrelevant for createPatch() call
 	sendChangestoTHR = false; // We apply all the settings in one shot with a MIDI-Patch-Upload to THRII via "createPatch()" 
                             // and not each setting separately. So we use the setters only for our local fields!
 
@@ -1405,7 +1408,8 @@ int THR30II_Settings::SetLoadedPatch(const DynamicJsonDocument &djd ) // Invoke 
 	TRACE_THR30IIPEDAL(Serial.println(F("SetLoadedPatch(): Done setting."));)
 	return 0;
 }
-
+*/
+/*
 THR30II_Settings::States THR30II_Settings::_state = THR30II_Settings::States::St_idle;  // The actual state of the state engine for creating a patch
 
 void THR30II_Settings::createPatch() // Fill send buffer with actual settings, creating a valid SysEx for sending to THR30II
@@ -1930,7 +1934,8 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 	//                 Send it out.
 
 } //End of THR30II_Settings::createPatch()
-
+*/
+/*
 byte THR30II_Settings::UseSysExSendCounter() // Returns the actual counter value and increments it afterwards
 {
   return (SysExSendCounter++) % 0x80;  // Cycles to 0, if more than 0x7f
@@ -1955,7 +1960,8 @@ void THR30II_Settings::setUserSettingsHaveChanged(bool changed) // Setter for st
 {
 	userSettingsHaveChanged = changed;
 }
-
+*/
+/*
 // Tokens to find inside the patch data
 std::map<String, std::vector<byte>> THR30II_Settings::tokens 
 {
@@ -1972,16 +1978,16 @@ std::map<String, std::vector<byte>> THR30II_Settings::tokens
 	{{"PseudoVal"},	  { 0x00, 0x80, 0x07, 0x00 }},   
 	{{"PseudoType"},  { 0x00, 0x80, 0x02, 0x00 }}
 };
-
-static std::map<uint16_t, string_or_ulong> globals; // Global settings from a patch-dump
-std::map<uint16_t, Dumpunit> units; // Ushort value for UnitKey
-uint16_t actualUnitKey = 0, actualSubunitKey = 0;
-static String logg; // The log while analyzing dump
+*/
+//static std::map<uint16_t, string_or_ulong> globals; // Global settings from a patch-dump
+//std::map<uint16_t, Dumpunit> units; // Ushort value for UnitKey
+//uint16_t actualUnitKey = 0, actualSubunitKey = 0;
+//static String logg; // The log while analyzing dump
 
 /////////////////////////////////////////////////////////////////////////////////////
 // patchSetAll()
 /////////////////////////////////////////////////////////////////////////////////////
-
+/*
 // Helper for "patchSetAll()"
 // Check key and following token, if in state "Structure"
 static THR30II_Settings::States checkKeyStructure(byte key[], byte *buf, int buf_len, uint16_t &pt)
@@ -2274,7 +2280,8 @@ THR30II_Settings::States getValueSubunit(byte key[], byte *buf, int buf_len, uin
 	logg += "ValuesSubunit:\n\r";
 	return THR30II_Settings::States::St_valuesSubunit;
 }
-
+*/
+/*
 // Extract all settings from a received dump. returns error code
 int THR30II_Settings::patch_setAll(uint8_t * buf, uint16_t buf_len) 
 {
@@ -2605,7 +2612,7 @@ int THR30II_Settings::patch_setAll(uint8_t * buf, uint16_t buf_len)
 
 	return 0; // Success
 } // end of THR30II_settings::patch_setAll
-
+*/
 ///////////////////////////////////////////////////////////////////////
 // The setters for locally stored THR30II-Settings class
 ///////////////////////////////////////////////////////////////////////
@@ -2613,7 +2620,7 @@ int THR30II_Settings::patch_setAll(uint8_t * buf, uint16_t buf_len)
 // void THR30II_Settings::SetAmp(uint8_t _amp) // No separate setter necessary at the moment
 // {
 // }
-
+/*
 void THR30II_Settings::SetColAmp(THR30II_COL _col, THR30II_AMP _amp) // Setter for the Simulation Collection / Amp
 {
 //	bool changed = false;
@@ -2673,7 +2680,8 @@ void THR30II_Settings::SetAudioVol(uint16_t _a_vol)
 {
     audio_volume = _a_vol;
 }
-
+*/
+/*
 void THR30II_Settings::EchoSetting(uint16_t ctrl, double value) // Setter for the Echo Parameters
 {
 	 EchoSetting(echotype, ctrl, value); // Using setter with actual selected echo type
@@ -3000,7 +3008,8 @@ void THR30II_Settings::ReverbSetting(uint16_t ctrl, double value)  // Using inte
 {
 	ReverbSetting(reverbtype, ctrl, value); // Use actual selected reverbtype
 }
-
+*/
+/*
 void THR30II_Settings::Switch_On_Off_Gate_Unit(bool state) // Setter for switching on / off the effect unit
 {
 	unit[GATE] = state;
@@ -3122,9 +3131,9 @@ void THR30II_Settings::SetPatchName(String nam, int nr) // nr = -1 as default fo
 		CreateNamePatch();
 	}
 }
-
+*/
 //--------- METHOD FOR UPLOADING PATCHNAME TO THR30II -----------------
-
+/*
 void THR30II_Settings::CreateNamePatch() // Fill send buffer with just setting for actual patchname, creating a valid SysEx for sending to THR30II  
 {                                        // uses same algorithm as CreatePatch() - but will only be  o n e  frame!
 	//1.) Make the data buffer (structure and values) store the length.
@@ -3328,7 +3337,8 @@ void THR30II_Settings::CreateNamePatch() // Fill send buffer with just setting f
 	//                 finish with 0xF7
 	//                 Send it out.
 }
-
+*/
+/*
 String THR30II_Settings::getPatchName()
 {
    return patchNames[constrain(activeUserSetting, 0, 5)];
@@ -3346,7 +3356,8 @@ col_amp THR30IIAmpKey_ToColAmp(uint16_t ampkey)
 	}
 	return col_amp{CLASSIC, CLEAN};
 }
-
+*/
+/*
 //---------FUNCTION FOR SENDING COL/AMP SETTING TO THR30II -----------------
 void THR30II_Settings::SendColAmp() // Send COLLLECTION/AMP setting to THR
 {
@@ -3382,15 +3393,15 @@ void THR30II_Settings::SendUnitState(THR30II_UNITS un) //Send unit state setting
 	type_val<uint16_t> tmp = {(byte){0x03}, unit[un]};
 	SendParameterSetting((un_cmd) {THR30II_UNITS_VALS[THR30II_UNITS::GATE].key, THR30II_UNIT_ON_OFF_COMMANDS[un]}, tmp);
 }
-
+*/
 //--------- FUNCTIONS FOR SENDING SETTINGS CHANGES TO THR30II -----------------
-void THR30II_Settings::SendTypeSetting(THR30II_UNITS unit, uint16_t val) //Send setting to THR (Col/Amp or Reverbtype or Effecttype)
-{
-	//This method is not really necessary for the THR30II-Pedal
-	//We need it on the PC where we can change settings separately
-	//
-	//Because with the the pedal settings are changed all together with complete MIDI-patches 
-	//Perhaps for future use: If knobs for switching on/off the units are added?
+//void THR30II_Settings::SendTypeSetting(THR30II_UNITS unit, uint16_t val) //Send setting to THR (Col/Amp or Reverbtype or Effecttype)
+//{
+//	//This method is not really necessary for the THR30II-Pedal
+//	//We need it on the PC where we can change settings separately
+//	//
+//	//Because with the the pedal settings are changed all together with complete MIDI-patches 
+//	//Perhaps for future use: If knobs for switching on/off the units are added?
  /*
 	if (!MIDI_Activated)
 		return;
@@ -3451,8 +3462,8 @@ void THR30II_Settings::SendTypeSetting(THR30II_UNITS unit, uint16_t val) //Send 
 
 	//ToDO:  Set Wait for ACK
  */
-}
-
+//}
+/*
 void THR30II_Settings::next_col()
 {
   switch(col)
@@ -3581,7 +3592,7 @@ String THR30II_Settings::THRII_MODEL_NAME()
 		  break;
 	}
 }
-
+*/
 ArduinoQueue<Outmessage> outqueue(30); // FIFO Queue for outgoing SysEx-Messages to THRII
 
 // Messages, that have to be sent out,
@@ -3594,7 +3605,7 @@ ArduinoQueue<SysExMessage> inqueue(40);
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // UI DRAWING FUNCTIONS
 /////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 void drawPatchID(uint16_t fgcolour, int patchID)
 {
  	int x = 0, y = 0, w = 80, h = 80;
@@ -4341,7 +4352,7 @@ void THR30II_Settings::updateStatusMask(uint8_t x, uint8_t y)
 	}
 	maskUpdate = false; // Tell local GUI that mask has been updated
 }
-
+*/
 void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
 {
 	// Care about queued incoming messages
@@ -4354,6 +4365,7 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
     if( THR_Values.userPresetDownloaded )
     {
       THR_Values.userPresetDownloaded = false;
+      THR_Values.boost_activated = false;
       int idx = THR_Values.getActiveUserSetting();
       Serial.println("Work. Tmr: User preset #" + String(idx) + " " + THR_Values.getPatchName() + " to be copied");
       if( idx >= 0 && idx <= 5 )

@@ -15,8 +15,6 @@ extern THR30II_Settings THR_Values, stored_THR_Values;
 extern ampSelectModes amp_select_mode;
 dynModes dyn_mode = Comp; // Used only in the FSM
 
-extern bool boost_activated;
-
 extern std::array< THR30II_Settings, 5 > thr_user_presets;
 
 extern uint16_t npatches; // Counts the patches stored on SD-card or in PROGMEN
@@ -221,6 +219,7 @@ void fsm_10b_1(UIStates &_uistate, uint8_t &button_state)
             THR_Values.setActiveUserSetting(nUserPreset);
             THR_Values.setUserSettingsHaveChanged(false);
             THR_Values.thrSettings = false;
+            THR_Values.boost_activated = false;
 
             // Switch to User preset ASAP, TODO: Check for timeouts...
             switch_preset_buf[22] = (byte)nUserPreset;
@@ -261,7 +260,7 @@ void fsm_10b_1(UIStates &_uistate, uint8_t &button_state)
 							break;
 
 							case Boost:
-								if(boost_activated)
+								if(THR_Values.boost_activated)
 								{
 									undo_gain_boost();
 									Serial.println("Gain boost deactivated");
@@ -270,7 +269,6 @@ void fsm_10b_1(UIStates &_uistate, uint8_t &button_state)
 								{
 									do_gain_boost();
 									Serial.println("Gain boost activated");
-
 								}
 							break;
 

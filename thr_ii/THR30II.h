@@ -49,6 +49,9 @@ const byte LINE6_YAMAHA_MIDI_ID[]   { 0x00, 0x01, 0x0C };
 // const byte LINE6_YAMAHA_DEVICE_ID[] { 0x02, 0x4D }; // THR0II_W
 const byte LINE6_YAMAHA_DEVICE_ID[] { 0x01, 0x4D }; // THR10II_W
 
+class Outmessage; // Forward declaration
+extern ArduinoQueue<Outmessage> outqueue; // FIFO Queue for outgoing SysEx-Messages to THRII
+
 // Line6/Yamaha MIDI SYSEX data header (from THR30II to PC)
 // For new THRII series
 const byte THR30II_SYSEX_BEGIN[] { SYSEX_START, LINE6_YAMAHA_MIDI_ID[0], LINE6_YAMAHA_MIDI_ID[1], LINE6_YAMAHA_MIDI_ID[2], 0x24,
@@ -293,10 +296,10 @@ class THR30II_Settings
 	int patch_setAll(uint8_t * buf, uint16_t buf_len );
 	int SetLoadedPatch(const DynamicJsonDocument &djd );
 	void createPatch();
-	void CreateNamePatch(); // Fill send buffer with just setting for actual patchname, creating a valid SysEx for sending to THR30II
+//	void CreateNamePatch(); // Fill send buffer with just setting for actual patchname, creating a valid SysEx for sending to THR30II
 	void SetControl(uint8_t ctrl, double value);
 	double GetControl(uint8_t ctrl);
-	void SendTypeSetting(THR30II_UNITS unit, uint16_t val); // Send setting for unit type to THR30II	
+//	void SendTypeSetting(THR30II_UNITS unit, uint16_t val); // Send setting for unit type to THR30II	
 	void SetPatchName(String nam, int nr=-1);  // For the 5 User-Settings (-1 = actual as default )
 	String getPatchName();
 	void updateStatusMask(uint8_t x, uint8_t y);
@@ -494,6 +497,8 @@ class THR30II_Settings
 
   uint16_t guitar_volume = 0;
   uint16_t audio_volume  = 0;
+
+  bool boost_activated;
 
   private:
 	bool MIDI_Activated = false; // Set true, if MIDI unlocked by magic key (success checked by receiving first regular THR-SysEx)
