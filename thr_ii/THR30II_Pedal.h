@@ -17,6 +17,12 @@
 #include <ArduinoQueue.h>
 #include "THR30II.h"
 
+// Moved from main() 
+enum ampSelectModes {COL, AMP, CAB};
+enum dynModes {Boost, Comp, Gate};
+
+////////////////////////////////////////
+
 void OnSysEx(const uint8_t *data, uint16_t length, bool complete);
 
 //uint16_t dePack(uint8_t *raw, uint8_t *clean, uint16_t received); //not needed on Teensy
@@ -32,20 +38,20 @@ void patch_deactivate();
 void patch_activate(uint16_t pnr);
 void do_volume_patch();
 void undo_volume_patch();
-void send_init();         //Try to activate THR30II MIDI 
-void WorkingTimer_Tick();
-void drawConnIcon(bool THRconnected);
 void do_gain_boost();
 void undo_gain_boost();
-void pollpedalinputs();
-void updatemastervolume(int mastervolume);
-void blinkTTLED();
+void send_init();         // Try to activate THR30II MIDI 
+void WorkingTimer_Tick();
+void drawConnIcon(bool THRconnected);
 
-extern String preSelName; //Name of the pre selected patch
+//void pollpedalinputs();
+//void updatemastervolume(int mastervolume);
+//void blinkTTLED();
+
+//extern String preSelName; //Name of the pre selected patch
 
 // enum UIStates { UI_idle, UI_init_act_set, UI_act_vol_sol, UI_patch, UI_ded_sol, UI_pat_vol_sol}; //States for the patch/solo activation user interface
 enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_edit, UI_save, UI_name};
-
 extern UIStates _uistate;
 
 extern ArduinoQueue<Outmessage> outqueue;
@@ -244,4 +250,4 @@ const byte TFT_DIR_RIGHT_LEFT =3;
 #define TFT_THRVIOLET           tft.color565(191,   0, 255)
 #define TFT_THRDIMVIOLET        tft.color565( 95,   0, 127)
 
-#endif
+#endif // _THR30II_PEDAL_H_

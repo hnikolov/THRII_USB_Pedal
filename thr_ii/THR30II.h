@@ -9,6 +9,8 @@
  *  Author: Martin Zwerschke
  *
  */ 
+#ifndef _THR30II_H_
+#define _THR30II_H_
 
 #include <Arduino.h>
 #include "Globals.h"
@@ -21,9 +23,6 @@
 #include <array>
 #include <ArduinoJson.h>  // For patches stored in JSON (.thrl6p) format
 #include <ArduinoQueue.h> // For message queuing in and out
-
-#ifndef THR30_H_
-#define THR30_H_
 
 // MIDI SYSEX data demarcation
 #define SYSEX_START 0xf0
@@ -620,4 +619,4 @@ class Outmessage
 	{}
 }; 
 
-#endif /* THR30II_H_ */
+#endif // _THR30II_H_

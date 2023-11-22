@@ -86,4 +86,4 @@ void hexdump (const T &sb, size_t cnt)
 
 int freeMemory();  //for development only
 
-#endif
+#endif // _GLOBALS_H_

@@ -136,13 +136,13 @@ File32 file;
 //uint16_t audio_volume  = 0;
 
 // Used in the FSM
-enum ampSelectModes {COL, AMP, CAB};
-ampSelectModes amp_select_mode = COL;
-enum dynModes {Boost, Comp, Gate};
-dynModes dyn_mode = Comp;
+//enum ampSelectModes {COL, AMP, CAB}; // moved to THR30II_Pedal.h
+ampSelectModes amp_select_mode = COL; // Currently used in updateStatusMask()
+//enum dynModes {Boost, Comp, Gate};  // moved to THR30II_Pedal.h
+//dynModes dyn_mode = Comp; // declared in FSM_10B_1.cpp
 
 bool boost_activated = 0;
-double scaledvolume = 0; // TODO: Can it be a local variable?
+//double scaledvolume = 0; // TODO: Can it be a local variable?
 
 USBHost Usb; // On Teensy3.6/4.1 this is the class for the native USB-Host-Interface  
 // Note: It is essential to increase rx queue size in "USBHost_t3": RX_QUEUE_SIZE = 2048 should do the job, use 4096 to be safe
@@ -162,8 +162,8 @@ uint8_t buf[MIDI_EVENT_PACKET_SIZE]; // Receive buffer for incoming (raw) Messag
 uint8_t currentSysEx[310];           // Buffer for the currently processed incoming SysEx message (maybe coming in spanning over up to 5 consecutive buffers)
 						                         // Was needed on Arduino Due. On Teensy3.6 64 could be enough
 
-String patchname;  // Limitation by Windows THR30 Remote is 64 Bytes.
-String preSelName; // Global variable: Name of the pre selected patch
+//String patchname;  // Limitation by Windows THR30 Remote is 64 Bytes.
+//String preSelName; // Global variable: Name of the pre selected patch
 
 class THR30II_Settings THR_Values;			     // Actual settings of the connected THR30II
 class THR30II_Settings stored_THR_Values;    // Stored settings, when applying a patch (to be able to restore them later on)
@@ -174,17 +174,23 @@ class THR30II_Settings stored_THR_Values;    // Stored settings, when applying a
 // Current behavior: The first time usere preset is selected from the pedal board, it switched the preset on the THRII and request the settings for the display
 //                   Next time, switch to the user preset via command and use the local THR_Values_x data to update the display - it is faster this way
 class THR30II_Settings THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5;
-std::array< THR30II_Settings, 5 > thr_user_presets = {{ THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5 }};
+std::array< THR30II_Settings, 10 > thr_user_presets = {{ THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5 }};
 
 // TODO: Why static volatile?
-static volatile int16_t presel_patch_id;   	 // ID of actually pre-selected patch (absolute number)
-static volatile int16_t active_patch_id;   	 // ID of actually selected patch     (absolute number)
-static volatile bool send_patch_now = false; // pre-select patch to send (false) or send immediately (true)
+//static volatile int16_t presel_patch_id;   	 // ID of actually pre-selected patch (absolute number)
+//static volatile int16_t active_patch_id;   	 // ID of actually selected patch     (absolute number)
+//static volatile bool send_patch_now = false; // pre-select patch to send (false) or send immediately (true)
+//
+//static std::vector <String> libraryPatchNames; // All the names of the patches stored on SD-card or in PROGMEN
+//
+//static volatile uint16_t npatches = 0; // Counts the patches stored on SD-card or in PROGMEN
+extern int16_t presel_patch_id;   	 // ID of actually pre-selected patch (absolute number)
+extern int16_t active_patch_id;   	 // ID of actually selected patch     (absolute number)
+extern bool send_patch_now; // pre-select patch to send (false) or send immediately (true)
 
-static std::vector <String> libraryPatchNames; // All the names of the patches stored on SD-card or in PROGMEN
+std::vector <String> libraryPatchNames; // All the names of the patches stored on SD-card or in PROGMEN
 
-static volatile uint16_t npatches = 0; // Counts the patches stored on SD-card or in PROGMEN
-
+uint16_t npatches  =  0; // Counts the patches stored on SD-card or in PROGMEN
 int8_t nUserPreset = -1; // Used to cycle the THRII User presets
 
 #if USE_SDCARD
@@ -370,7 +376,7 @@ void setup() // Do preparations
 	//tft.begin();
   tft.setRotation(1);
   spr.setColorDepth(16); // 16 bit colour needed to show antialiased fonts
-  tft.fillScreen(TFT_THRCREAM);
+  tft.fillScreen(TFT_THRCREAM); // Show a splash screen instead? :)
   //THR_Values.updateStatusMask(0,85); // Show some flash-screen here?
 
   // -----------------------
@@ -446,10 +452,13 @@ uint16_t cur_len = 0; // Length of actual SysEx if completed
 
 volatile static byte midi_connected = false;
 
-static byte maskUpdate = false;    // Set, if a value changed and the display mask should be updated soon
-static byte maskActive = false;    // Set, if local THR-settings or modified patch settings are valid
+byte maskUpdate = false;    // Set, if a value changed and the display mask should be updated soon
+byte maskActive = false;    // Set, if local THR-settings or modified patch settings are valid
 							                     // (e.g. after init or after turning a knob or restored local settings)
-static byte preNameActive = false; // Pre-selected name is shown, not settings mask nor active patchname (NOT implemented yet?)
+//static byte maskUpdate = false;    // Set, if a value changed and the display mask should be updated soon
+//static byte maskActive = false;    // Set, if local THR-settings or modified patch settings are valid
+//							                     // (e.g. after init or after turning a knob or restored local settings)
+//static byte preNameActive = false; // Pre-selected name is shown, not settings mask nor active patchname (NOT implemented yet?)
 
 UIStates _uistate = UI_idle; // Always begin with idle state until actual settings are fetched
 
@@ -524,6 +533,8 @@ void timing()
 
 // elapsedMillis tickpedals;
 
+void fsm_10b_1(UIStates &_uistate, uint8_t &button_state); // Forward declaration
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // LOOP
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -590,21 +601,27 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 
   // Should be called every 4-5ms or faster, for the default debouncing time of ~20ms.
   for (uint8_t i = 0; i < NUM_BUTTONS; i++) { buttons[i].check(); }
-	
-	/////////////////////////////////////////////////////////////////////////////////////////
-	// STATE MACHINE
-	/////////////////////////////////////////////////////////////////////////////////////////
 
-  std::array<byte, 29> ask_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
-  // Switch to preset #4 (__0x03__)
-  std::array<byte, 29> switch_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x08, 0x00, 0x0e, 0x0b, 0x00, 0x0e, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
-  // TODO: Switch col/amp:  Classic Lead
-  // std::array<byte, 29> sendbuf_head = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x00, 0x03, 0x00, 0x00, 0x07, 0x00, 0x08, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
-  // std::array<byte, 29> sendbuf_body = {0xf0, 0x00, 0x01, 0x00, 0x24, 0x00, 0x4d, 0x00, 0x04, 0x00, 0x00, 0x07, 0x04, 0x0c, 0x01, 0x00, 0x00, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
+  fsm_10b_1(_uistate, button_state);
 
-	//                0        1            2              3        4        5        6                7
-	// enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_edit, UI_save, UI_name, UI_init_act_set, UI_act_vol_sol, UI_patch, UI_ded_sol, UI_pat_vol_sol};
+} // End of loop()
 
+/////////////////////////////////////////////////////////////////////////////////////////
+// STATE MACHINE
+/////////////////////////////////////////////////////////////////////////////////////////
+/*
+std::array<byte, 29> ask_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
+// Switch to preset #4 (__0x03__)
+std::array<byte, 29> switch_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x08, 0x00, 0x0e, 0x0b, 0x00, 0x0e, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
+// TODO: Switch col/amp:  Classic Lead
+// std::array<byte, 29> sendbuf_head = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x00, 0x03, 0x00, 0x00, 0x07, 0x00, 0x08, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
+// std::array<byte, 29> sendbuf_body = {0xf0, 0x00, 0x01, 0x00, 0x24, 0x00, 0x4d, 0x00, 0x04, 0x00, 0x00, 0x07, 0x04, 0x0c, 0x01, 0x00, 0x00, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
+
+//                0        1            2              3        4        5        6                7
+// enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_edit, UI_save, UI_name, UI_init_act_set, UI_act_vol_sol, UI_patch, UI_ded_sol, UI_pat_vol_sol};
+
+void fsm_10b_1(UIStates &_uistate, uint8_t &button_state) 
+{
 	if(button_state!=0) // A foot switch was pressed
 	{
 		TRACE_V_THR30IIPEDAL(Serial.println();)
@@ -661,72 +678,16 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 						{
 							case COL:
                 THR_Values.next_col();
-                /*
-								switch(THR_Values.col)
-								{
-									case CLASSIC:	 THR_Values.col = BOUTIQUE;	break;
-									case BOUTIQUE: THR_Values.col = MODERN; 	break;
-									case MODERN:	 THR_Values.col = CLASSIC; 	break;
-								}
-                // TODO
-                //THR_Values.sendChangestoTHR = true;
-                //THR_Values.SetColAmp(THR_Values.col, THR_Values.amp);
-                //THR_Values.SendColAmp();
-                //THR_Values.sendChangestoTHR = false;
-                */
                 Serial.println("Amp collection switched to: " + String(THR_Values.col));
 							break;
 
 							case AMP:
                 THR_Values.next_amp();
-								/*
-                switch(THR_Values.amp)
-								{
-									case CLEAN:		THR_Values.amp = CRUNCH;	break;
-									case CRUNCH:	THR_Values.amp = LEAD;		break;
-									case LEAD:		THR_Values.amp = HI_GAIN;	break;
-									case HI_GAIN:	THR_Values.amp = SPECIAL;	break;
-									case SPECIAL:	THR_Values.amp = BASS;		break;
-									case BASS:		THR_Values.amp = ACO;	  	break;
-									case ACO:		  THR_Values.amp = FLAT;		break;
-									case FLAT:		THR_Values.amp = CLEAN;		break;
-								}
-                // TODO
-                //THR_Values.sendChangestoTHR = true;
-                //THR_Values.SetColAmp(THR_Values.col, THR_Values.amp);
-                //THR_Values.sendChangestoTHR = false;
-                */
                 Serial.println("Amp type switched to: " + String(THR_Values.amp));
 							break;
 
 							case CAB:
                 THR_Values.next_cab();
-                /*
-								switch(THR_Values.cab)
-								{
-									case British_4x12:		THR_Values.cab = American_4x12;		break;
-									case American_4x12:		THR_Values.cab = Brown_4x12;	  	break;
-									case Brown_4x12:	  	THR_Values.cab = Vintage_4x12;		break;
-									case Vintage_4x12:		THR_Values.cab = Fuel_4x12;		  	break;
-									case Fuel_4x12:		  	THR_Values.cab = Juicy_4x12;	  	break;
-									case Juicy_4x12:	  	THR_Values.cab = Mods_4x12;		  	break;
-									case Mods_4x12:		  	THR_Values.cab = American_2x12;		break;
-									case American_2x12:		THR_Values.cab = British_2x12;		break;
-									case British_2x12:		THR_Values.cab = British_Blues;		break;
-									case British_Blues:		THR_Values.cab = Boutique_2x12;		break;
-									case Boutique_2x12:		THR_Values.cab = Yamaha_2x12;		  break;
-									case Yamaha_2x12:	  	THR_Values.cab = California_1x12;	break;
-									case California_1x12:	THR_Values.cab = American_1x12;		break;
-									case American_1x12:		THR_Values.cab = American_4x10;		break;
-									case American_4x10:		THR_Values.cab = Boutique_1x12;		break;
-									case Boutique_1x12:		THR_Values.cab = Bypass;			    break;
-									case Bypass:			    THR_Values.cab = British_4x12;	  break;
-								}
-                // TODO: To be removed if THR_Values.createPatch() to be used or do not call THR_Values.createPatch() when changing cabinet
-                //THR_Values.sendChangestoTHR = true;
-                //THR_Values.SendCab(); // This works
-                //THR_Values.sendChangestoTHR = false;
-								*/
                 Serial.println("Cabinet switched to: " + String(THR_Values.cab));
 							break;
 						}
@@ -1055,12 +1016,10 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 		TRACE_V_THR30IIPEDAL(Serial.println("New UI_state: " + String(_uistate));)
 		// TRACE_V_THR30IIPEDAL(Serial.println("New THR_Values.sendChangestoTHR: " + String(THR_Values.sendChangestoTHR));)
 		// TRACE_V_THR30IIPEDAL(Serial.println("New stored_THR_Values.sendChangestoTHR: " + String(stored_THR_Values.sendChangestoTHR));)
-
 	} //button_state!=0
-
-}//end of loop()
-
-
+}
+*/
+//////////////////////////////////////////////////////////////////////////////////////////
 
 void send_init()  //Try to activate THR30II MIDI 
 {    
@@ -1103,17 +1062,17 @@ void send_init()  //Try to activate THR30II MIDI
 	//#S3 + #S4  will invoke #R4 (seems always the same) "MIDI activate" (works only after ID_Req!)														   
 
 }//end of send_init
-
+/*
 void updatemastervolume(int mastervolume)
 {
 	Serial.print("updatemastervolume(" + String(mastervolume) + ") = ");
-	scaledvolume = min(max((static_cast<double>(mastervolume)+1) * 100 / 1024, 0), 100);
+	double scaledvolume = min(max((static_cast<double>(mastervolume) + 1) * 100 / 1024, 0), 100);
 	Serial.println(scaledvolume);
-	THR_Values.sendChangestoTHR=true;
+	THR_Values.sendChangestoTHR = true;
 	THR_Values.SetControl(CTRL_MASTER, scaledvolume);
-	THR_Values.sendChangestoTHR=false;
+	THR_Values.sendChangestoTHR = false;
 }
-
+*/
 void do_gain_boost()
 {
   do_volume_patch();
