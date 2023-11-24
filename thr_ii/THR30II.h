@@ -296,10 +296,8 @@ class THR30II_Settings
 	int patch_setAll(uint8_t * buf, uint16_t buf_len );
 	int SetLoadedPatch(const DynamicJsonDocument &djd );
 	void createPatch();
-//	void CreateNamePatch(); // Fill send buffer with just setting for actual patchname, creating a valid SysEx for sending to THR30II
 	void SetControl(uint8_t ctrl, double value);
 	double GetControl(uint8_t ctrl);
-//	void SendTypeSetting(THR30II_UNITS unit, uint16_t val); // Send setting for unit type to THR30II	
 	void SetPatchName(String nam, int nr=-1);  // For the 5 User-Settings (-1 = actual as default )
 	String getPatchName();
 	void updateStatusMask(uint8_t x, uint8_t y);
@@ -308,15 +306,14 @@ class THR30II_Settings
 	int8_t getActiveUserSetting(); // Getter for number of the active user setting
 	bool getUserSettingsHaveChanged(); // Getter for state of user Settings
   void setUserSettingsHaveChanged(bool changed);
-	// void SetAmp(uint8_t _amp);
 	void SetColAmp(THR30II_COL _col, THR30II_AMP _amp);  // Setter for the Simulation Collection
 	void setColAmp(uint16_t ca); // Setter for the Simulation Collection by key
+  col_amp THR30IIAmpKey_ToColAmp(uint16_t ampkey);
 	void SetCab(THR30II_CAB _cab); // Setter for the Cabinet Simulation
 	void ReverbSelect(THR30II_REV_TYPES type); // Setter for selection of the reverb type
 	void EffectSelect(THR30II_EFF_TYPES type); // Setter for selection of the Effect type
 	void EchoSelect(THR30II_ECHO_TYPES type);  // Setter for selection of the Echo type
 	void EchoTempoTap();
-  // TODO: Probably needs better implementation - need to be able to set guitar volume to THR for boost mode
   void SetGuitarVol(uint16_t _g_vol);
   void SetAudioVol(uint16_t _a_vol);
 

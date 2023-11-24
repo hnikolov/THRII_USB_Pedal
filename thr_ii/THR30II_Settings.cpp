@@ -59,10 +59,6 @@ void THR30II_Settings::EchoTempoTap()
 // The setters for locally stored THR30II-Settings class
 ///////////////////////////////////////////////////////////////////////
 
-// void THR30II_Settings::SetAmp(uint8_t _amp) // No separate setter necessary at the moment
-// {
-// }
-
 void THR30II_Settings::SetColAmp(THR30II_COL _col, THR30II_AMP _amp) // Setter for the Simulation Collection / Amp
 {
 //	bool changed = false;
@@ -518,50 +514,25 @@ double THR30II_Settings::GetControl(uint8_t ctrl)
 void THR30II_Settings::ReverbSelect(THR30II_REV_TYPES type) // Setter for selection of the reverb type
 {
 	reverbtype = type;
-	
-//	if( sendChangestoTHR )
-//	{
-//		SendTypeSetting(REVERB, THR30II_REV_TYPES_VALS[type].key); // Send reverb type change to THR
-//	}
-//	// TODO: Await Acknowledge?
 }
 
 void THR30II_Settings::EffectSelect(THR30II_EFF_TYPES type) // Setter for selection of the Effect type
 {
 	effecttype = type;
-	
-//	if( sendChangestoTHR ) // Do not send back if change results from THR itself
-//	{
-//		SendTypeSetting(EFFECT, THR30II_EFF_TYPES_VALS[type].key); // Send effect type change to THR
-//	}
-//	// TODO: Await Acknowledge?
 }
 
 void THR30II_Settings::EchoSelect(THR30II_ECHO_TYPES type) // Setter for selection of the Effect type
 {
 	echotype = type;
-	
-//	if( sendChangestoTHR ) // Do not send back if change results from THR itself
-//	{
-//		SendTypeSetting(ECHO, THR30II_ECHO_TYPES_VALS[type].key); // Send echo type change to THR
-//	}
-//	// TODO: Await Acknowledge?
 }
 
 void THR30II_Settings::SetPatchName(String nam, int nr) // nr = -1 as default for actual patchname
 {														                            // corresponds to field "activeUserSetting"
 	TRACE_THR30IIPEDAL(Serial.println(String("SetPatchName(): Patchnname: ") + nam + String(" nr: ") + String(nr) );)
-//	Serial.println(String("SetPatchName(): Patchnname: ") + nam + String(" nr: ") + String(nr) );
 	
-	nr = constrain(nr, 0, 5);  // Make 0 based index for array patchNames[]
+	nr = constrain(nr, 0, 5); // Make 0 based index for array patchNames[]
 
 	patchNames[nr] = nam.length() > 64 ? nam.substring(0,64) : nam; // Cut if necessary
-
-  // TODO: Is this needed at all?
-	//if( sendChangestoTHR )
-	//{
-	//	CreateNamePatch();
-	//}
 }
 
 String THR30II_Settings::getPatchName()
@@ -570,8 +541,7 @@ String THR30II_Settings::getPatchName()
 }
 
 // Find the correct (col, amp)-struct object for this ampkey
-// TODO: Make it part of the class
-col_amp THR30IIAmpKey_ToColAmp(uint16_t ampkey)
+col_amp THR30II_Settings::THR30IIAmpKey_ToColAmp(uint16_t ampkey)
 { 
 	for(auto it = THR30IIAmpKeys.begin(); it != THR30IIAmpKeys.end(); ++it)
 	{
@@ -919,7 +889,7 @@ int THR30II_Settings::SetLoadedPatch(const DynamicJsonDocument &djd ) // Invoke 
 		ReverbSetting(ROOM, glob["FX4WetSend"], djd["data"]["tone"]["THRGroupFX4EffectReverb"]["@wetDry"].as<double>()  * 100);
 	}
 
-  createPatch();  // Send all settings as a patch dump SysEx to THRII
+  createPatch(); // Send all settings as a patch dump SysEx to THRII
 	
 	TRACE_THR30IIPEDAL(Serial.println(F("SetLoadedPatch(): Done setting."));)
 	return 0;
@@ -1469,220 +1439,6 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 
 } // End of THR30II_Settings::createPatch()
 
-/*
-void THR30II_Settings::CreateNamePatch() // Fill send buffer with just setting for actual patchname, creating a valid SysEx for sending to THR30II  
-{                                        // uses same algorithm as CreatePatch() - but will only be  o n e  frame!
-	//1.) Make the data buffer (structure and values) store the length.
-	//    Add 12 to get the 2nd length-field for the header. Add 8 to get the 1st length field for the header.
-	//2.) Cut it to slices with 0x0d02 (210 dez.) bytes (gets the payload of the frames)
-	//    These frames will thus not have incomplete 8/7 groups after bitbucketing but total frame length is 253 (just below the possible 255 bytes).
-	//    The remaining bytes will build the last frame (perhaps with last 8/7 group incomplete)
-	//    Store the length of the last slice (all others are fixed 210 bytes  long.)
-	//3.) Create the header:
-	//    SysExStart:  f0 00 01 0c 24 02 4d (always the same)       (24 01 for THR10ii-W)
-	//                 01   (memory command, not settings command)
-	//                 Get actual counter for memory frames and append it here
-	//                 00 01 0b  ("same frame counter" and payload size  for the header)
-	//                 hang following 4-Byte values together:
-	//
-	//                 0d 00 00 00   (Opcode for memory write/send)
-	//                 (len +8+12)   (1st length field = total length= data length + 3 values + type field/netto length )
-	//                 FF FF FF FF   (user patch number to overwrite/ 0xFFFFFFFF for actual patch)
-	//                 (len   +12)   (2nd length field = netto length= data length + the following 3 values)
-	//                 00 00 00 00   (always the same, kind of opcode?)
-	//                 01 00 00 00   (always the same, kind of opcode?)
-	//                 00 00 00 00   (always the same, kind of opcode?)
-	//
-	//                 Bitbucket this group (gives no incomplete 8/7 group!)
-	//                 and append it to the header
-	//                 finish header with 0xF7
-	//                 Header frame may already be sent out!
-	//4.)              For each slice:
-	//                 Bitbucket encode the slice
-	//                 Build frame:
-	//                 f0 00 01 0c 24 02 4d(always the same)       (24 01 for THR10ii-W)
-	//                 01   (memory command, not settings command)
-	//                 Get actual counter for memory frames and append it here
-	//                 append same frame counter (is the slice counter) as a byte
-	//                 0d 01  (except for last frame, where we use it's stored length before bitbucketing)
-	//                 bitbucketed data for this slice
-	//                 0xF7
-	//                 Send it out.
-
-	TRACE_V_THR30IIPEDAL(Serial.println(F("Create_Name_Patch(): "));)
-//	Serial.println(F("Create_Name_Patch(): "));
-
-	std::array<byte, 300> dat;  // TODO: 2000 in createPatch()
-	auto datlast = dat.begin(); // Iterator to last element (starts on begin!)
-	std::array<byte, 300> sb;
-	auto sblast = sb.begin();   // Iterator to last element (starts on begin!)
-	std::array<byte, 300> sb2;
-	auto sb2last = sb2.begin(); // Iterator to last element (starts on begin!)
-
-	std::array<byte, 4> toInsert4;
-	std::array<byte, 6> toInsert6;
-
-	#define datback(x) for(const byte &b: x) { *datlast++ = b; };
-	
-	// Macro for converting a 32-Bit value to a 4-byte array<byte,4> and append it to "dat"
-	#define conbyt4(x) toInsert4 = { (byte)(x), (byte)((x)>>8), (byte)((x)>>16), (byte)((x)>>24) }; datlast = std::copy(std::begin(toInsert4), std::end(toInsert4), datlast); 
-	
-  // Macro for appending a 16-Bit value to "dat"
-	#define conbyt2(x) *datlast ++= (byte)(x); *datlast ++= (byte)((x)>>8); 
-	
-	// 1.) Make the data buffer (structure and values) ---------------------------------------------------------------
-	datback(tokens["StructOpen"]);
-	// Meta
-	datback(tokens["Meta"]);          
-	datback(tokens["TokenMeta"]);
-	toInsert6 = { 0x00, 0x00, 0x00, 0x00, 0x04, 0x00 };
-	datlast = std::copy(std::begin(toInsert6), std::end(toInsert6),datlast); // Number 0x0000, type 0x00040000 (String)
-	
-	conbyt4( patchNames[0].length() + 1 ) // Length of patchname (incl. '\0')
-	                                      // 32Bit-Value (little endian; low byte first) 
-	
-	std::string nam = patchNames[0u].c_str();
-	datback( nam ); // Copy the patchName  //!!ZWEZWE!! mind UTF-8 ?
-	*datlast++='\0'; // Append '\0' to the patchname
-	
-	datback(tokens["StructClose"]); // close Structure Meta
-	
-	// print whole buffer as a chain of HEX
-	TRACE_V_THR30IIPEDAL(Serial.printf("\n\rRaw frame before slicing/enbucketing:\n\r"); hexdump(dat,datlast-dat.begin());)
-//	Serial.printf("\n\rRaw frame before slicing/enbucketing:\n\r"); hexdump(dat,datlast-dat.begin());
-
-	// Now store the length.
-	// Add 12 to get the 2nd length-field for the header. Add 8 to get the 1st length field for the header.
-	uint32_t datalen = (uint32_t) (datlast-dat.begin());
-	
-	// 2.) cut to slices ----------------------------------------------------------------------------
-	uint32_t lengthfield2 = datalen + 12;
-	uint32_t lengthfield1 = datalen + 20;
-
-	int numslices = (int)datalen / 210; // Number of 210-byte slices
-	int lastlen   = (int)datalen % 210; // Data left for last frame containing the rest
-	TRACE_V_THR30IIPEDAL(Serial.print("Datalen: "); Serial.println(datalen);)
-	TRACE_V_THR30IIPEDAL(Serial.print("Number of slices: "); Serial.println(numslices);)
-	TRACE_V_THR30IIPEDAL(Serial.print("Length of last slice: "); Serial.println(lastlen);)
-//	Serial.print("Datalen: "); Serial.println(datalen);
-//	Serial.print("Number of slices: "); Serial.println(numslices);
-//	Serial.print("Length of last slice: "); Serial.println(lastlen);
-
-	// 3.) Create the header: -----------------------------------------------------------------------
-	//    SysExStart:  f0 00 01 0c 22 02 4d (always the same)       (24 01 for THR10ii-W)
-	//                 01   (memory command, not settings command)
-	//                 put following 4-Byte values together:
-	//
-	//                 0d 00 00 00   (Opcode for memory write/send)
-	
-	// Macro for converting a 32-Bit value to a 4-byte vector<byte,4> and append it to "sb"
-	#define conbyt4s(x) toInsert4 = { (byte)(x), (byte)((x)>>8), (byte)((x)>>16), (byte)((x)>>24) }; sblast = std::copy( std::begin(toInsert4), std::end(toInsert4), sblast ); 
-	//sblast starts at sb.begin()
-	conbyt4s(0x0du);
-	//                 (len +8+12)   (1st length field = total length= data length + 3 values + type field/netto length )
-	conbyt4s(lengthfield1);
-	//                 FF FF FF FF   (number of user patch to overwrite / 0xFFFFFFFF for actual patch)
-	conbyt4s(0xFFFFFFFFu);
-	//                 (len   +12)   (2nd length field = netto length= data length + the following 3 values)
-	conbyt4s(lengthfield2);
-	//                 00 00 00 00   (always the same, kind of opcode?)
-	conbyt4s(0x0u);
-	//                 01 00 00 00   (always the same, kind of opcode?)
-	conbyt4s(0x1u);
-	//                 00 00 00 00   (always the same, kind of opcode?)
-	conbyt4s(0x0u);
-	//
-	// Bitbucket this group (gives no incomplete 8/7 group!)
-	sb2last = Enbucket(sb2, sb, sblast); 
-	//                 And append it to the header
-	//                 Finish header with 0xF7
-	//                 Header frame may already be sent out!
-	byte memframecnt = 0x06;
-	//                 Get actual counter for memory frames and append it here
-
-	//                 00 01 0b  ("same frame counter" and payload size  for the header)
-	sblast = sb.begin(); // Start the buffer to send
-	
-	std::array<byte, 12> toInsert;
-	toInsert = std::array<byte,12>({ 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, memframecnt++, 0x00, 0x01, 0x0b });
-	//toInsert=std::array<byte,12>({ 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x01, memframecnt++, 0x00, 0x01, 0x0b });
-	sblast = std::copy(toInsert.begin(), toInsert.end(), sb.begin());
-	sblast = std::copy(sb2.begin(), sb2last, sblast);
-
-	*sblast ++= 0xF7; // SysEx end demarkation
-
-	SysExMessage m(sb.data(), sblast - sb.begin());
-	Outmessage om(m, 100, false, false); // no Ack, no answer for the header 
-	outqueue.enqueue(om); // Send header to THRxxII
-
-	// 4.) For each slice: --------------------------------------------------------------------------------
-	//    Bitbucket encode the slice
-	
-	for( int i = 0; i < numslices; i++ )
-	{
-		std::array<byte, 210> slice;
-		std::copy(dat.begin() + i*210, dat.begin() + i*210 + 210, slice.begin());
-		sb2last = Enbucket(sb2, slice, slice.end());
-		sblast = sb.begin(); // Start new buffer to send
-		//toInsert=  { 0xF0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x01, memframecnt++, (byte)(i % 128), 0x0d, 0x01 };
-		toInsert = { 0xF0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, memframecnt, (byte)(i % 128), 0x0d, 0x01 }; // memframecount is not incremented inside sent patches
-		//toInsert=  { 0xF0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x01, memframecnt, (byte)(i % 128), 0x0d, 0x01 };  //memframecount is not incremented inside sent patches
-		sblast = std::copy(toInsert.begin(), toInsert.end(), sblast);
-		sblast = std::copy(sb2.begin(), sb2last, sblast);
-		*sblast ++= 0xF7;
-		// Print whole buffer as a chain of HEX
-		TRACE_V_THR30IIPEDAL(Serial.printf("\n\rFrame %d to send in \"Create_Name_Patch\":\n\r", i); hexdump(sb, sblast - sb.begin());)
-//		Serial.printf("\n\rFrame %d to send in \"Create_Name_Patch\":\n\r", i); hexdump(sb, sblast - sb.begin());
-		//m = SysExMessage(sb.data(), sblast -sb.begin() );
-		//om = Outmessage(m, (uint16_t)(101 + i), false, false);  //no Ack, for all the other slices 
-  	SysExMessage m(sb.data(), sblast - sb.begin());
-	  Outmessage om(m, (uint16_t)(101 + i), false, false); // no Ack, for all the other slices  
-    outqueue.enqueue(om); // Send slice to THRxxII
-	}
-
-	if( lastlen > 0 ) // Last slice (could be the first, if it is the only one)
-	{
-		std::array<byte, 210> slice;  // Here 210 is a maximum size, not the true element count
-		byte *slicelast = slice.begin();
-		slicelast = std::copy(dat.begin() + numslices * 210, dat.begin() + numslices * 210 + lastlen, slicelast);
-		sb2last = Enbucket(sb2, slice, slicelast);
-		sblast = sb.begin(); // Start new buffer to send
-		toInsert = { 0xF0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, memframecnt++, (byte)((numslices) % 128), (byte)((lastlen - 1) / 16), (byte)((lastlen - 1) % 16) }; 
-		//toInsert={ 0xF0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x01, memframecnt++, (byte)((numslices) % 128), (byte)((lastlen - 1) / 16), (byte)((lastlen - 1) % 16) }; 
-		sblast = std::copy(toInsert.begin(), toInsert.end(), sblast);
-		sblast = std::copy(sb2.begin(), sb2last,sblast);
-		*sblast ++= 0xF7;
-		// Print whole buffer as a chain of HEX
-		TRACE_V_THR30IIPEDAL(Serial.println(F("\n\rLast frame to send in \"Create_Name_Patch\":")); hexdump(sb, sblast - sb.begin());)
-//		Serial.println(F("\n\rLast frame to send in \"Create_Name_Patch\":")); hexdump(sb, sblast - sb.begin());
-		//m =  SysExMessage(sb.data(),sblast-sb.begin());
-		//om = Outmessage(m, (uint16_t)(101 + numslices), true, false);  //Ack, but no answer for the header 
-  	SysExMessage m(sb.data(), sblast - sb.begin());
-	  Outmessage om(m, (uint16_t)(101 + numslices), true, false); // no Ack, but no answer for the header   
-    outqueue.enqueue(om); // Send last slice to THRxxII
-	}
-	
-	TRACE_THR30IIPEDAL(Serial.println(F("\n\rCreate_Name_patch(): Ready outsending."));)
-//	Serial.println(F("\n\rCreate_Name_patch(): Ready outsending."));
-
-	// Now we have to await acknowledgment for the last frame
-
-	// on_ack_queue.enqueue(std::make_tuple(101+numslices,Outmessage(SysExMessage((const byte[29]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x3c, 0x00, 0x7f, 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0xf7 },29), 
-	//                      101+numslices+1, false, true),nullptr,false)); //answer will be the settings dump for actual settings
-
-    // Summary of what we did just now:
-	//                 Building the SysEx frame:
-	//                 f0 00 01 0c 22 02 4d(always the same)       (24 01 for THR10ii-W)
-	//                 01   (memory command, not a settings command)
-	//                 Get actual counter for memory frames and append it here
-	//                 append same frame counter (is the slice counter) as a byte
-	//                 set length field to  0d 01  (except for last frame, where we use it's stored length before bitbucketing)
-	//                 append "bitbucketed" data for this slice
-	//                 finish with 0xF7
-	//                 Send it out.
-}
-*/
-
 //---------FUNCTION FOR SENDING COL/AMP SETTING TO THR30II -----------------
 // TODO
 void THR30II_Settings::SendColAmp() // Send COLLLECTION/AMP setting to THR
@@ -1705,9 +1461,3 @@ void THR30II_Settings::SendColAmp() // Send COLLLECTION/AMP setting to THR
     ////delay(1000);
     //outqueue.enqueue(Outmessage(SysExMessage((const byte[29]){ 0xf0, 0x00, 0x01, 0x0, 0x24, 0x0, 0x4d, 0x00, 0x04, 0x00, 0x00, 0x07, 0x04, 0x0c, 0x01, 0x00, 0x00, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7 },29), 1112, true, true)); // ack/answ  
 }
-
-//--------- FUNCTIONS FOR SENDING SETTINGS CHANGES TO THR30II -----------------
-//void THR30II_Settings::SendTypeSetting(THR30II_UNITS unit, uint16_t val) //Send setting to THR (Col/Amp or Reverbtype or Effecttype)
-//{
-//    // Not needed since we send complete patches...
-//}

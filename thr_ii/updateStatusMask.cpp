@@ -370,8 +370,6 @@ void drawPPChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolou
 {
   // Used to represent Guitar Volume and Audio Volume
 	int tpad = 20; int pad = 0;
-//	int ped1height = ped1*(h-tpad-pad)/1023;
-//	int ped2height = ped2*(h-tpad-pad)/1023;
 	int ped1height = ped1*(h-tpad-pad)/100; // For guitar and audio volume
 	int ped2height = ped2*(h-tpad-pad)/100; // 
 	spr.createSprite(w, h);
@@ -381,7 +379,6 @@ void drawPPChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolou
 	spr.setTextColor(fgcolour, bgcolour);
 	spr.drawString(label, w/2-1, 11);
 	spr.fillRect(pad, h-ped1height, w/2-1-2*pad, ped1height, fgcolour);
-	//spr.fillRect(pad, h-(h-tpad-pad)*ex/100, w/2-1-2*pad, (h-tpad-pad)*ex/100, fgcolour);
 	spr.fillRect(w/2+pad, h-ped2height, w/2-1-2*pad, ped2height, fgcolour);
 	spr.pushSprite(x, y);
 	spr.unloadFont();

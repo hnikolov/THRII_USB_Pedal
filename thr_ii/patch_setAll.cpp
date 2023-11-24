@@ -19,12 +19,48 @@
 
 ////////////////////////////////////////
 
+uint16_t UnitOnMap(uint16_t u)
+{
+	std::map<uint16_t, uint16_t>::iterator p = unitOnMap.find(u);
+	if( p != unitOnMap.end() ) { return p->second; } // The value for this key
+	else                       { return 0xFFFF;    } // Map does not contain key u
+}
+
+uint16_t ReverbMap(uint16_t u)
+{
+	std::map<uint16_t, uint16_t>::iterator p = reverbMap.find(u);
+	if( p != reverbMap.end() ) { return p->second; } // The value for this key
+	else                       { return 0xFFFF;    } // Map does not contain key u
+}
+
+uint16_t EchoMap(uint16_t u)
+{
+	std::map<uint16_t, uint16_t>::iterator p = echoMap.find(u);
+	if( p != echoMap.end() ) { return p->second; } // The value for this key
+	else                     { return 0xFFFF;    } // Map does not contain key u
+}
+
+uint16_t EffectMap(uint16_t u)
+{
+	std::map<uint16_t, uint16_t>::iterator p = effectMap.find(u);
+	if( p != effectMap.end() ) { return p->second; } // The value for this key
+	else                       { return 0xFFFF;    } // Map does not contain key u
+}
+
+uint16_t CompressorMap(uint16_t u)
+{
+	std::map<uint16_t, uint16_t>::iterator p = compressorMap.find(u);
+	if( p != compressorMap.end() ) { return p->second; } // The value for this key
+	else                           { return 0xFFFF;    } // Map does not contain key u
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
 static std::map<uint16_t, string_or_ulong> globals; // Global settings from a patch-dump
 std::map<uint16_t, Dumpunit> units; // Ushort value for UnitKey
 uint16_t actualUnitKey = 0, actualSubunitKey = 0;
 static String logg; // The log while analyzing dump
 
-// Helper for "patchSetAll()"
 // Check key and following token, if in state "Structure"
 static THR30II_Settings::States checkKeyStructure(byte key[], byte *buf, int buf_len, uint16_t &pt)
 {
@@ -62,7 +98,6 @@ static THR30II_Settings::States checkKeyStructure(byte key[], byte *buf, int buf
 	return THR30II_Settings::States::St_structure;
 }
 
-// Helper for "patchSetAll()"
 // check key, if in state "Data"
 THR30II_Settings::States checkKeyData(byte key[], byte *buf, int buf_len, uint16_t &pt)
 {
@@ -86,7 +121,6 @@ THR30II_Settings::States checkKeyData(byte key[], byte *buf, int buf_len, uint16
 	return THR30II_Settings::States::St_data;
 }
 
-// Helper for "patchSetAll()"
 // Check key and eventually following token, if in state "Unit"
 THR30II_Settings::States checkKeyUnit(byte key[], byte *buf,int buf_len, uint16_t &pt)
 {
@@ -141,7 +175,6 @@ THR30II_Settings::States checkKeyUnit(byte key[], byte *buf,int buf_len, uint16_
 	return THR30II_Settings::States::St_error;
 }
 
-// Helper for "patchSetAll()"
 // Check key and eventually following token, if in state "SubUnit"
 THR30II_Settings::States checkKeySubunit(byte key[], byte *buf, int buf_len, uint16_t &pt)
 {
@@ -197,7 +230,7 @@ THR30II_Settings::States checkKeySubunit(byte key[], byte *buf, int buf_len, uin
 	return THR30II_Settings::States::St_error;
 }
 
-// Get data, when in state "Global" - Helper for "patchSetAll()"
+// Get data, when in state "Global"
 // Fetch one global setting from the patch dump (called several times, if there are several global values)
 static void getGlobal(byte *buf, int buf_len, uint16_t &pt)  
 {
@@ -248,7 +281,7 @@ static void getGlobal(byte *buf, int buf_len, uint16_t &pt)
 	}
 }
 
-// Get data, when in state "Unit" - Helper for "patchSetAll()"
+// Get data, when in state "Unit"
 // Get one of the units' settings from the patch dump (called several times, if there are several values)
 THR30II_Settings::States getValueUnit(byte key[], byte *buf, int buf_len, uint16_t &pt) 
 {
@@ -282,7 +315,6 @@ THR30II_Settings::States getValueUnit(byte key[], byte *buf, int buf_len, uint16
 	return THR30II_Settings::States::St_valuesUnit;
 }
 
-// Helper for "patchSetAll()"
 // Checks, if there is a value in the current subUnti and extract this value (4-Byte)
 THR30II_Settings::States getValueSubunit(byte key[], byte *buf, int buf_len, uint16_t &pt)
 {
@@ -646,4 +678,4 @@ int THR30II_Settings::patch_setAll(uint8_t * buf, uint16_t buf_len)
 	} // end of foreach dumpunit
 
 	return 0; // Success
-} // end of THR30II_settings::patch_setAll
+} // end of patch_setAll

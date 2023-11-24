@@ -151,7 +151,6 @@ void init_patches_SDCard()
 						TRACE_THR30IIPEDAL( Serial.println("Error proceeding in file!" );)	
 					}
 					//TRACE_THR30IIPEDAL(Serial.println(inBrack);)
-
 				}
 
 				TRACE_THR30IIPEDAL(Serial.println("Read through \"patches.txt\".\n\r");)
