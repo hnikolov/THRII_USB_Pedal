@@ -37,9 +37,9 @@
 
 //#include <Adafruit_NeoPixel.h>	//Status LED library
 
-#include <ArduinoJson.h> 	// For patches stored in JSON (.thrl6p) format
-#include <algorithm>  	 	// For the std::find_if function
-#include <vector>			  	// In some cases we will use dynamic arrays - though heap usage is problematic
+//#include <ArduinoJson.h> 	// For patches stored in JSON (.thrl6p) format
+//#include <algorithm>  	 	// For the std::find_if function
+//#include <vector>			  	// In some cases we will use dynamic arrays - though heap usage is problematic
 							  	        // Where ever possibly we use std::array instead to keep values on stack instead
 #include "THR30II_Pedal.h"
 #include "Globals.h"		 	// For the global keys	
@@ -111,19 +111,21 @@ TFT_eSprite spr = TFT_eSprite(&tft); // Declare Sprite object "spr" with pointer
 // If USE_SDCARD is set to 0 then the file patches.h is included which needs to 
 // define a PROGMEM variable named patches.
 // NOTE: Compiler errors when using PROGMEM
-
+/*
 #define USE_SDCARD 1
 // #define USE_SDCARD 0
 #if USE_SDCARD
 #include <SD.h>
 const int sd_chipsel = BUILTIN_SDCARD;
 File32 file;
-
+*/
+/*
 #define PATCH_FILE "patches.txt" // If you want to use a SD card, a file with this name contains the patches 
 #else
 // #include <avr/pgmspace.h>
 #include "patches.h"  // Patches located in PROGMEM  (for Teensy 3.6/4.0/4.1 there is enough space there for hundreds of patches)
 #endif
+*/
 
 // Normal TRACE/DEBUG
 #define TRACE_THR30IIPEDAL(x) x	  // trace on
@@ -146,6 +148,9 @@ File32 file;
 //bool boost_activated = 0; Moved to the THR30II_Settings class
 //double scaledvolume = 0; // TODO: Can it be a local variable?
 
+/////////////////////////////////////////////////////////////////////////////////////////
+// USB MIDI
+/////////////////////////////////////////////////////////////////////////////////////////
 USBHost Usb; // On Teensy3.6/4.1 this is the class for the native USB-Host-Interface  
 // Note: It is essential to increase rx queue size in "USBHost_t3": RX_QUEUE_SIZE = 2048 should do the job, use 4096 to be safe
 
@@ -167,6 +172,9 @@ uint8_t currentSysEx[310];           // Buffer for the currently processed incom
 //String patchname;  // Limitation by Windows THR30 Remote is 64 Bytes.
 //String preSelName; // Global variable: Name of the pre selected patch
 
+/////////////////////////////////////////////////////////////////////////////////////////
+// GLOBAL VARIABLES
+/////////////////////////////////////////////////////////////////////////////////////////
 class THR30II_Settings THR_Values;			     // Actual settings of the connected THR30II
 class THR30II_Settings stored_THR_Values;    // Stored settings, when applying a patch (to be able to restore them later on)
 //class THR30II_Settings stored_Patch_Values;  // Stored settings of a (modified) patch, when applying a solo (to be able to restore them later on)
@@ -188,20 +196,25 @@ std::array< THR30II_Settings, 10 > thr_user_presets = {{ THR_Values_1, THR_Value
 //static volatile uint16_t npatches = 0; // Counts the patches stored on SD-card or in PROGMEN
 extern int16_t presel_patch_id;   	 // ID of actually pre-selected patch (absolute number)
 extern int16_t active_patch_id;   	 // ID of actually selected patch     (absolute number)
-extern bool send_patch_now; // pre-select patch to send (false) or send immediately (true)
+//extern bool send_patch_now; // pre-select patch to send (false) or send immediately (true)
 
-std::vector <String> libraryPatchNames; // All the names of the patches stored on SD-card or in PROGMEN
+//extern std::vector <String> libraryPatchNames; // All the names of the patches stored on SD-card or in PROGMEN
 
-uint16_t npatches  =  0; // Counts the patches stored on SD-card or in PROGMEN
+extern uint16_t npatches; // Counts the patches stored on SD-card or in PROGMEN
 int8_t nUserPreset = -1; // Used to cycle the THRII User presets
 
-#if USE_SDCARD
-	std::vector<std::string> patchesII; // patches are read in dynamically, not as a static PROGMEM array
-#else
-	                                    // patchesII is declared in "patches.h" in this case
-#endif
+extern std::vector<std::string> patchesII; // patches are read in dynamically, not as a static PROGMEM array
+//#if USE_SDCARD
+//	std::vector<std::string> patchesII; // patches are read in dynamically, not as a static PROGMEM array
+//#else
+//	                                    // patchesII is declared in "patches.h" in this case
+//#endif
 
 uint32_t msgcount = 0;
+
+void init_patches_SDCard(); // Forward declaration
+void init_patch_names();    // Forward declaration
+
 
 // Family-ID 24, Model-Nr: 1 = THR10II-W
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -226,7 +239,9 @@ void setup() // Do preparations
   Serial.println("THR30II Footswitch");
 
 	while( Serial.read() > 0 ) {}; // Make read buffer empty
-    
+  
+  init_patches_SDCard();
+  /*
   // -------------
   // SD-card setup
   // -------------
@@ -351,6 +366,7 @@ void setup() // Do preparations
 		npatches = patchesII.size();  //from file patches.h 
 		TRACE_V_THR30IIPEDAL(Serial.printf("From PROGMEM: npatches: %d",npatches) ;)
 	#endif	
+  */
 
   // ----------------------
   // Initialise the buttons
@@ -392,6 +408,8 @@ void setup() // Do preparations
 	TRACE_THR30IIPEDAL(Serial.printf(F("\n\rThere are %d JSON patches in patches.h / patches.txt.\n\r"), npatches);)
 	TRACE_THR30IIPEDAL(Serial.println(F("Fetching Library Patch Names:")); )
 
+  init_patch_names();
+  /*
 	DynamicJsonDocument djd (4096); // Buffer size for JSON decoding of thrl6p-files is at least 1967 (ArduinoJson Assistant) 2048 recommended
 	
 	for(int i = 0; i < npatches; i++ ) // Get the patch names by de-serializing
@@ -412,6 +430,7 @@ void setup() // Do preparations
       Serial.println(patchesII[i].c_str());
     }
 	}
+  */
 
 	delay(250); // Could be reduced in release version
 
