@@ -26,7 +26,7 @@ enum dynModes {Boost, Comp, Gate};
 void OnSysEx(const uint8_t *data, uint16_t length, bool complete);
 
 //uint16_t dePack(uint8_t *raw, uint8_t *clean, uint16_t received); //not needed on Teensy
-void drawStatusMask(uint8_t x, uint8_t y);
+//void drawStatusMask(uint8_t x, uint8_t y);
 void send_patch(uint8_t patch_id);
 void drawPatchID(uint16_t fgcolour, int patchID);
 void drawPatchIcon(int x, int y, int w, int h, uint16_t colour, int patchID);
@@ -209,8 +209,10 @@ const byte TFT_DIR_RIGHT_LEFT =3;
 #define ST7789_YELLOWGREEN 0x9E66
 
 // Expand colour palette
+#define TFT_THRGREY             tft.color565(127, 127, 127)
 #define TFT_THRDARKGREY         tft.color565( 63,  63,  63)
-#define TFT_THRVDARKGREY        tft.color565(  8,   8,   8)
+//#define TFT_THRVDARKGREY        tft.color565(  8,   8,   8)
+#define TFT_THRVDARKGREY        tft.color565( 16,  16,  16)
 #define TFT_THRCREAM            tft.color565(248, 227, 198)
 #define TFT_THRBROWN            tft.color565(122,  97,  67)
 

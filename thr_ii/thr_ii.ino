@@ -79,7 +79,24 @@ uint8_t button_state = 0;
 /////////////////////////////////////////////////////////////////////////////////////////
 #include <SPI.h>
 #include <TFT_eSPI.h> // Include the graphics library (this includes the sprite functions)
-// NOTE: ST7789 controller is selected and SPI is configured in User_Setup.h of TFT_eSPI library src!
+// NOTES: 
+// ST7789 controller is selected and SPI is configured in User_Setup.h of TFT_eSPI library src!
+//    #define ST7789_2_DRIVER // Minimal configuration option, define additional parameters below for this display
+//    #define TFT_WIDTH  240  // ST7789 240 x 240 and 240 x 320
+//    #define TFT_HEIGHT 320  // ST7789 240 x 320
+//    #define SPI_FREQUENCY  27000000
+// ILI9341 controller
+//    #define ILI9341_DRIVER  // Generic driver for common displays
+//    no width and height specified
+//    #define SPI_FREQUENCY  40000000
+// SPI pins on Teensy 4.1
+//    #define TFT_MISO  12
+//    #define TFT_MOSI  11
+//    #define TFT_SCK   13
+//    #define TFT_DC   9 
+//    #define TFT_CS   10  
+//    #define TFT_RST  8
+
 TFT_eSPI tft = TFT_eSPI(); // Declare object "tft"
 TFT_eSprite spr = TFT_eSprite(&tft); // Declare Sprite object "spr" with pointer to "tft" object
 
@@ -207,7 +224,8 @@ void setup() // Do preparations
   // ----------------------------
   tft.init();
 	//tft.begin();
-  tft.setRotation(1);
+  //tft.setRotation(1); // for the 2" tft (ST7789)
+  tft.setRotation(3); // for the 3.2" tft (ILI9341)
   spr.setColorDepth(16); // 16 bit colour needed to show antialiased fonts
   tft.fillScreen(TFT_THRCREAM); // Show a splash screen instead? :)
   //THR_Values.updateStatusMask(0,85); // Show some flash-screen here?
@@ -225,7 +243,7 @@ void setup() // Do preparations
 
   init_patch_names();
 
-	delay(250); // Could be reduced in release version
+//	delay(250); // Could be reduced in release version
 
   // -----------
 	// MIDI
@@ -233,7 +251,7 @@ void setup() // Do preparations
   midi1.begin();
   midi1.setHandleSysEx(OnSysEx);
 	
-	delay(250); // Could be reduced in release version
+//	delay(250); // Could be reduced in release version
 } // End of Setup()
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -265,8 +283,7 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
 // Global variables, because values must be stored in between two calls of "parse_thr"
 //////////////////////////////////////////////////////////////////////////////////////
 byte maskUpdate = false;    // Set, if a value changed and the display mask should be updated soon
-byte maskActive = false;    // Set, if local THR-settings or modified patch settings are valid
-							                     // (e.g. after init or after turning a knob or restored local settings)
+			                      // (e.g. after init or after turning a knob or restored local settings)
 
 UIStates _uistate = UI_idle; // Always begin with idle state until actual settings are fetched
 
@@ -283,19 +300,22 @@ void timing()
 {
   if( millis() - tick1 > 40 ) // Mask update if it was required because of changed values
   {
-    if( maskActive && maskUpdate )
+    if( maskUpdate )
     {
       THR_Values.updateStatusMask(0, 85);
+      maskUpdate = false;
       tick1 = millis(); // Start new waiting period
       return;
     }
 	}
 
-	if( millis() - tick2 > 1000 ) // Force mask update to avoid "forgotten" value changes
+	else if( millis() - tick2 > 1000 ) // Force mask update to avoid "forgotten" value changes
 	{
-	  if( maskActive )
+    // FIXME: There should not be 'forgotten' values
+    if( maskUpdate )
 		{
-		  THR_Values.updateStatusMask(0, 85);
+		  THR_Values.updateStatusMask(0, 85); // Needed probably only because midi_connected is set too soon
+      maskUpdate = false;
 		  tick2 = millis(); // Start new waiting period
 		  return;
 		}
@@ -309,7 +329,6 @@ void timing()
 			preNameActive = false; // Reset showing pre-selected name
 			
 			// Patch is not active => local Settings mask should be activated again
-			maskActive = true;
 			// drawStatusMask(0,85); // TODO: Check is we need this
 			maskUpdate = true;
 			
@@ -320,7 +339,7 @@ void timing()
 */
 //	 if(millis()-tick4>3500)  //force to get all actual settings by dump request
 //	 {
-//	    if(maskActive)
+//	    if(maskUpdate)
 //		{
 //		 //send_dump_request();  //not used - THR-Remote does not do this as well
 //		 tick4=millis();  //start new waiting
@@ -370,15 +389,14 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 				
 				Serial.println(F("\r\nSending Midi-Interface Activation..\r\n")); 
 				send_init();  // Send SysEx to activate THR30II-Midi interface
+
 				// ToDo: only set true, if SysEx's were acknowledged
 				midi_connected = true;  // A Midi Device is connected now. Proof later, if it is a THR30II
-			
+        
 				drawConnIcon(midi_connected);
 				drawPatchName(TFT_SKYBLUE, "INITIALIZING");
 
-				maskActive=true;  // Tell GUI that it must show the settings mask
-				// drawStatusMask(0,85); //y-position results from height of the bar-diagram, that is drawn bound to lowest display line
-				maskUpdate=true;  // Tell GUI to update settings mask one time because of changed settings		
+				maskUpdate = true; // Tell GUI to update settings mask one time because of changed settings		
 			}
 		} // of MIDI not connected so far
 	} // of if( midi1 )  means: a device is connected
@@ -390,7 +408,9 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 		THR_Values.ConnectedModel = 0x00000000; // TODO: This will lead to show "NOT CONNECTED"
     _uistate = UI_home_amp;                 //
     THR_Values.thrSettings = true;          //
-		drawConnIcon(midi_connected);
+		drawConnIcon(midi_connected); // Not part of THR_Values.updateStatusMask(0, 85); 
+    //THR_Values.updateStatusMask(0, 85); // FIXME: Update only to show "NOT CONNECTED"
+    maskUpdate = true; // Tell GUI to update settings mask one time because of changed settings
   } // of: if(midi_connected)
 		
 	timing(); // GUI timing must be called regularly enough. Locate the call in the working loop	
@@ -590,10 +610,6 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
       }
     }
 
-		if( !maskActive )
-		{
-			maskActive = true; // Tell GUI to show Settings mask
-		}
 		maskUpdate = true; // Tell GUI to update mask one time because of changed settings       
 	}		
 

@@ -500,13 +500,13 @@ void THR30II_Settings::updateStatusMask(uint8_t x, uint8_t y)
 	// FX1 Compressor -------------------------------------------------------------
 	utilparams[0] = compressor_setting[CO_SUSTAIN];
 	utilparams[1] = compressor_setting[CO_LEVEL];
- 	if(THR_Values.unit[COMPRESSOR]) { drawUtilUnit(60, 140, 60, 50, 1, TFT_THRWHITE,    TFT_THRDARKGREY,  "Comp", utilparams); }
-  else                            { drawUtilUnit(60, 140, 60, 50, 1, TFT_THRDARKGREY, TFT_THRVDARKGREY, "Comp", utilparams); }
+  if(THR_Values.unit[COMPRESSOR]) { drawUtilUnit(60, 140, 60, 50, 1, TFT_THRWHITE, TFT_THRDARKGREY,  "Comp", utilparams); }
+  else                            { drawUtilUnit(60, 140, 60, 50, 1, TFT_THRGREY,  TFT_THRVDARKGREY, "Comp", utilparams); }
 	
  	// Gate -----------------------------------------------------------------------
 	utilparams[0] = gate_setting[GA_THRESHOLD];
 	utilparams[1] = gate_setting[GA_DECAY];
- 	if(THR_Values.unit[GATE]) {	drawUtilUnit(60, 190, 60, 50, 0, TFT_THRYELLOW,    TFT_THRDIMYELLOW, "Gate", utilparams); }
+  if(THR_Values.unit[GATE]) {	drawUtilUnit(60, 190, 60, 50, 0, TFT_THRYELLOW,    TFT_THRDIMYELLOW, "Gate", utilparams); }
   else                      { drawUtilUnit(60, 190, 60, 50, 0, TFT_THRDIMYELLOW, TFT_THRVDARKGREY, "Gate", utilparams); }
 
 	// FX2 Effect (Chorus/Flanger/Phaser/Tremolo) ----------------------------------
