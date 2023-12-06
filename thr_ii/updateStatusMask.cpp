@@ -207,7 +207,19 @@ void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
   spr.loadFont(AA_FONT_LARGE);
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(fg_colour, bg_colour);
-  spr.drawString(patchname, w/2, h/2);
+
+  if( spr.textWidth(patchname) > w )
+  {
+    String line1 = patchname.substring(0, 15); // TODO: Split at space char
+    String line2 = patchname.substring(15, patchname.length());
+    spr.drawString(line1, w/2, h/2-11);
+    spr.drawString(line2, w/2, h/2+12);
+  }
+  else
+  {
+    spr.drawString(patchname, w/2, h/2);
+  }
+
   spr.pushSprite(x, y);
   spr.unloadFont();
   spr.deleteSprite();

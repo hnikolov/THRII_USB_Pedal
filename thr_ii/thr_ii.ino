@@ -610,7 +610,7 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
       }
     }
 
-		maskUpdate = true; // Tell GUI to update mask one time because of changed settings       
+		maskUpdate = true; // Tell GUI to update mask one time because of changed settings
 	}		
 
 	// Care about next queued outgoing SysEx, if at least one is pending
