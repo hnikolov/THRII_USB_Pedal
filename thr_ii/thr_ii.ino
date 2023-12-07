@@ -174,6 +174,8 @@ class THR30II_Settings stored_THR_Values;    // Stored settings, when applying a
 class THR30II_Settings THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5;
 std::array< THR30II_Settings, 10 > thr_user_presets = {{ THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5 }};
 
+extern void updateStatusMask(uint8_t x, uint8_t y, THR30II_Settings &thrs);
+
 // Family-ID 24, Model-Nr: 1 = THR10II-W
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // SETUP
@@ -302,7 +304,7 @@ void timing()
   {
     if( maskUpdate )
     {
-      THR_Values.updateStatusMask(0, 85);
+      updateStatusMask(0, 85, THR_Values);
       maskUpdate = false;
       tick1 = millis(); // Start new waiting period
       return;
@@ -314,7 +316,7 @@ void timing()
     // FIXME: There should not be 'forgotten' values
     if( maskUpdate )
 		{
-		  THR_Values.updateStatusMask(0, 85); // Needed probably only because midi_connected is set too soon
+		  updateStatusMask(0, 85, THR_Values); // Needed probably only because midi_connected is set too soon
       maskUpdate = false;
 		  tick2 = millis(); // Start new waiting period
 		  return;

@@ -300,7 +300,7 @@ class THR30II_Settings
 	double GetControl(uint8_t ctrl);
 	void SetPatchName(String nam, int nr=-1);  // For the 5 User-Settings (-1 = actual as default )
 	String getPatchName();
-	void updateStatusMask(uint8_t x, uint8_t y);
+//	void updateStatusMask(uint8_t x, uint8_t y);
 	void updateConnectedBanner();  // Show the connected Model 
 	void setActiveUserSetting(int8_t val); // Setter for number of the active user setting
 	int8_t getActiveUserSetting(); // Getter for number of the active user setting
@@ -497,7 +497,7 @@ class THR30II_Settings
 
   bool boost_activated;
 
-  private:
+//  private: // FIXME: Commented for debug purposes, review what needs to be public and what private!
 	bool MIDI_Activated = false; // Set true, if MIDI unlocked by magic key (success checked by receiving first regular THR-SysEx)
 	
 	bool dumpInProgress = false;
