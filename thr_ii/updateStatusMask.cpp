@@ -192,6 +192,23 @@ void drawConnIcon(bool THRconnected)
   spr.deleteSprite();
 }
 
+// Split patch name into 2 lines if too long. Split at space, '-', or '_' char
+uint8_t getSplitPos( String patchname )
+{
+    uint8_t pos = 14; // Use < 14 to have shorter first line
+    while( pos > 0 )
+    {
+      char tmp = patchname.charAt( pos );
+      if( tmp == ' ' || tmp == '-' || tmp == '_' )
+      {
+        return pos;
+      }
+      pos--;
+    }
+    
+    return 14; // Should not happen
+}
+
 void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
 {
   int x = 80, y = 20, w = 240, h = 60;
@@ -210,8 +227,9 @@ void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
 
   if( spr.textWidth(patchname) > w )
   {
-    String line1 = patchname.substring(0, 15); // TODO: Split at space char
-    String line2 = patchname.substring(15, patchname.length());
+    uint8_t pos = getSplitPos( patchname );
+    String line1 = patchname.substring(0, pos); // TODO: Split at space char
+    String line2 = patchname.substring(pos, patchname.length());
     spr.drawString(line1, w/2, h/2-11);
     spr.drawString(line2, w/2, h/2+12);
   }
