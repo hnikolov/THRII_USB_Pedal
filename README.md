@@ -34,7 +34,7 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
 **CURRENT BEHAVIOUR**
 - LED strip support removed, was in BuhJuhWuh version
 - No analogue input support (for now)
-- The AudioVolume and GuitarVolume parameters are shown as bars (GA) on the right part of the TFT screen i.s.o. the analogue pedals values (P).
+- The GuitarVolume and AudioVolume parameters are shown as bars (GA) on the right part of the TFT screen i.s.o. the analogue pedals values (P).
 - At start-up and connection with THR, GUI shows "INITIALIZING" and then "*THR* PANEL". 
   It checks and prints the actual THR name, e.g., in my case *THR* = **THR10II-W**.   
   It changes to a User preset name when selected from the THRII amp or by pressing Button 6.
@@ -47,7 +47,7 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
 
 *BUTTONS (Original Layout)*
 - Selecting a patch (Button 1), switches to a patch (white color)
-  - Pressing Button 1 again switches to THR settings (THR Local, User preset, or User preset(*))
+  - Pressing Button 1 again switches to THR settings (THR Local, User preset, or modified User preset)
   - Pressing Button 1 again loads the preselected patch again (reloads, possible parameter changes are lost)
 - Button 2 works as intended - cycle between AMP/COL/Cabinets.
   - Selection to what to cycle - press and hold
@@ -82,23 +82,24 @@ After some fixes, it seems that the GUI features from BuhJuhWuh's code base work
 
 **DONE**
 - Use button press event only for the tap echo time button/feature
-- Remove '(\*)' from modified patch to save space on screen - change only the color of the patch name
+- Removed '(\*)' from modified patch to save space on screen - change only the color of the patch name
 - Invert patch name font color and background when Solo switch on
 - When switching from patch to the THRII settings, the THRII (user preset) patch name is shown but the small-font number (0-4) was not
 - At connection, start with 'THR Local' and show the (large-font) number of the preselected patch (1), was (-1)
-- Select User presets from the pedal board (number of preset to be on the THR display)
-  - Currently sends a complete patch to be loaded as active settings
+- Select User presets from the pedal board via Button 6 - number of preset to be shown on the THR display
+  - Originally was sending a complete patch to be loaded as active settings, therefore, the THR display did not show the preset number
+- Refactoring in progress: Moved code to different files: SDCard, FSM, etc.
 
 **TODOs**
-- Refactor: Move code to different files: SDCard, FSM, etc.
 - Introduce button mapping (it has been removed)
-- Define different FSMs as functions, currently fsm is in the loop() function
+- Define a new FSM (as a function) for a 9-button layout
 - Use Family ID and model number: obtain after connection and use in communication
   - In this way, all THRxII flavour should be supported
 - Add new fonts - currently facing problems with this :(
 - Cannot switch THRII amp/col without calling createPatch() 
-  - Can switch from Boom SendSX Midi SW sending hex data. The 'same' data does not switch amp/col when sent from Teensy
+  - Can switch from 'Boom SendSX' Midi SW sending hex data. The 'same' data does not switch amp/col when sent from Teensy
 - Use Guitar volume for Boost (Solo switch). Currently uses Master+EQ. Make it selectable?
+  - Care to be taken when switching presets and the solo switch was on!
 - Define useable settings for all parameters/effects and initialize them at startup. I
   - In this case even if nothing is loaded from the amp, effects can be switched and used. Currently, they can be switched but not very usable
 - Define new 10-button, 9-button, and 7-button versions
