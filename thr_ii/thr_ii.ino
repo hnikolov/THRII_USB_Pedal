@@ -289,7 +289,7 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
 byte maskUpdate = false;    // Set, if a value changed and the display mask should be updated soon
 			                      // (e.g. after init or after turning a knob or restored local settings)
 
-UIStates _uistate = UI_idle; // Always begin with idle state until actual settings are fetched
+UIStates _uistate = UI_home_amp; // TODO: idle state not needed?
 
 uint32_t tick1 = millis(); // Timer for regular mask update
 uint32_t tick2 = millis(); // Timer for background mask update for forgotten values

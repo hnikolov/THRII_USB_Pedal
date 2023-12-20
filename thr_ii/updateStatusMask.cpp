@@ -34,9 +34,9 @@ extern TFT_eSprite spr;
 extern std::vector <String> libraryPatchNames;
 
 extern uint16_t npatches;
-extern int16_t presel_patch_id;   	 // ID of actually pre-selected patch (absolute number)
-extern int16_t active_patch_id;   	 // ID of actually selected patch     (absolute number)
-//extern bool send_patch_now; // pre-select patch to send (false) or send immediately (true)
+extern int16_t presel_patch_id; // ID of actually pre-selected patch (absolute number)
+extern int16_t active_patch_id; // ID of actually selected patch     (absolute number)
+extern int8_t nUserPreset;      // Used to cycle the THRII User presets
 
 extern byte maskUpdate;
 /////////////////////////
@@ -483,12 +483,11 @@ void THR30II_Settings::updateConnectedBanner() // Show the connected Model
 // x-position (0) where to place top left corner of status mask
 // y-position     where to place top left corner of status mask
 /////////////////////////////////////////////////////////////////
-//void updateStatusMask(uint8_t x, uint8_t y, THR30II_Settings &thrs)
 void updateStatusMask(THR30II_Settings &thrs)
 {
 	// Patch number
-  drawPatchID(TFT_THRCREAM, active_patch_id);
-//  drawPatchID(TFT_THRCREAM, active_patch_id, thrs.boost_activated);
+  if( _uistate == UI_home_amp )        { drawPatchID(TFT_THRCREAM, nUserPreset + 1); }
+  else if( _uistate == UI_home_patch ) { drawPatchID(TFT_THRCREAM, active_patch_id); }  
 	
 	// Patch icon bank
 	drawPatchIconBank(presel_patch_id, active_patch_id, thrs.getActiveUserSetting());
