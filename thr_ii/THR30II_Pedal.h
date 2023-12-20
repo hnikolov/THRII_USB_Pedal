@@ -8,7 +8,12 @@
  * Last modified: 19/02/2023 Buhjuhwuh
  *  Author: Martin Zwerschke
  *
- */ 
+ */
+
+/*
+ * Further modified: Dec 2023
+ *  Hristo Nikolov
+ */
 
 #ifndef _THR30II_PEDAL_H_
 #define _THR30II_PEDAL_H_
@@ -17,54 +22,34 @@
 #include <ArduinoQueue.h>
 #include "THR30II.h"
 
-// Moved from main() 
 enum ampSelectModes {COL, AMP, CAB};
 enum dynModes {Boost, Comp, Gate};
 
-////////////////////////////////////////
+// enum UIStates { UI_idle, UI_init_act_set, UI_act_vol_sol, UI_patch, UI_ded_sol, UI_pat_vol_sol}; //States for the patch/solo activation user interface
+enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_manual,  UI_edit, UI_save, UI_name};
+extern UIStates _uistate;
+extern UIStates _uistate_prev;
 
-void OnSysEx(const uint8_t *data, uint16_t length, bool complete);
-
-//uint16_t dePack(uint8_t *raw, uint8_t *clean, uint16_t received); //not needed on Teensy
-//void drawStatusMask(uint8_t x, uint8_t y);
-void send_patch(uint8_t patch_id);
-void drawPatchID(uint16_t fgcolour, int patchID);
-void drawPatchIcon(int x, int y, int w, int h, uint16_t colour, int patchID);
 void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false);
-void send_dump_request();
-void solo_deactivate(bool restore);
-void solo_activate();
-void patch_deactivate();
-void patch_activate(uint16_t pnr);
-void do_volume_patch();
-void undo_volume_patch();
-void do_gain_boost();
-void undo_gain_boost();
-void send_init();         // Try to activate THR30II MIDI 
-void WorkingTimer_Tick();
 void drawConnIcon(bool THRconnected);
 
-//void pollpedalinputs();
-//void updatemastervolume(int mastervolume);
-//void blinkTTLED();
+void patch_activate(uint16_t pnr);
 
-//extern String preSelName; //Name of the pre selected patch
+void do_gain_boost();
+void undo_gain_boost();
 
-// enum UIStates { UI_idle, UI_init_act_set, UI_act_vol_sol, UI_patch, UI_ded_sol, UI_pat_vol_sol}; //States for the patch/solo activation user interface
-enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_edit, UI_save, UI_name};
-extern UIStates _uistate;
 
 extern ArduinoQueue<Outmessage> outqueue;
-//Messages, that have to be sent out,
+// Messages, that have to be sent out,
 // and flags to change, if an awaited acknowledge comes in (adressed by their ID)
 extern ArduinoQueue <std::tuple<uint16_t, Outmessage, bool *, bool> > on_ack_queue;
 extern ArduinoQueue<SysExMessage> inqueue;
 
 // TFT Write Directions
-const byte TFT_DIR_BOTTOM_UP =0;
-const byte TFT_DIR_LEFT_RIGHT =1;
-const byte TFT_DIR_UP_DOWN =2;
-const byte TFT_DIR_RIGHT_LEFT =3;
+const byte TFT_DIR_BOTTOM_UP  = 0;
+const byte TFT_DIR_LEFT_RIGHT = 1;
+const byte TFT_DIR_UP_DOWN    = 2;
+const byte TFT_DIR_RIGHT_LEFT = 3;
 
 // Color definitions (RGB565)
 #define ST7789_ALICEBLUE 0xF7DF 

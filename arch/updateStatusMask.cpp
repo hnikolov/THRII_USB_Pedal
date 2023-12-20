@@ -36,56 +36,16 @@ extern std::vector <String> libraryPatchNames;
 extern uint16_t npatches;
 extern int16_t presel_patch_id;   	 // ID of actually pre-selected patch (absolute number)
 extern int16_t active_patch_id;   	 // ID of actually selected patch     (absolute number)
-//extern bool send_patch_now; // pre-select patch to send (false) or send immediately (true)
+extern bool send_patch_now; // pre-select patch to send (false) or send immediately (true)
 
 extern byte maskUpdate;
 /////////////////////////
 
 ampSelectModes amp_select_mode = COL; // Currently used in updateStatusMask()
 
-// Can be: THRII (5 presets), User, and Factory (TODO) set
-void drawPatchSet(uint16_t colour, String ps_name)
-{
-  int x = 0, y = 0, w = 80, h = 20;
-  spr.createSprite(w, h);
-  spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
-  spr.loadFont(AA_FONT_SMALL);
-  spr.setTextDatum(MC_DATUM);
-  spr.setTextColor(TFT_BLACK, colour);
-  spr.drawString(ps_name, w/2, h/2+1);
-  spr.pushSprite(x, y);
-  spr.deleteSprite();
-}
-/*
-void drawPatchID(uint16_t fgcolour, int patchID, bool inverted = false)
-{
-  // TODO: y = 20, h = 60?
- 	int x = 0, y = 0, w = 80, h = 80;
-  uint16_t fg_colour = fgcolour;
-  uint16_t bg_colour = TFT_THRVDARKGREY;
-  if( inverted )
-  {
-    fg_colour = TFT_THRVDARKGREY;
-    bg_colour = fgcolour;
-  }
-	spr.createSprite(w, h);
-	spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, bg_colour, TFT_BLACK);
-	spr.setTextFont(7);
-	spr.setTextSize(1);
-	spr.setTextDatum(MR_DATUM);
-	spr.setTextColor(TFT_BLACK); // TODO in case of inverted
-	spr.drawNumber(88, w-7, h/2);
-  spr.setTextColor(fg_colour, bg_colour);
-	spr.drawNumber(patchID, w-7, h/2);
-	spr.pushSprite(x, y);
-	spr.unloadFont();
-	spr.deleteSprite();
-}
-/*/
 void drawPatchID(uint16_t fgcolour, int patchID)
 {
-// 	int x = 0, y = 0, w = 80, h = 80;
- 	int x = 0, y = 20, w = 80, h = 60;
+ 	int x = 0, y = 0, w = 80, h = 80;
 	uint16_t bgcolour = TFT_THRVDARKGREY;
 	spr.createSprite(w, h);
 	spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, bgcolour, TFT_BLACK);
@@ -93,25 +53,12 @@ void drawPatchID(uint16_t fgcolour, int patchID)
 	spr.setTextSize(1);
 	spr.setTextDatum(MR_DATUM);
 	spr.setTextColor(TFT_BLACK);
-	spr.drawNumber(88, w-10, h/2);
+	spr.drawNumber(88, w-7, h/2);
 	spr.setTextColor(fgcolour);
-	spr.drawNumber(patchID, w-10, h/2);
+	spr.drawNumber(patchID, w-7, h/2);
 	spr.pushSprite(x, y);
 	spr.unloadFont();
 	spr.deleteSprite();
-}
-//*/
-
-void drawPatchIcon(int x, int y, int w, int h, uint16_t colour, int patchID)
-{
-  spr.createSprite(w, h);
-  spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
-  spr.loadFont(AA_FONT_SMALL);
-  spr.setTextDatum(MC_DATUM);
-  spr.setTextColor(TFT_BLACK, colour);
-  spr.drawNumber(patchID, 10, 11);
-  spr.pushSprite(x, y);
-  spr.deleteSprite();
 }
 
 void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_user_setting)
@@ -174,7 +121,18 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
 	}
 }
 
-// Used to indicate Manual mode
+void drawPatchIcon(int x, int y, int w, int h, uint16_t colour, int patchID)
+{
+  spr.createSprite(w, h);
+  spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
+  spr.loadFont(AA_FONT_SMALL);
+  spr.setTextDatum(MC_DATUM);
+  spr.setTextColor(TFT_BLACK, colour);
+  spr.drawNumber(patchID, 10, 11);
+  spr.pushSprite(x, y);
+  spr.deleteSprite();
+}
+
 void drawPatchSelMode(uint16_t colour)
 {
   int x = 180, y = 0, w = 50, h = 20;
@@ -183,7 +141,7 @@ void drawPatchSelMode(uint16_t colour)
   spr.loadFont(AA_FONT_SMALL);
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(TFT_BLACK, colour);
-  spr.drawString("MAN", w/2, h/2+1);
+  spr.drawString("NOW", w/2, h/2+1);
   spr.pushSprite(x, y);
   spr.deleteSprite();
 }
@@ -252,7 +210,6 @@ uint8_t getSplitPos( String patchname )
 void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
 {
   int x = 80, y = 20, w = 240, h = 60;
-//  int x = 60, y = 80, w = 240, h = 60; // Place in manual mode layout
   uint16_t fg_colour = fgcolour;
   uint16_t bg_colour = TFT_THRVDARKGREY;
   if( inverted )
@@ -483,31 +440,24 @@ void THR30II_Settings::updateConnectedBanner() // Show the connected Model
 // x-position (0) where to place top left corner of status mask
 // y-position     where to place top left corner of status mask
 /////////////////////////////////////////////////////////////////
-//void updateStatusMask(uint8_t x, uint8_t y, THR30II_Settings &thrs)
-void updateStatusMask(THR30II_Settings &thrs)
+//void THR30II_Settings::updateStatusMask(uint8_t x, uint8_t y)
+void updateStatusMask(uint8_t x, uint8_t y, THR30II_Settings &thrs)
 {
 	// Patch number
   drawPatchID(TFT_THRCREAM, active_patch_id);
-//  drawPatchID(TFT_THRCREAM, active_patch_id, thrs.boost_activated);
 	
 	// Patch icon bank
 	drawPatchIconBank(presel_patch_id, active_patch_id, thrs.getActiveUserSetting());
 
-	// Use Patch select mode to indicate manual mode
-  if( _uistate == UI_manual ) { drawPatchSelMode(TFT_THRCREAM); }
-  else                        { drawPatchSelMode(TFT_THRBROWN); }
-
-  // Show which set of patches is used
-  if( _uistate == UI_home_amp )        { drawPatchSet(TFT_THRCREAM, "THRII"); }
-  else if( _uistate == UI_home_patch ) { drawPatchSet(TFT_THRCREAM, "USER");  } // TODO: 'FACTORY'
-
-  /*     
 	// Patch select mode (pre-select/immediate) & UI mode
 	switch( _uistate )
   {
 		case UI_home_amp:
+			if( send_patch_now ) { drawPatchSelMode(TFT_THRCREAM); }
+			else                 { drawPatchSelMode(TFT_THRBROWN); }
+		  break;
+
 		case UI_home_patch:
-		case UI_manual:
 			if( send_patch_now ) { drawPatchSelMode(TFT_THRCREAM); }
 			else                 { drawPatchSelMode(TFT_THRBROWN); }
 		  break;
@@ -517,14 +467,21 @@ void updateStatusMask(THR30II_Settings &thrs)
 		default:
 		  break;
 	}
-  */
 
 	// Amp select mode (COL/AMP/CAB)
 	switch( amp_select_mode )
 	{
-		case COL: drawAmpSelMode(TFT_THRCREAM, "COL"); break;
-		case AMP:	drawAmpSelMode(TFT_THRCREAM, "AMP"); break;
-		case CAB: drawAmpSelMode(TFT_THRCREAM, "CAB"); break;
+		case COL:
+			drawAmpSelMode(TFT_THRCREAM, "COL");
+		  break;
+
+		case AMP:
+			drawAmpSelMode(TFT_THRCREAM, "AMP");
+		  break;
+
+		case CAB:
+			drawAmpSelMode(TFT_THRCREAM, "CAB");
+		  break;
 	}
 
 	String FXtitle;
@@ -541,9 +498,6 @@ void updateStatusMask(THR30II_Settings &thrs)
 
 	// Gain, Master, and EQ (B/M/T) ---------------------------------------------------------
   drawBarChart( 0, 80, 15, 160, TFT_THRBROWN, TFT_THRCREAM,  "G", thrs.control[CTRL_GAIN]);
-  drawBarChart(15, 80, 15, 160, TFT_THRBROWN, TFT_THRCREAM,  "M", thrs.control[CTRL_MASTER]);
-  drawEQChart( 30, 80, 30, 160, TFT_THRBROWN, TFT_THRCREAM, "EQ", thrs.control[CTRL_BASS], thrs.control[CTRL_MID], thrs.control[CTRL_TREBLE]);
-  /*
   if( thrs.boost_activated )
   {
     drawBarChart(15, 80, 15, 160, TFT_THRDIMORANGE, TFT_THRORANGE,  "M", thrs.control[CTRL_MASTER]);
@@ -554,16 +508,23 @@ void updateStatusMask(THR30II_Settings &thrs)
     drawBarChart(15, 80, 15, 160, TFT_THRBROWN, TFT_THRCREAM,  "M", thrs.control[CTRL_MASTER]);
    	drawEQChart( 30, 80, 30, 160, TFT_THRBROWN, TFT_THRCREAM, "EQ", thrs.control[CTRL_BASS], thrs.control[CTRL_MID], thrs.control[CTRL_TREBLE]);
   }
-  */
+
 	// Amp/Cabinet ---------------------------------------------------------------
 	switch( thrs.col )
 	{
-		case BOUTIQUE: tft.setTextColor(TFT_BLUE,  TFT_BLACK);	break;
-		case MODERN:   tft.setTextColor(TFT_GREEN, TFT_BLACK); 	break;
-		case CLASSIC:  tft.setTextColor(TFT_RED, TFT_BLACK); 		break;
+		case BOUTIQUE:
+			tft.setTextColor(TFT_BLUE, TFT_BLACK);
+		break;
+
+		case MODERN:
+			tft.setTextColor(TFT_GREEN, TFT_BLACK);
+		break;
+
+		case CLASSIC:
+			tft.setTextColor(TFT_RED, TFT_BLACK);
+		break;
 	}
   drawAmpUnit(60, 80, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab);
-//  drawAmpUnit(80, 20, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab); // Place in manual mode layout
 	
 	// FX1 Compressor -------------------------------------------------------------
 	utilparams[0] = thrs.compressor_setting[CO_SUSTAIN];
@@ -805,50 +766,7 @@ void updateStatusMask(THR30II_Settings &thrs)
   drawPPChart(300, 80, 20, 160, TFT_THRBROWN, TFT_THRCREAM, "VA", thrs.guitar_volume, thrs.audio_volume);
 
 	String s2, s3;
-
-  if( _uistate == UI_home_amp || (_uistate == UI_manual && _uistate_prev == UI_home_amp) )
-  {
-    if( thrs.thrSettings )
-    {
-      s2 = thrs.THRII_MODEL_NAME();
-      if( s2 != "None") { s2 += " PANEL";       }
-      else              { s2 = "NOT CONNECTED"; }
-      drawPatchName(TFT_SKYBLUE, s2, thrs.boost_activated);
-    }
-    else if( thrs.getUserSettingsHaveChanged() )
-    {
-      s2 = thrs.getPatchName();
-      drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
-    }
-    else
-    {
-      s2 = thrs.getPatchName();
-      drawPatchName(TFT_SKYBLUE, s2, thrs.boost_activated);
-    }
-  }
-  else if( _uistate == UI_home_patch || (_uistate == UI_manual && _uistate_prev == UI_home_patch) )
-  {
-    // If unchanged User Memory setting is active:
-    if( !thrs.getUserSettingsHaveChanged() )
-    {
-      if( presel_patch_id != active_patch_id )
-      {
-        s2 = libraryPatchNames[presel_patch_id - 1]; // libraryPatchNames is 0-indexed
-        drawPatchName(ST7789_ORANGE, s2, thrs.boost_activated);
-      }
-      else
-      {
-        s2 = libraryPatchNames[active_patch_id - 1];
-        drawPatchName(TFT_THRCREAM, s2, thrs.boost_activated);
-      }
-    }
-    else
-    {
-      s2 = libraryPatchNames[active_patch_id - 1]; // libraryPatchNames is 0-indexed; "(*)" removed to save space
-      drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
-    }
-  }
-  /*
+	
 	switch( _uistate )
 	{
 	  case UI_home_amp: // !patchActive
@@ -897,6 +815,5 @@ void updateStatusMask(THR30II_Settings &thrs)
 		default:
 		break;
 	}
-  */
 	maskUpdate = false; // Tell local GUI that mask has been updated
 }

@@ -159,7 +159,8 @@ void init_patch_names();    // Forward declaration
 //////////////////
 // FSM
 //////////////////
-void fsm_10b_1(UIStates &_uistate, uint8_t &button_state); // Forward declaration
+//void fsm_10b_1(UIStates &_uistate, uint8_t &button_state); // Forward declaration
+void fsm_9b_1(UIStates &_uistate, uint8_t &button_state); // Forward declaration
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
@@ -174,7 +175,8 @@ class THR30II_Settings stored_THR_Values;    // Stored settings, when applying a
 class THR30II_Settings THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5;
 std::array< THR30II_Settings, 10 > thr_user_presets = {{ THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5 }};
 
-extern void updateStatusMask(uint8_t x, uint8_t y, THR30II_Settings &thrs);
+//extern void updateStatusMask(uint8_t x, uint8_t y, THR30II_Settings &thrs);
+extern void updateStatusMask(THR30II_Settings &thrs);
 
 // Family-ID 24, Model-Nr: 1 = THR10II-W
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -264,12 +266,12 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
   switch (eventType) {
     case AceButton::kEventPressed:
       // Only the tap-echo time button reacts on key pressed event
-      if( button_pressed == 3 ) { button_state = button_pressed; }
+      if( button_pressed == 4 ) { button_state = button_pressed; }
       break;
 
     // case AceButton::kEventReleased:    
     case AceButton::kEventClicked:
-      if( button_pressed != 3 ) { button_state = button_pressed; } // Skip button #3
+      if( button_pressed != 4 ) { button_state = button_pressed; } // Skip button #4
       break;
 
     case AceButton::kEventLongPressed:
@@ -304,7 +306,8 @@ void timing()
   {
     if( maskUpdate )
     {
-      updateStatusMask(0, 85, THR_Values);
+//      updateStatusMask(0, 85, THR_Values);
+      updateStatusMask(THR_Values);
       maskUpdate = false;
       tick1 = millis(); // Start new waiting period
       return;
@@ -316,7 +319,8 @@ void timing()
     // FIXME: There should not be 'forgotten' values
     if( maskUpdate )
 		{
-		  updateStatusMask(0, 85, THR_Values); // Needed probably only because midi_connected is set too soon
+//		  updateStatusMask(0, 85, THR_Values); // Needed probably only because midi_connected is set too soon
+		  updateStatusMask(THR_Values); // Needed probably only because midi_connected is set too soon
       maskUpdate = false;
 		  tick2 = millis(); // Start new waiting period
 		  return;
@@ -422,7 +426,8 @@ void loop() // Infinite working loop:  check midi connection status, poll button
   // Should be called every 4-5ms or faster, for the default debouncing time of ~20ms.
   for(uint8_t i = 0; i < NUM_BUTTONS; i++) { buttons[i].check(); }
 
-  fsm_10b_1(_uistate, button_state);
+//  fsm_10b_1(_uistate, button_state);
+  fsm_9b_1(_uistate, button_state);
 
 } // End of loop()
 
@@ -481,24 +486,35 @@ void undo_gain_boost()
 	THR_Values.boost_activated = false;
 }
 
+bool g_vol = false;
+
 void do_volume_patch() // Increases Volume and/or Tone settings for SOLO to be louder than actual patch
 {
+  g_vol = false;
 	std::copy(THR_Values.control.begin(), THR_Values.control.end(), THR_Values.control_store.begin());  // Save volume and tone related settings
 
-	if( THR_Values.GetControl(CTRL_MASTER) < 100 / 1.333333 ) // Is there enough headroom to increase Master Volume by 33%?
+	if( THR_Values.guitar_volume < 100 / 1.333333 ) // Is there enough headroom to increase Master Volume by 33%?
+	{
+		THR_Values.sendChangestoTHR = true;
+		THR_Values.SetGuitarVol(THR_Values.guitar_volume * 1.333333); // Do it
+		THR_Values.sendChangestoTHR = false;
+    g_vol = true;
+	}
+  else if( THR_Values.GetControl(CTRL_MASTER) < 100 / 1.333333 ) // Is there enough headroom to increase Master Volume by 33%?
 	{
 		THR_Values.sendChangestoTHR = true;
 		THR_Values.SetControl(CTRL_MASTER, THR_Values.GetControl(CTRL_MASTER) * 1.333333); // Do it
 		THR_Values.sendChangestoTHR = false;
-	}
-	else // Try to increase volume by simultaneously increasing MID/TREBLE/BASS
+	}	
+  else // Try to increase volume by simultaneously increasing MID/TREBLE/BASS
 	{
 		THR_Values.sendChangestoTHR = true;
 		double margin = (100.0 - THR_Values.GetControl(CTRL_MASTER)) / THR_Values.GetControl(CTRL_MASTER); // Maximum MASTER multiplier? (e.g. 0.17)
 		THR_Values.SetControl(CTRL_MASTER, 100); // Use maximum MASTER
 		double max_tone = std::max(std::max(THR_Values.GetControl(CTRL_BASS), THR_Values.GetControl(CTRL_MID)), THR_Values.GetControl(CTRL_TREBLE)); // Highest value of the tone settings 
-		double tone_margin=(100.0-max_tone)/max_tone; // Maximum equal TONE-Settings multiplier? (e.g. 0.28)
-		if( tone_margin > 0.333333 - margin ) // Can we increase the TONE settings simultaneously to reach the missing MASTER-increasement?
+		double tone_margin = (100.0 - max_tone) / max_tone; // Maximum equal TONE-Settings multiplier? (e.g. 0.28)
+		
+    if( tone_margin > 0.333333 - margin ) // Can we increase the TONE settings simultaneously to reach the missing MASTER-increasement?
 		{
 			THR_Values.SetControl(CTRL_BASS,   THR_Values.GetControl(CTRL_BASS)   * (1+0.333333 - margin));
 			THR_Values.SetControl(CTRL_MID,    THR_Values.GetControl(CTRL_MID)    * (1+0.333333 - margin));
@@ -518,17 +534,24 @@ void undo_volume_patch()
 {
 	THR_Values.sendChangestoTHR = true;
 	// Restore volume related settings
-	THR_Values.SetControl( CTRL_MASTER, THR_Values.control_store[CTRL_MASTER] );
-	// THR_Values.SetControl( CTRL_GAIN, THR_Values.control_store[CTRL_GAIN] ); // Gain is not involved in Volume-Patch
-	THR_Values.SetControl( CTRL_BASS,   THR_Values.control_store[CTRL_BASS] );
-	THR_Values.SetControl( CTRL_MID,    THR_Values.control_store[CTRL_MID] );
-	THR_Values.SetControl( CTRL_TREBLE, THR_Values.control_store[CTRL_TREBLE] );
+  if( g_vol == true )
+  {
+    THR_Values.SetGuitarVol(THR_Values.guitar_volume / 1.333333);
+  }
+  else
+  {
+    THR_Values.SetControl( CTRL_MASTER, THR_Values.control_store[CTRL_MASTER] );
+    THR_Values.SetControl( CTRL_BASS,   THR_Values.control_store[CTRL_BASS] );
+    THR_Values.SetControl( CTRL_MID,    THR_Values.control_store[CTRL_MID] );
+    THR_Values.SetControl( CTRL_TREBLE, THR_Values.control_store[CTRL_TREBLE] );    
+  }
 	THR_Values.sendChangestoTHR = false;
 }
 
 //////////////////////////////////////////////
 // Manage patches activation
 //////////////////////////////////////////////
+/*
 void patch_deactivate()
 {
 	// Restore local settings
@@ -549,7 +572,7 @@ void patch_deactivate()
 	// Sending/activating local settings means returning to the initial actual settings
 	_uistate = UI_home_amp;
 }
-
+*/
 void patch_activate(uint16_t pnr) // Check patchnumber and send patch as a SysEx message to THR30II
 {
 	if( pnr <= npatches ) // This patch-id is available
