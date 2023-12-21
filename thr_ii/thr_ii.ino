@@ -493,6 +493,8 @@ void do_volume_patch() // Increases Volume and/or Tone settings for SOLO to be l
   g_vol = false;
 	std::copy(THR_Values.control.begin(), THR_Values.control.end(), THR_Values.control_store.begin());  // Save volume and tone related settings
 
+  // TODO: Needs more than just 1.3x, but how much?
+  /*
 	if( THR_Values.guitar_volume < 100 / 1.333333 ) // Is there enough headroom to increase Master Volume by 33%?
 	{
 		THR_Values.sendChangestoTHR = true;
@@ -500,7 +502,9 @@ void do_volume_patch() // Increases Volume and/or Tone settings for SOLO to be l
 		THR_Values.sendChangestoTHR = false;
     g_vol = true;
 	}
-  else if( THR_Values.GetControl(CTRL_MASTER) < 100 / 1.333333 ) // Is there enough headroom to increase Master Volume by 33%?
+  else
+  */ 
+  if( THR_Values.GetControl(CTRL_MASTER) < 100 / 1.333333 ) // Is there enough headroom to increase Master Volume by 33%?
 	{
 		THR_Values.sendChangestoTHR = true;
 		THR_Values.SetControl(CTRL_MASTER, THR_Values.GetControl(CTRL_MASTER) * 1.333333); // Do it
@@ -508,6 +512,7 @@ void do_volume_patch() // Increases Volume and/or Tone settings for SOLO to be l
 	}	
   else // Try to increase volume by simultaneously increasing MID/TREBLE/BASS
 	{
+    // NOTE: This removes the preset number from the THRII display
 		THR_Values.sendChangestoTHR = true;
 		double margin = (100.0 - THR_Values.GetControl(CTRL_MASTER)) / THR_Values.GetControl(CTRL_MASTER); // Maximum MASTER multiplier? (e.g. 0.17)
 		THR_Values.SetControl(CTRL_MASTER, 100); // Use maximum MASTER
@@ -540,6 +545,7 @@ void undo_volume_patch()
   }
   else
   {
+    // NOTE: This does not bring back the preset number on the THRII display
     THR_Values.SetControl( CTRL_MASTER, THR_Values.control_store[CTRL_MASTER] );
     THR_Values.SetControl( CTRL_BASS,   THR_Values.control_store[CTRL_BASS] );
     THR_Values.SetControl( CTRL_MID,    THR_Values.control_store[CTRL_MID] );
