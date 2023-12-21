@@ -124,27 +124,12 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
 	switch( _uistate ) 
   {
 		case UI_home_amp:
-			for(int i = 1; i <= 5; i++)
-			{
-				if( i == active_user_setting + 1 )
-				{
-          // Note: if user preset is selected and parameter is changed via THRII, then getActiveUserSetting() returns -1
-					iconcolour = TFT_SKYBLUE; // Highlight active user preset patch icon
-				}
-//				else if( i == presel_patch_id )
-//				{
-//					iconcolour = ST7789_ORANGE; // Highlight pre-selected patch icon
-//				}
-				else
-				{
-					iconcolour = TFT_THRBROWN; // Colour for unselected patch icons
-				}
-				if( i > npatches )
-				{
-					iconcolour = TFT_BLACK;
-				}
-				drawPatchIcon(60 + 20*i, 0, 20, 20, iconcolour, i, show_num);
-			}
+      for(int i = 1; i <= 5; i++)
+      {
+        drawPatchIcon(60 + 20*i, 0, 20, 20, TFT_THRBROWN, i, false);
+      }
+      // Note: if user preset is selected and parameter is changed via THRII, then getActiveUserSetting() returns -1
+      drawPatchIcon(60 + 20*active_user_setting + 1, 0, 20, 20, TFT_SKYBLUE, active_user_setting + 1, false);
 		break;
 		
 		case UI_home_patch:
@@ -491,7 +476,7 @@ void updateStatusMask(THR30II_Settings &thrs)
   else if( _uistate == UI_home_patch ) { drawPatchID(TFT_THRCREAM, active_patch_id); }  
 	
 	// Patch icon bank
-	drawPatchIconBank(presel_patch_id, active_patch_id, thrs.getActiveUserSetting(), show_patch_num);
+	drawPatchIconBank(presel_patch_id, active_patch_id, nUserPreset + 1, show_patch_num);
 
 	// Use Patch select mode to indicate manual mode
   if( _uistate == UI_manual ) { drawPatchSelMode(TFT_THRCREAM); }
