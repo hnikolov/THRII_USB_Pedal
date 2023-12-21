@@ -586,7 +586,7 @@ void patch_activate(uint16_t pnr) // Check patchnumber and send patch as a SysEx
 	} 
 	else
 	{
-		TRACE_THR30IIPEDAL(Serial.printf("Patch_activate(): invalid pnr");)
+		TRACE_THR30IIPEDAL(Serial.printf("Patch_activate(): invalid pnr ");)
 	}
 }
 

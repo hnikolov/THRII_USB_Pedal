@@ -37,6 +37,7 @@ extern uint16_t npatches;
 extern int16_t presel_patch_id; // ID of actually pre-selected patch (absolute number)
 extern int16_t active_patch_id; // ID of actually selected patch     (absolute number)
 extern int8_t nUserPreset;      // Used to cycle the THRII User presets
+extern bool show_patch_num;     // Used to show match numbers only when switching banks
 
 extern byte maskUpdate;
 /////////////////////////
@@ -102,19 +103,19 @@ void drawPatchID(uint16_t fgcolour, int patchID)
 }
 //*/
 
-void drawPatchIcon(int x, int y, int w, int h, uint16_t colour, int patchID)
+void drawPatchIcon(int x, int y, int w, int h, uint16_t colour, int patchID, bool show_num = true)
 {
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(TFT_BLACK, colour);
-  spr.drawNumber(patchID, 10, 11);
+  if( show_num ) { spr.drawNumber(patchID, 10, 11); }
   spr.pushSprite(x, y);
   spr.deleteSprite();
 }
 
-void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_user_setting)
+void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_user_setting, bool show_num = false)
 {
 	uint16_t iconcolour = 0;
 	int banksize = 5;
@@ -130,10 +131,10 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
           // Note: if user preset is selected and parameter is changed via THRII, then getActiveUserSetting() returns -1
 					iconcolour = TFT_SKYBLUE; // Highlight active user preset patch icon
 				}
-				else if( i == presel_patch_id )
-				{
-					iconcolour = ST7789_ORANGE; // Highlight pre-selected patch icon
-				}
+//				else if( i == presel_patch_id )
+//				{
+//					iconcolour = ST7789_ORANGE; // Highlight pre-selected patch icon
+//				}
 				else
 				{
 					iconcolour = TFT_THRBROWN; // Colour for unselected patch icons
@@ -142,7 +143,7 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
 				{
 					iconcolour = TFT_BLACK;
 				}
-				drawPatchIcon(60 + 20*i, 0, 20, 20, iconcolour, i);
+				drawPatchIcon(60 + 20*i, 0, 20, 20, iconcolour, i, show_num);
 			}
 		break;
 		
@@ -165,7 +166,7 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
 				{
 					iconcolour = TFT_BLACK;
 				}
-				drawPatchIcon(60 + 20*(i-first+1), 0, 20, 20, iconcolour, i);
+				drawPatchIcon(60 + 20*(i-first+1), 0, 20, 20, iconcolour, i, show_num);
 			}
 		break;
 
@@ -490,7 +491,7 @@ void updateStatusMask(THR30II_Settings &thrs)
   else if( _uistate == UI_home_patch ) { drawPatchID(TFT_THRCREAM, active_patch_id); }  
 	
 	// Patch icon bank
-	drawPatchIconBank(presel_patch_id, active_patch_id, thrs.getActiveUserSetting());
+	drawPatchIconBank(presel_patch_id, active_patch_id, thrs.getActiveUserSetting(), show_patch_num);
 
 	// Use Patch select mode to indicate manual mode
   if( _uistate == UI_manual ) { drawPatchSelMode(TFT_THRCREAM); }
@@ -499,24 +500,6 @@ void updateStatusMask(THR30II_Settings &thrs)
   // Show which set of patches is used
   if( _uistate == UI_home_amp )        { drawPatchSet(TFT_THRCREAM, "THRII"); }
   else if( _uistate == UI_home_patch ) { drawPatchSet(TFT_THRCREAM, "USER");  } // TODO: 'FACTORY'
-
-  /*     
-	// Patch select mode (pre-select/immediate) & UI mode
-	switch( _uistate )
-  {
-		case UI_home_amp:
-		case UI_home_patch:
-		case UI_manual:
-			if( send_patch_now ) { drawPatchSelMode(TFT_THRCREAM); }
-			else                 { drawPatchSelMode(TFT_THRBROWN); }
-		  break;
-
-		case UI_edit:
-		  break;
-		default:
-		  break;
-	}
-  */
 
 	// Amp select mode (COL/AMP/CAB)
 	switch( amp_select_mode )

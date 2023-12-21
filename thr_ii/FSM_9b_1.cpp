@@ -20,11 +20,12 @@ extern std::array< THR30II_Settings, 5 > thr_user_presets;
 extern uint16_t npatches;  // Counts the patches stored on SD-card or in PROGMEN
 extern int8_t nUserPreset; // Used to cycle the THRII User presets
 
-uint8_t bank_first_patch = 1; // The first patch in a bank
+int16_t bank_first_patch = 1; // The first patch in a bank
 int16_t presel_patch_id  = 1; // ID of actually pre-selected patch (absolute number)
 int16_t active_patch_id  = 1; // ID of actually selected patch     (absolute number)
 // Test FSM_10b_v1 that still works with current updateStatusMask(), note button 3 behavior in the button handler
 //bool send_patch_now = false; // pre-select patch to send (false) or send immediately (true) - Used in updateStatusMask (TODO))
+bool show_patch_num = false;
 
 extern byte maskUpdate;
 
@@ -78,6 +79,28 @@ void select_thrii_preset(byte nThriiPreset)
     // Just update the display with the User preset data
     THR_Values = thr_user_presets[nThriiPreset];
   }  
+}
+
+void select_user_patch(int16_t &presel_patch_id, uint8_t pnr)
+{
+  if( bank_first_patch + pnr <= npatches ) // The new patch-id is available
+  {
+    presel_patch_id = bank_first_patch + pnr;
+    if(presel_patch_id != active_patch_id) // A new patch to be activated
+    {
+      Serial.printf("\n\rActivating patch %d ...\n\r", presel_patch_id);
+      show_patch_num = false;
+      patch_activate(presel_patch_id);
+    }
+    else // Solo switch
+    {
+      toggle_boost();
+    }
+  }
+  else
+  {
+    Serial.printf("\n\rActivating patch - Invalid patch number: %d ...\n\r", bank_first_patch + pnr);
+  }
 }
 
 void handle_home_amp(UIStates &_uistate, uint8_t &button_state);
@@ -307,18 +330,18 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
 // User presets mode
 // ================================================================
 void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
-{ 
+{
     switch (button_state)
     {
         case 1: // Decrement patch to first entry in previous bank of 5 (bank size = 5)
-          // TODO: Does not work if bank_first_patch is used instead of presel_patch_id!
-          presel_patch_id = ((presel_patch_id-1)/5 - 1) * 5 + 1;	// Decrement pre-selected patch-ID to first of next bank
-          if (presel_patch_id < 1)	// Detect if went below first patch
+          bank_first_patch = ((bank_first_patch-1)/5 - 1) * 5 + 1; // Decrement pre-selected patch-ID to first of next bank
+          if (bank_first_patch < 1)	// Detect if went below first patch
           {
-            presel_patch_id = ((npatches-1)/5) * 5 + 1;	// Wrap back round to the last bank in library
+            bank_first_patch = ((npatches-1)/5) * 5 + 1; // Wrap back round to the last bank in library
           }
-          bank_first_patch = presel_patch_id;
-          //presel_patch_id = bank_first_patch;
+          presel_patch_id = bank_first_patch;
+          THR_Values.boost_activated = false;
+          show_patch_num = true;
           
           Serial.printf("Patch #%d pre-selected\n\r", bank_first_patch);
           maskUpdate = true; // Request display update to show new states quickly
@@ -326,12 +349,14 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 2: 
-          bank_first_patch = ((bank_first_patch-1)/5 + 1) * 5 + 1;	// Increment pre-selected patch-ID to first of next bank
-          if (bank_first_patch > npatches)	// Detect if went beyond last patch
+          bank_first_patch = ((bank_first_patch-1)/5 + 1) * 5 + 1; // Increment pre-selected patch-ID to first of next bank
+          if (bank_first_patch > npatches) // Detect if went beyond last patch
           {
               bank_first_patch = 1;	// Wrap back round to first patch in library
           }
           presel_patch_id = bank_first_patch;
+          THR_Values.boost_activated = false;
+          show_patch_num = true;
           Serial.printf("Patch #%d pre-selected\n\r", bank_first_patch);
           maskUpdate = true; // Request display update to show new states quickly
           button_state = 0;  // Remove flag, because it is handled      
@@ -351,76 +376,31 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
         break;
             
         case 5: // Activate the patch 1 in a bank
-          presel_patch_id = bank_first_patch + 0;
-          if(presel_patch_id != active_patch_id) // A new patch to be activated
-          {
-            Serial.printf("\n\rActivating patch %d ...\n\r", presel_patch_id);
-            patch_activate(presel_patch_id);
-          }
-          else // Solo switch
-          {
-            toggle_boost();
-          }
+          select_user_patch( presel_patch_id, 0 );
           maskUpdate = true; // Request display update to show new states quickly
           button_state = 0;  // Button is handled
         break;
 
         case 6: // Activate the patch 2 in a bank
-          presel_patch_id = bank_first_patch + 1;
-          if(presel_patch_id != active_patch_id) // A new patch to be activated
-          {
-            Serial.printf("\n\rActivating patch %d ...\n\r", presel_patch_id);
-            patch_activate(presel_patch_id);
-          }
-          else // Solo switch
-          {
-            toggle_boost();
-          }
+          select_user_patch( presel_patch_id, 1 );
           maskUpdate = true; // Request display update to show new states quickly
           button_state = 0;  // Button is handled
         break;
 
         case 7: // Activate the patch 3 in a bank
-          presel_patch_id = bank_first_patch + 2;
-          if(presel_patch_id != active_patch_id) // A new patch to be activated
-          {
-            Serial.printf("\n\rActivating patch %d ...\n\r", presel_patch_id);
-            patch_activate(presel_patch_id);
-          }
-          else // Solo switch
-          {
-            toggle_boost();
-          }
+          select_user_patch( presel_patch_id, 2 );
           maskUpdate = true; // Request display update to show new states quickly
           button_state = 0;  // Button is handled
         break;
 
         case 8: // Activate the patch 4 in a bank
-          presel_patch_id = bank_first_patch + 3;
-          if(presel_patch_id != active_patch_id) // A new patch to be activated
-          {
-            Serial.printf("\n\rActivating patch %d ...\n\r", presel_patch_id);
-            patch_activate(presel_patch_id);
-          }
-          else // Solo switch
-          {
-            toggle_boost();
-          }
+          select_user_patch( presel_patch_id, 3 );
           maskUpdate = true; // Request display update to show new states quickly
           button_state = 0;  // Button is handled
         break;
         
         case 9: // Activate the patch 5 in a bank
-          presel_patch_id = bank_first_patch + 4;
-          if(presel_patch_id != active_patch_id) // A new patch to be activated
-          {
-            Serial.printf("\n\rActivating patch %d ...\n\r", presel_patch_id);
-            patch_activate(presel_patch_id);
-          }
-          else // Solo switch
-          {
-            toggle_boost();
-          }
+          select_user_patch( presel_patch_id, 4 );
           maskUpdate = true; // Request display update to show new states quickly
           button_state = 0;  // Button is handled
         break;
