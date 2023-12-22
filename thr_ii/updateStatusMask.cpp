@@ -27,7 +27,7 @@ extern TFT_eSprite spr;
 
 // The font names are arrays references, thus must NOT be in quotes ""
 #define AA_FONT_SMALL NotoSansBold15
-//#define AA_FONT_LARGE NotoSansBold36
+#define AA_FONT_XLARGE NotoSansBold36
 #define AA_FONT_LARGE Latin_Hiragana_24
 #define AA_FONT_MONO  NotoSansMonoSCB20 // NotoSansMono-SemiCondensedBold 20pt
 
@@ -89,11 +89,13 @@ void drawPatchID(uint16_t fgcolour, int patchID)
  	int x = 0, y = 20, w = 80, h = 60;
 	uint16_t bgcolour = TFT_THRVDARKGREY;
 	spr.createSprite(w, h);
-	spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, bgcolour, TFT_BLACK);
+	//spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, bgcolour, TFT_BLACK);
+	spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, TFT_THRBROWN, TFT_BLACK);
 	spr.setTextFont(7);
 	spr.setTextSize(1);
 	spr.setTextDatum(MR_DATUM);
-	spr.setTextColor(TFT_BLACK);
+//	spr.setTextColor(TFT_BLACK);
+	spr.setTextColor(TFT_THRDARKBROWN);
 	spr.drawNumber(88, w-10, h/2);
 	spr.setTextColor(fgcolour);
 	spr.drawNumber(patchID, w-10, h/2);
@@ -129,7 +131,8 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
         drawPatchIcon(60 + 20*i, 0, 20, 20, TFT_THRBROWN, i, false);
       }
       // Note: if user preset is selected and parameter is changed via THRII, then getActiveUserSetting() returns -1
-      drawPatchIcon(60 + 20*active_user_setting + 1, 0, 20, 20, TFT_SKYBLUE, active_user_setting + 1, false);
+      drawPatchIcon(60 + 20*active_user_setting + 1, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
+      //drawPatchIcon(60 + 20*active_user_setting + 1, 0, 20, 20, TFT_SKYBLUE, active_user_setting + 1, false); // No need to be blue
 		break;
 		
 		case UI_home_patch:
@@ -192,27 +195,27 @@ void drawConnIcon(bool THRconnected)
   spr.createSprite(40, 20);
   if( THRconnected ) // Connected: green
   {
-    spr.fillSmoothRoundRect(0, 0, 40, 19, 3, TFT_GREEN, TFT_BLACK); // Bg
-    spr.drawWideLine(1, 9, 14, 9, 3, TFT_WHITE, TFT_GREEN);         // Left wire
-    spr.drawWideLine(26, 9, 38, 9, 3, TFT_WHITE, TFT_GREEN);        // Right wire
-    spr.fillSmoothRoundRect(12, 2, 8, 15, 3, TFT_WHITE, TFT_GREEN); // Plug
-    spr.fillRect(16, 2, 4, 15, TFT_WHITE);                          // Plug
-    spr.fillSmoothRoundRect(21, 2, 8, 15, 3, TFT_WHITE, TFT_GREEN); // Socket
-    spr.fillRect(21, 2, 4, 15, TFT_WHITE);                          // Socket
-    spr.fillRect(16, 4, 5, 3, TFT_WHITE);                           // Upper prong
-    spr.fillRect(16, 12, 5, 3, TFT_WHITE);                          // Lower prong
+    spr.fillSmoothRoundRect(0, 0, 40, 19, 3, TFT_DARKGREEN, TFT_BLACK);    // Bg
+    spr.drawWideLine(1, 9, 14, 9, 3, TFT_THRCREAM, TFT_DARKGREEN);         // Left wire
+    spr.drawWideLine(26, 9, 38, 9, 3, TFT_THRCREAM, TFT_DARKGREEN);        // Right wire
+    spr.fillSmoothRoundRect(12, 2, 8, 15, 3, TFT_THRCREAM, TFT_DARKGREEN); // Plug
+    spr.fillRect(16, 2, 4, 15, TFT_THRCREAM);                              // Plug
+    spr.fillSmoothRoundRect(21, 2, 8, 15, 3, TFT_THRCREAM, TFT_DARKGREEN); // Socket
+    spr.fillRect(21, 2, 4, 15, TFT_THRCREAM);                              // Socket
+    spr.fillRect(16, 4, 5, 3, TFT_THRCREAM);                               // Upper prong
+    spr.fillRect(16, 12, 5, 3, TFT_THRCREAM);                              // Lower prong
   }
   else // Disconnected: red 
   {
-    spr.fillSmoothRoundRect(0, 0, 40, 19, 3, TFT_RED, TFT_BLACK); // Bg
-    spr.drawWideLine(1, 9, 10, 9, 3, TFT_WHITE, TFT_RED);         // Left wire
-    spr.drawWideLine(30, 9, 38, 9, 3, TFT_WHITE, TFT_RED);        // Right wire
-    spr.fillSmoothRoundRect(8, 2, 8, 15, 3, TFT_WHITE, TFT_RED);  // Plug
-    spr.fillRect(12, 2, 4, 15, TFT_WHITE);                        // Plug
-    spr.fillSmoothRoundRect(24, 2, 8, 15, 3, TFT_WHITE, TFT_RED); // Socket
-    spr.fillRect(24, 2, 4, 15, TFT_WHITE);                        // Socket
-    spr.fillRect(16, 4, 5, 3, TFT_WHITE);                         // Upper prong
-    spr.fillRect(16, 12, 5, 3, TFT_WHITE);                        // Lower prong
+    spr.fillSmoothRoundRect(0, 0, 40, 19, 3, TFT_RED, TFT_BLACK);    // Bg
+    spr.drawWideLine(1, 9, 10, 9, 3, TFT_THRCREAM, TFT_RED);         // Left wire
+    spr.drawWideLine(30, 9, 38, 9, 3, TFT_THRCREAM, TFT_RED);        // Right wire
+    spr.fillSmoothRoundRect(8, 2, 8, 15, 3, TFT_THRCREAM, TFT_RED);  // Plug
+    spr.fillRect(12, 2, 4, 15, TFT_THRCREAM);                        // Plug
+    spr.fillSmoothRoundRect(24, 2, 8, 15, 3, TFT_THRCREAM, TFT_RED); // Socket
+    spr.fillRect(24, 2, 4, 15, TFT_THRCREAM);                        // Socket
+    spr.fillRect(16, 4, 5, 3, TFT_THRCREAM);                         // Upper prong
+    spr.fillRect(16, 12, 5, 3, TFT_THRCREAM);                        // Lower prong
   }
   spr.pushSprite(280, 0);
   spr.deleteSprite();
@@ -237,8 +240,7 @@ uint8_t getSplitPos( String patchname )
 
 void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
 {
-  int x = 80, y = 20, w = 240, h = 60;
-//  int x = 60, y = 80, w = 240, h = 60; // Place in manual mode layout
+  int x = 00, y = 80, w = 320, h = 80; // Place in manual mode layout
   uint16_t fg_colour = fgcolour;
   uint16_t bg_colour = TFT_THRVDARKGREY;
   if( inverted )
@@ -248,7 +250,10 @@ void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
   }
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w, h-1, 3, bg_colour, TFT_BLACK);
-  spr.loadFont(AA_FONT_LARGE);
+  spr.loadFont(AA_FONT_XLARGE);
+  // FIXME: free for local variables:-23904: Error program exceeds memory space
+  //if( spr.textWidth(patchname) > w ) {spr.loadFont(Latin_Hiragana_24);}
+  //else                               {spr.loadFont(NotoSansBold36);}
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(fg_colour, bg_colour);
 
@@ -257,8 +262,11 @@ void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
     uint8_t pos = getSplitPos( patchname );
     String line1 = patchname.substring(0, pos); // TODO: Split at space char
     String line2 = patchname.substring(pos, patchname.length());
-    spr.drawString(line1, w/2, h/2-11);
-    spr.drawString(line2, w/2, h/2+12);
+    // TODO -19/+20 works OK with the xlarge font
+//    spr.drawString(line1, w/2, h/2-11);
+//    spr.drawString(line2, w/2, h/2+12);
+    spr.drawString(line1, w/2, h/2-19);
+    spr.drawString(line2, w/2, h/2+20);
   }
   else
   {
@@ -285,7 +293,7 @@ void drawBarChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolo
   spr.deleteSprite();
 }
 
-void drawEQChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int b, int m, int t)
+void draw2BarChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int b1, int b2)
 {
   int tpad = 20; int pad = 0;
   spr.createSprite(w, h);
@@ -294,6 +302,40 @@ void drawEQChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolou
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(fgcolour, bgcolour);
   spr.drawString(label, w/2, 11);
+  spr.fillRect(pad, h-(h-tpad-pad)*b1/100, w/2-1-2*pad, (h-tpad-pad)*b1/100, fgcolour);
+  spr.fillRect(w/2+pad, h-(h-tpad-pad)*b2/100, w/2-1-2*pad, (h-tpad-pad)*b2/100, fgcolour);
+  spr.pushSprite(x, y);
+  spr.unloadFont();
+  spr.deleteSprite();
+}
+
+void drawPPChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int ped1, int ped2)
+{
+	int tpad = 20; int pad = 0;
+	int ped1height = ped1*(h-tpad-pad)/100; // For guitar and audio volume
+	int ped2height = ped2*(h-tpad-pad)/100; // 
+	spr.createSprite(w, h);
+	spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);
+	spr.loadFont(AA_FONT_SMALL);
+	spr.setTextDatum(MC_DATUM);
+	spr.setTextColor(fgcolour, bgcolour);
+	spr.drawString(label, w/2-1, 12);
+	spr.fillRect(pad, h-ped1height, w/2-1-2*pad, ped1height, fgcolour);
+	spr.fillRect(w/2+pad, h-ped2height, w/2-1-2*pad, ped2height, fgcolour);
+	spr.pushSprite(x, y);
+	spr.unloadFont();
+	spr.deleteSprite();
+}
+
+void drawEQChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int b, int m, int t)
+{
+  int tpad = 20; int pad = 0;
+  spr.createSprite(w, h);
+  spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);
+  spr.loadFont(AA_FONT_SMALL);
+  spr.setTextDatum(MC_DATUM);
+  spr.setTextColor(fgcolour, bgcolour);
+  spr.drawString(label, w/2, 12);
   spr.fillRect(pad, h-(h-tpad-pad)*b/100, w/3-1-2*pad, (h-tpad-pad)*b/100, fgcolour);
   spr.fillRect(w/3+pad, h-(h-tpad-pad)*m/100, w/3-1-2*pad, (h-tpad-pad)*m/100, fgcolour);
   spr.fillRect(2*w/3+pad, h-(h-tpad-pad)*t/100, w/3-1-2*pad, (h-tpad-pad)*t/100, fgcolour);
@@ -371,7 +413,7 @@ void drawAmpUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolou
 
 void drawUtilUnit(int x, int y, int w, int h, int bpad, uint16_t bgcolour, uint16_t fgcolour, String label, double utilparams[2])
 {
-	int tpad = 30; int pad = 2;
+	int tpad = 26; int pad = 2;
 	int grx = pad; int gry = tpad; int grw = w-1-2*pad; int grh = h-1-tpad-pad;
 	int barw = 0; int barh = grh/2;
 	spr.createSprite(w, h);
@@ -379,12 +421,12 @@ void drawUtilUnit(int x, int y, int w, int h, int bpad, uint16_t bgcolour, uint1
 	spr.loadFont(AA_FONT_SMALL);
 	spr.setTextDatum(MC_DATUM);
 	spr.setTextColor(fgcolour, bgcolour);
-	spr.drawString(label, w/2, 16);
+	spr.drawString(label, w/2, 13);
 	spr.fillRect(grx, gry, grw, grh, fgcolour);	// Draw graph area
 	barw = grw * utilparams[0]/100;
-	spr.fillRect(grx, gry, barw, barh, bgcolour);
+	spr.fillRect(grx, gry, barw, barh+1, bgcolour);
 	barw = grw * utilparams[1]/100;
-	spr.fillRect(grx, gry+barh, barw, barh+1, bgcolour);
+	spr.fillRect(grx, gry+1+barh, barw, barh+1, bgcolour);
 	spr.pushSprite(x, y);
 	spr.unloadFont();
 	spr.deleteSprite();
@@ -392,7 +434,7 @@ void drawUtilUnit(int x, int y, int w, int h, int bpad, uint16_t bgcolour, uint1
 
 void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int nbars, double FXparams[5], int selectedFXparam)
 {
-	int tpad = 30; int pad = 2;
+	int tpad = 26; int pad = 2;
 	int grx = pad; int gry = tpad; int grw = w-1-2*pad; int grh = h-1-tpad-pad;
 	int barw = grw / nbars;	// Calculate bar width
 	int barh = 0;
@@ -401,7 +443,7 @@ void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour
 	spr.loadFont(AA_FONT_SMALL);
 	spr.setTextDatum(MC_DATUM);
 	spr.setTextColor(fgcolour, bgcolour);
-	spr.drawString(label, w/2, 16);	// Write label
+	spr.drawString(label, w/2, 13);	// Write label
 	spr.fillRect(grx, gry, grw, grh, fgcolour);	// Draw graph area
 	for(int i = 0; i < nbars; i++)
 	{
@@ -418,25 +460,6 @@ void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour
 			spr.fillRect(grx + i * barw, gry + grh - barh, barw, barh, bgcolour);
 		}
 	}
-	spr.pushSprite(x, y);
-	spr.unloadFont();
-	spr.deleteSprite();
-}
-
-void drawPPChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int ped1, int ped2)
-{
-  // Used to represent Guitar Volume and Audio Volume
-	int tpad = 20; int pad = 0;
-	int ped1height = ped1*(h-tpad-pad)/100; // For guitar and audio volume
-	int ped2height = ped2*(h-tpad-pad)/100; // 
-	spr.createSprite(w, h);
-	spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);
-	spr.loadFont(AA_FONT_SMALL);
-	spr.setTextDatum(MC_DATUM);
-	spr.setTextColor(fgcolour, bgcolour);
-	spr.drawString(label, w/2-1, 11);
-	spr.fillRect(pad, h-ped1height, w/2-1-2*pad, ped1height, fgcolour);
-	spr.fillRect(w/2+pad, h-ped2height, w/2-1-2*pad, ped2height, fgcolour);
 	spr.pushSprite(x, y);
 	spr.unloadFont();
 	spr.deleteSprite();
@@ -494,34 +517,6 @@ void updateStatusMask(THR30II_Settings &thrs)
 		case CAB: drawAmpSelMode(TFT_THRCREAM, "CAB"); break;
 	}
 
-	String FXtitle;
-	uint16_t FXbgcolour  =  0;
-	uint16_t FXfgcolour  =  0;
-	double FXparams[5]   = {0};
-	double utilparams[2] = {0};
-	uint8_t FXx;
-	uint8_t FXy;
-	uint8_t FXw =  60;
-	uint8_t FXh = 100;
-	uint8_t nFXbars = 5;
-	uint8_t selectedFXparam = 0;
-
-	// Gain, Master, and EQ (B/M/T) ---------------------------------------------------------
-  drawBarChart( 0, 80, 15, 160, TFT_THRBROWN, TFT_THRCREAM,  "G", thrs.control[CTRL_GAIN]);
-  drawBarChart(15, 80, 15, 160, TFT_THRBROWN, TFT_THRCREAM,  "M", thrs.control[CTRL_MASTER]);
-  drawEQChart( 30, 80, 30, 160, TFT_THRBROWN, TFT_THRCREAM, "EQ", thrs.control[CTRL_BASS], thrs.control[CTRL_MID], thrs.control[CTRL_TREBLE]);
-  /*
-  if( thrs.boost_activated )
-  {
-    drawBarChart(15, 80, 15, 160, TFT_THRDIMORANGE, TFT_THRORANGE,  "M", thrs.control[CTRL_MASTER]);
-   	drawEQChart( 30, 80, 30, 160, TFT_THRDIMORANGE, TFT_THRORANGE, "EQ", thrs.control[CTRL_BASS], thrs.control[CTRL_MID], thrs.control[CTRL_TREBLE]);
-  }
-  else
-  {
-    drawBarChart(15, 80, 15, 160, TFT_THRBROWN, TFT_THRCREAM,  "M", thrs.control[CTRL_MASTER]);
-   	drawEQChart( 30, 80, 30, 160, TFT_THRBROWN, TFT_THRCREAM, "EQ", thrs.control[CTRL_BASS], thrs.control[CTRL_MID], thrs.control[CTRL_TREBLE]);
-  }
-  */
 	// Amp/Cabinet ---------------------------------------------------------------
 	switch( thrs.col )
 	{
@@ -529,20 +524,38 @@ void updateStatusMask(THR30II_Settings &thrs)
 		case MODERN:   tft.setTextColor(TFT_GREEN, TFT_BLACK); 	break;
 		case CLASSIC:  tft.setTextColor(TFT_RED, TFT_BLACK); 		break;
 	}
-  drawAmpUnit(60, 80, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab);
-//  drawAmpUnit(80, 20, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab); // Place in manual mode layout
+  drawAmpUnit(80, 20, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab); // Place in manual mode layout
+
+	String FXtitle;
+	uint16_t FXbgcolour  =  0;
+	uint16_t FXfgcolour  =  0;
+	double FXparams[5]   = {0};
+	double utilparams[2] = {0};
+	uint8_t FXx = 0;
+  uint8_t FXx_offset = -7;
+	uint8_t FXy = 160;
+	uint8_t FXw =  60;
+	uint8_t FXh =  80;
+	uint8_t nFXbars = 5;
+	uint8_t selectedFXparam = 0;
+
+	// Gain, Master, and EQ (B/M/T) ---------------------------------------------------------
+  drawPPChart( 0, FXy, 26, FXh, TFT_THRBROWN, TFT_THRCREAM, "GM", thrs.control[CTRL_GAIN],thrs.control[CTRL_MASTER]);
+  drawEQChart(26, FXy, 27, FXh, TFT_THRBROWN, TFT_THRCREAM, "EQ", thrs.control[CTRL_BASS], thrs.control[CTRL_MID], thrs.control[CTRL_TREBLE]);
 	
+  FXx = FXw + FXx_offset; // Set FX unit position
+
 	// FX1 Compressor -------------------------------------------------------------
 	utilparams[0] = thrs.compressor_setting[CO_SUSTAIN];
 	utilparams[1] = thrs.compressor_setting[CO_LEVEL];
-  if(thrs.unit[COMPRESSOR]) { drawUtilUnit(60, 140, 60, 50, 1, TFT_THRWHITE, TFT_THRDARKGREY,  "Comp", utilparams); }
-  else                      { drawUtilUnit(60, 140, 60, 50, 1, TFT_THRGREY,  TFT_THRVDARKGREY, "Comp", utilparams); }
+  if(thrs.unit[COMPRESSOR]) { drawUtilUnit(FXx, FXy, 60, 40, 1, TFT_THRWHITE, TFT_THRDARKGREY,  "Comp", utilparams); }
+  else                      { drawUtilUnit(FXx, FXy, 60, 40, 1, TFT_THRGREY,  TFT_THRVDARKGREY, "Comp", utilparams); }
 	
  	// Gate -----------------------------------------------------------------------
 	utilparams[0] = thrs.gate_setting[GA_THRESHOLD];
 	utilparams[1] = thrs.gate_setting[GA_DECAY];
-  if(thrs.unit[GATE]) {	drawUtilUnit(60, 190, 60, 50, 0, TFT_THRYELLOW,    TFT_THRDIMYELLOW, "Gate", utilparams); }
-  else                { drawUtilUnit(60, 190, 60, 50, 0, TFT_THRDIMYELLOW, TFT_THRVDARKGREY, "Gate", utilparams); }
+  if(thrs.unit[GATE]) {	drawUtilUnit(FXx, FXy + 40, 60, 40, 0, TFT_THRYELLOW,    TFT_THRDIMYELLOW, "Gate", utilparams); }
+  else                { drawUtilUnit(FXx, FXy + 40, 60, 40, 0, TFT_THRDIMYELLOW, TFT_THRVDARKGREY, "Gate", utilparams); }
 
 	// FX2 Effect (Chorus/Flanger/Phaser/Tremolo) ----------------------------------
 	switch( thrs.effecttype )
@@ -628,8 +641,7 @@ void updateStatusMask(THR30II_Settings &thrs)
 		break;
 	} // of switch(effecttype)
 		
-	FXx = 120; // Set FX unit position
-	FXy = 140;
+	FXx = 2*FXw + FXx_offset; // Set FX unit position
 	drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
 
   // FX3 Echo (Tape Echo/Digital Delay)
@@ -676,8 +688,7 @@ void updateStatusMask(THR30II_Settings &thrs)
 		break;
 	}	// of switch(effecttype)
 	
-	FXx = 180;	// set FX unit position
-	FXy = 140;
+	FXx = 3*FXw + FXx_offset;	// set FX unit position
 	drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
 
  	// FX4 Reverb (Spring/Room/Plate/Hall)
@@ -764,12 +775,12 @@ void updateStatusMask(THR30II_Settings &thrs)
 		break;
 	}	// of switch(reverbtype)
 		
-	FXx = 240; // Set FX unit position
-	FXy = 140;
+	FXx = 4*FXw + FXx_offset; // Set FX unit position
 	drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
 
   // Show THRII Guitar and Audio volume values
-  drawPPChart(300, 80, 20, 160, TFT_THRBROWN, TFT_THRCREAM, "VA", thrs.guitar_volume, thrs.audio_volume);
+  // FIXME: Does not work if FXx is, and if not uint8_t... FXx = 5*FXw + FXx_offset; // Set FX unit position
+  drawPPChart(293, FXy, 27, FXh, TFT_THRBROWN, TFT_THRCREAM, "VA", thrs.guitar_volume, thrs.audio_volume);
 
 	String s2, s3;
 
@@ -790,7 +801,8 @@ void updateStatusMask(THR30II_Settings &thrs)
     else
     {
       s2 = thrs.getPatchName();
-      drawPatchName(TFT_SKYBLUE, s2, thrs.boost_activated);
+//      drawPatchName(TFT_SKYBLUE, s2, thrs.boost_activated); // No need to be blue
+      drawPatchName(TFT_THRCREAM, s2, thrs.boost_activated);
     }
   }
   else if( _uistate == UI_home_patch || (_uistate == UI_manual && _uistate_prev == UI_home_patch) )
@@ -815,55 +827,5 @@ void updateStatusMask(THR30II_Settings &thrs)
       drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
     }
   }
-  /*
-	switch( _uistate )
-	{
-	  case UI_home_amp: // !patchActive
-    	if( thrs.thrSettings )
-			{
-        s2 = thrs.THRII_MODEL_NAME();
-        if( s2 != "None") { s2 += " PANEL";       }
-        else              { s2 = "NOT CONNECTED"; }
-				drawPatchName(TFT_SKYBLUE, s2, thrs.boost_activated);
-			}
-			else if( thrs.getUserSettingsHaveChanged() )
-			{
-				s2 = thrs.getPatchName();
-				drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
-			}
-			else
-			{
-				// Update GUI status line
-				s2 = thrs.getPatchName();
-				drawPatchName(TFT_SKYBLUE, s2, thrs.boost_activated);
-			}
-	 	break;
-
-		case UI_home_patch:	// Patch is active
-			// If unchanged User Memory setting is active:
-			if( !thrs.getUserSettingsHaveChanged() )
-			{
-				if( presel_patch_id != active_patch_id )
-				{
-					s2 = libraryPatchNames[presel_patch_id - 1]; // libraryPatchNames is 0-indexed
-					drawPatchName(ST7789_ORANGE, s2, thrs.boost_activated);
-				}
-				else
-				{
-					s2 = libraryPatchNames[active_patch_id - 1];
-					drawPatchName(TFT_THRCREAM, s2, thrs.boost_activated);
-				}
-			}
-			else
-			{
-				s2 = libraryPatchNames[active_patch_id - 1]; // libraryPatchNames is 0-indexed; "(*)" removed to save space
-				drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
-			}
-		break;
-
-		default:
-		break;
-	}
-  */
 	maskUpdate = false; // Tell local GUI that mask has been updated
 }

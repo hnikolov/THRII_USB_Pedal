@@ -200,6 +200,7 @@ const byte TFT_DIR_RIGHT_LEFT = 3;
 #define TFT_THRVDARKGREY        tft.color565( 16,  16,  16)
 #define TFT_THRCREAM            tft.color565(248, 227, 198)
 #define TFT_THRBROWN            tft.color565(122,  97,  67)
+#define TFT_THRDARKBROWN        tft.color565(112,  87,  57)
 
 #define TFT_THRORANGE           tft.color565(255, 111,   0)
 #define TFT_THRDIMORANGE        tft.color565(127,  63,   0)
@@ -210,6 +211,7 @@ const byte TFT_DIR_RIGHT_LEFT = 3;
 
 #define TFT_THRLIGHTRED         tft.color565(255, 191, 191)
 #define TFT_THRGREEN            tft.color565(  0, 255,   0)
+#define TFT_THRDARKGREEN        tft.color565( 128, 255,  128)
 #define TFT_THRLIGHTGREEN       tft.color565(191, 255, 191)
 #define TFT_THRBLUE             tft.color565(  0,   0, 255)
 #define TFT_THRLIGHTBLUE        tft.color565(191, 191, 255)
