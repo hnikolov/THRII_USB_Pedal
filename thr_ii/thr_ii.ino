@@ -176,7 +176,11 @@ class THR30II_Settings THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, T
 std::array< THR30II_Settings, 10 > thr_user_presets = {{ THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5 }};
 
 //extern void updateStatusMask(uint8_t x, uint8_t y, THR30II_Settings &thrs);
-extern void updateStatusMask(THR30II_Settings &thrs);
+//extern void updateStatusMask(THR30II_Settings &thrs);
+extern uint32_t maskCUpdate;
+extern uint32_t maskAll;
+extern void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate);
+
 
 // Family-ID 24, Model-Nr: 1 = THR10II-W
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -304,16 +308,16 @@ void timing()
 {
   if( millis() - tick1 > 40 ) // Mask update if it was required because of changed values
   {
-    if( maskUpdate )
+    //if( maskUpdate )
+    if( maskCUpdate )
     {
-//      updateStatusMask(0, 85, THR_Values);
-      updateStatusMask(THR_Values);
+      updateStatusMask(THR_Values, maskCUpdate);
       maskUpdate = false;
       tick1 = millis(); // Start new waiting period
       return;
     }
 	}
-
+/*
 	else if( millis() - tick2 > 1000 ) // Force mask update to avoid "forgotten" value changes
 	{
     // FIXME: There should not be 'forgotten' values
@@ -326,7 +330,7 @@ void timing()
 		  return;
 		}
 	}
-
+*/
 /*
 	if( millis() - tick3 > 1500 ) // Switch back to mask or selected patchname after showing preselected patchname for a while
 	{		
@@ -402,7 +406,8 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 				drawConnIcon(midi_connected);
 				drawPatchName(TFT_SKYBLUE, "INITIALIZING");
 
-				maskUpdate = true; // Tell GUI to update settings mask one time because of changed settings		
+				maskUpdate = true; // Tell GUI to update settings mask one time because of changed settings
+        maskCUpdate = maskAll;
 			}
 		} // of MIDI not connected so far
 	} // of if( midi1 )  means: a device is connected
@@ -417,7 +422,9 @@ void loop() // Infinite working loop:  check midi connection status, poll button
 		drawConnIcon(midi_connected); // Not part of THR_Values.updateStatusMask(0, 85); 
     //THR_Values.updateStatusMask(0, 85); // FIXME: Update only to show "NOT CONNECTED"
     maskUpdate = true; // Tell GUI to update settings mask one time because of changed settings
+    maskCUpdate = maskAll;
   } // of: if(midi_connected)
+  else { drawConnIcon(midi_connected); } // default: not connected
 		
 	timing(); // GUI timing must be called regularly enough. Locate the call in the working loop	
 
@@ -616,6 +623,7 @@ void send_patch(uint8_t patch_id) // Send a patch from preset library to THRxxII
 	}
 } // End of send_patch()
 
+int flag = 0;
 
 void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
 {
@@ -639,9 +647,14 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
         nUserPreset = idx;
         Serial.println("Done");
       }
+      maskUpdate = true; // Tell GUI to update mask one time because of changed settings
+      maskCUpdate = maskAll;
+      flag = 1; // Then update of single parameters (via amp knobs) does not get visualized
     }
 
-		maskUpdate = true; // Tell GUI to update mask one time because of changed settings
+    // We need this extra delay during initialization due to some timing issues I guess :(
+    // TODO: Try a print statement instead of using a flag and delay()?
+    if( flag == 0 ) { delay(10); }
 	}		
 
 	// Care about next queued outgoing SysEx, if at least one is pending

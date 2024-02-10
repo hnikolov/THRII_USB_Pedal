@@ -11,6 +11,26 @@
 #include "THR30II_Pedal.h"
 #include "Globals.h"
 
+extern uint32_t maskCUpdate;
+
+extern uint32_t maskPatchID;
+extern uint32_t maskPatchIconBank;
+extern uint32_t maskPatchSelMode;
+extern uint32_t maskPatchSet;
+extern uint32_t maskAmpSelMode;
+extern uint32_t maskConnIcon; // Not used
+extern uint32_t maskPatchName;
+extern uint32_t maskGainMaster;
+extern uint32_t maskVolumeAudio;
+extern uint32_t maskEQChart;
+extern uint32_t maskAmpUnit;
+extern uint32_t maskCompressor;
+extern uint32_t maskNoiseGate;
+extern uint32_t maskFxUnit;
+extern uint32_t maskEcho;
+extern uint32_t maskReverb;
+extern uint32_t maskAll;
+
 //Function walks through an incoming MIDI-SysEx-Message and parses it's meaning
 //cur[] : the buffer
 //cur_len : length of the buffer
@@ -627,6 +647,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 result+=" "+String(msgVals[3])+" in AMP-Message ";
                             }
                             result+=" "+String(msgVals[3])+" in AMP-Message ";
+                            maskCUpdate |= maskAmpUnit;
                         }  //of Block AMP
                         else if (msgVals[2] == THR30II_UNITS_VALS[REVERB].key)//== 0x0112  Block Reverb ("FX4")
                         {
@@ -654,6 +675,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             {
                                 result+=String(cur[0x1a],HEX)+" Reverb: unknown Mode selected"; 
                             }
+                            maskCUpdate |= maskReverb;
                         }//of Block Reverb
                         else if (msgVals[2] == THR30II_UNITS_VALS[EFFECT].key) //== 0x010c  Block Effect  ("FX2")
                         {
@@ -677,10 +699,11 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             {   
                                  result+=(" Effect: unknown Mode selected  0x"+String(msgVals[3],HEX));
                             }
+                            maskCUpdate |= maskFxUnit;
                         }//of Block Effect
                         else if (msgVals[2] == THR30II_UNITS_VALS[COMPRESSOR].key) //== 0x0107 Block Compressor ("FX1")
-                        {                                                                 // Normally this should not occure
-                            if(msgVals[3] == glob["RedComp"] )                            //(because compressor can only be configured by the App)
+                        {                                                          // Normally this should not occure
+                            if(msgVals[3] == glob["RedComp"] )                     //(because compressor can only be configured by the App)
                             {
                                 result+=" Compressor: Mode RedComp selected ";
                                 //at the moment there is no other Compressor unit anyway!
@@ -694,6 +717,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             {
                                 result+=" Compressor: unknown "; 
                             }
+                            maskCUpdate |= maskCompressor;
                         }
                         else if (msgVals[2] == THR30II_UNITS_VALS[GATE].key) //== 0x013C  // Block "GuitarProc"
                         {
@@ -707,6 +731,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             {
                                 result+=" Gate: unknown "; 
                             }                                                                                              
+                            maskCUpdate |= maskNoiseGate;
                         }  //since firmware 1.40.0a Block Echo could eventually appear (Types TapeEcho/DigitalDelay)
                         else if (msgVals[2] == THR30II_UNITS_VALS[ECHO].key)  //0x010F  Block ECHO  ("FX3")
                         {    //But it seems not to be sent out by THR
@@ -722,6 +747,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             {
                                 result+=" Echo: unknown "; 
                             }
+                            maskCUpdate |= maskEcho;
                         }
                         else
                         {
@@ -909,7 +935,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                 }//Status message
             break; //of message 20 Bytes
             
-            case 24: //Message for Parameter changes
+            case 24: // Message for Parameter changes
 
                 if (cur_len >= 0x1a)  // 00 01 07 - messages have to be longer than 0x2c bytes (failure otherwise)
                 {
@@ -974,45 +1000,54 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             {       uint16_t cab =(NumberToVal(msgVals[5]) / 100.0f);  //Values 0...16 come in as floats 
                                     result+=(" CAB: "+THR30II_CAB_NAMES[(THR30II_CAB) constrain(cab, 0x00, 0x10)]);
                                     SetCab((THR30II_CAB)cab);
+                                    maskCUpdate |= maskAmpUnit;
                             }
                             else if(msgVals[3] == THR30II_INFO_PHAS[PH_MIX].sk) //0x010E:
                             {       result+=(" MIX (EFFECT) ");
                                     val = THR30II_Settings::NumberToVal(msgVals[5]);
                                     result+=String(val,0);
                                     EffectSetting(THR30II_INFO_EFFECT[effecttype]["MIX"].sk, val);
+                                    maskCUpdate |= maskFxUnit;
                             }
                             else if(msgVals[3] == THR30II_INFO_TAPE[TA_MIX].sk)  //0x0111:
                             {       result+=(" MIX (ECHO) ");
                                     val = THR30II_Settings::NumberToVal(msgVals[5]);
                                     result+=String(val,0);
                                     EchoSetting(THR30II_INFO_ECHO[echotype]["MIX"].sk, val);
+                                    maskCUpdate |= maskEcho;
                             }
                             else if(msgVals[3] == THR30II_INFO_SPRI[SP_MIX].sk)//0x0128:
                             {       result+=(" MIX (REVERB) ");
                                     val = THR30II_Settings::NumberToVal(msgVals[5]);
                                     result+=String(val,0);
                                     ReverbSetting(THR30II_INFO_REVERB[reverbtype]["MIX"].sk, val);
+                                    maskCUpdate |= maskReverb;
                             }
 
                             else if(msgVals[3]== THR30II_UNIT_ON_OFF_COMMANDS[GATE]) //0x0102:
                             {       result+=(" UNIT GATE "+String((msgVals[5] != 0 ? "On" : "Off")));
                                     Switch_On_Off_Gate_Unit(msgVals[5] != 0);
+                                    maskCUpdate |= maskNoiseGate;
                             }
                             else if(msgVals[3] == THR30II_UNIT_ON_OFF_COMMANDS[ECHO]) //0x012C:
                             {       result+=(" UNIT ECHO "+String((msgVals[5] != 0 ? "On" : "Off")));
                                     Switch_On_Off_Echo_Unit(msgVals[5] != 0);
+                                    maskCUpdate |= maskEcho;
                             }
                             else if(msgVals[3]== THR30II_UNIT_ON_OFF_COMMANDS[EFFECT]) //0x012D:
                             {       result+=(" UNIT EFFECT "+String((msgVals[5] != 0 ? "On" : "Off")));
                                     Switch_On_Off_Effect_Unit(msgVals[5] != 0);
+                                    maskCUpdate |= maskFxUnit;
                             }
                             else if(msgVals[3]== THR30II_UNIT_ON_OFF_COMMANDS[COMPRESSOR]) //0x012E:
                             {        result+=(" UNIT COMPRESSOR "+String((msgVals[5] != 0 ? "On" : "Off")));
                                     Switch_On_Off_Compressor_Unit(msgVals[5] != 0);
+                                    maskCUpdate |= maskCompressor;
                             }
                             else if(msgVals[3] == THR30II_UNIT_ON_OFF_COMMANDS[REVERB]) //0x0130:
                             {       result+=(" UNIT REVERB "+String((msgVals[5] != 0 ? "On" : "Off")));
                                     Switch_On_Off_Reverb_Unit(msgVals[5] != 0);
+                                    maskCUpdate |= maskReverb;
                             }
 
                             else if(msgVals[3]== THR30II_GATE_VALS[GA_THRESHOLD]) //0x0069:
@@ -1020,12 +1055,14 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                     val = THR30II_Settings::NumberToVal_Threshold(msgVals[5]);
                                     result+=String(val,0);
                                     GateSetting(GA_THRESHOLD, val);
+                                    maskCUpdate |= maskNoiseGate;
                             }
                             else if( msgVals[3] == THR30II_GATE_VALS[GA_DECAY]) //0x006B:
                             {       result+=(" GATE-DECAY ");
                                     val = THR30II_Settings::NumberToVal(msgVals[5]);
                                     result+=String(val,0);
                                     GateSetting(GA_DECAY, val);
+                                    maskCUpdate |= maskNoiseGate;
                             }
                             else
                             {      
@@ -1043,24 +1080,28 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 ReverbSetting(reverbtype, THR30II_INFO_PLAT[PL_DECAY].sk, val); //0x006B, val);
+                                maskCUpdate |= maskReverb;
                             }   
                             else if( msgVals[3] == THR30II_INFO_SPRI[SP_REVERB].sk) //0x00ED:
                             {    result+=(" REVERB-REVERB ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 ReverbSetting(reverbtype, THR30II_INFO_SPRI[SP_REVERB].sk, val);//0x00ED, val);
+                                maskCUpdate |= maskReverb;
                             }
                             else if(msgVals[3] == THR30II_INFO_PLAT[PL_TONE].sk) //0x00F4:
                             {    result+=(" REVERB-TONE ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 ReverbSetting(reverbtype, THR30II_INFO_PLAT[PL_TONE].sk, val);//0x00F4, val);
+                                maskCUpdate |= maskReverb;
                             }
                             else if(msgVals[3] == THR30II_INFO_PLAT[PL_PREDELAY].sk) //0x00FA:
                             {    result+=(" REVERB-PRE DELAY ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 ReverbSetting(reverbtype, THR30II_INFO_PLAT[PL_PREDELAY].sk, val);// 0x00FA, val);
+                                maskCUpdate |= maskReverb;
                             }
                             else
                             {
@@ -1079,30 +1120,35 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 SetControl(THR30II_CTRL_SET::CTRL_GAIN, val);
                                 result+=String(val,0);
+                                maskCUpdate |= maskGainMaster;
                             }
                             else if(msgVals[3]  == THR30II_CTRL_VALS[CTRL_MASTER]) //0x4C:
                             {   result+=(" MASTER ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 SetControl(CTRL_MASTER, val);
                                 result+=String(val,0);
+                                maskCUpdate |= maskGainMaster;
                             }
                             else if(msgVals[3]  == THR30II_CTRL_VALS[CTRL_BASS]) //0x54:
                             {   result+=(" TONE-BASS ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 SetControl(CTRL_BASS, val);
+                                maskCUpdate |= maskEQChart;
                             }
                             else if(msgVals[3]  == THR30II_CTRL_VALS[CTRL_MID]) //0x56:
                             {   result+=(" TONE-MID ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 SetControl(CTRL_MID, val);
                                 result+=String(val,0);
+                                maskCUpdate |= maskEQChart;
                             }
                             else if(msgVals[3]  == THR30II_CTRL_VALS[CTRL_TREBLE]) //0x57:
                             {   result+=(" TONE-TREBLE ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 SetControl(CTRL_TREBLE, val);
                                 result+=String(val,0);
+                                maskCUpdate |= maskEQChart;
                             }
                             else
                             {
@@ -1120,30 +1166,35 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 EffectSetting(effecttype, msgVals[3], val);
+                                maskCUpdate |= maskFxUnit;
                             }
                             else if(msgVals[3]  == THR30II_INFO_EFFECT[PHASER]["FEEDBACK"].sk) //0x00D6:
                             {   result+=(" EFFECT FEEDBACK ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 EffectSetting(effecttype, msgVals[3], val);
+                                maskCUpdate |= maskFxUnit;
                             }
                             else if(msgVals[3]  == THR30II_INFO_EFFECT[CHORUS]["DEPTH"].sk) //0x00E0:
                             {   result+=(" EFFECT DEPTH (Flanger/Chorus/Tremolo) ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 EffectSetting(effecttype, msgVals[3], val);
+                                maskCUpdate |= maskFxUnit;
                             }
                             else if(msgVals[3]  == THR30II_INFO_EFFECT[FLANGER]["SPEED"].sk) //0x00E4:
                             {   result+=(" EFFECT SPEED (Flanger / Chorus) ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 EffectSetting(effecttype, msgVals[3], val);
+                                maskCUpdate |= maskFxUnit;
                             }
                             else if(msgVals[3]  == THR30II_INFO_EFFECT[CHORUS]["PREDELAY"].sk) //0x00E8:
                             {   result+=(" EFFECT PRE-DELAY ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 EffectSetting(effecttype, msgVals[3], val);
+                                maskCUpdate |= maskFxUnit;
                             }
                             else
                             {
@@ -1162,24 +1213,28 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 EchoSetting(echotype,msgVals[3], val);
+                                maskCUpdate |= maskEcho;
                             }
                             else if(msgVals[3]  == THR30II_INFO_ECHO[TAPE_ECHO]["TREBLE"].sk) //0x0057:
                             {   result+=(" ECHO-TREBLE ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 EchoSetting(echotype,msgVals[3], val);
+                                maskCUpdate |= maskEcho;
                             }
                             else if(msgVals[3]  == THR30II_INFO_ECHO[TAPE_ECHO]["FEEDBACK"].sk) //0x00D6:
                             {   result+=(" Echo FEEDBACK ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 EchoSetting(echotype,msgVals[3], val);
+                                maskCUpdate |= maskEcho;
                             }
                             else if(msgVals[3]  == THR30II_INFO_ECHO[TAPE_ECHO]["TIME"].sk) //0x00ED:
                             {   result+=(" ECHO-TIME ");
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 result+=String(val,0);
                                 EchoSetting(echotype,msgVals[3], val);
+                                maskCUpdate |= maskEcho;
                             }
                             else
                             {
@@ -1226,6 +1281,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 val = NumberToVal(msgVals[5]);
                                 result+=(String(val,0));
                                 SetGuitarVol((uint16_t)val); // Show this in GUI
+                                maskCUpdate |= maskVolumeAudio;
                             }
                             else if(msgVals[3]  == glob["AudioVolume"])
                             {
@@ -1233,6 +1289,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 val = NumberToVal(msgVals[5]);
                                 result+=(String(val,0));
                                 SetAudioVol((uint16_t)val); // Show this in GUI
+                                maskCUpdate |= maskVolumeAudio;
                             }
                             else if(msgVals[3]  == glob["GuitProcInputGain"])
                             {

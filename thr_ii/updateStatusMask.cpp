@@ -40,7 +40,27 @@ extern int8_t nUserPreset;      // Used to cycle the THRII User presets
 extern bool show_patch_num;     // Used to show match numbers only when switching banks
 
 extern byte maskUpdate;
+
 /////////////////////////
+uint32_t maskCUpdate = 0;
+
+uint32_t maskPatchID       = 1 <<  0;
+uint32_t maskPatchIconBank = 1 <<  1;
+uint32_t maskPatchSelMode  = 1 <<  2;
+uint32_t maskPatchSet      = 1 <<  3;
+uint32_t maskAmpSelMode    = 1 <<  4;
+uint32_t maskConnIcon      = 1 <<  5; // Not used
+uint32_t maskPatchName     = 1 <<  6;
+uint32_t maskGainMaster    = 1 <<  7; // drawPPChart
+uint32_t maskVolumeAudio   = 1 <<  8; // drawPPChart
+uint32_t maskEQChart       = 1 <<  9;
+uint32_t maskAmpUnit       = 1 << 10;
+uint32_t maskCompressor    = 1 << 11; // drawUtilUnit
+uint32_t maskNoiseGate     = 1 << 12; // drawUtilUnit
+uint32_t maskFxUnit        = 1 << 13; // drawFxUnit
+uint32_t maskEcho          = 1 << 14; // drawFxUnit
+uint32_t maskReverb        = 1 << 15; // drawFxUnit
+uint32_t maskAll           = 0xffffffff;
 
 ampSelectModes amp_select_mode = COL; // Currently used in updateStatusMask()
 
@@ -492,40 +512,59 @@ void THR30II_Settings::updateConnectedBanner() // Show the connected Model
 // x-position (0) where to place top left corner of status mask
 // y-position     where to place top left corner of status mask
 /////////////////////////////////////////////////////////////////
-void updateStatusMask(THR30II_Settings &thrs)
+//void updateStatusMask(THR30II_Settings &thrs)
+void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 {
 	// Patch number
-  if( _uistate == UI_home_amp )        { drawPatchID(TFT_THRCREAM, nUserPreset + 1); }
-  else if( _uistate == UI_home_patch ) { drawPatchID(TFT_THRCREAM, active_patch_id); }  
-	
+  if( maskCUpdate & maskPatchID )
+  {
+    if( _uistate == UI_home_amp )        { drawPatchID(TFT_THRCREAM, nUserPreset + 1); }
+    else if( _uistate == UI_home_patch ) { drawPatchID(TFT_THRCREAM, active_patch_id); }
+  }
+
 	// Patch icon bank
-	drawPatchIconBank(presel_patch_id, active_patch_id, nUserPreset + 1, show_patch_num);
+  if( maskCUpdate & maskPatchIconBank )
+  {
+	  drawPatchIconBank(presel_patch_id, active_patch_id, nUserPreset + 1, show_patch_num);
+  }
 
 	// Use Patch select mode to indicate manual mode
-  if( _uistate == UI_manual ) { drawPatchSelMode(TFT_THRCREAM); }
-  else                        { drawPatchSelMode(TFT_THRBROWN); }
+  if( maskCUpdate & maskPatchSelMode )
+  {
+    if( _uistate == UI_manual ) { drawPatchSelMode(TFT_THRCREAM); }
+    else                        { drawPatchSelMode(TFT_THRBROWN); }
+  }
 
   // Show which set of patches is used
-  if( _uistate == UI_home_amp )        { drawPatchSet(TFT_THRCREAM, "THRII"); }
-  else if( _uistate == UI_home_patch ) { drawPatchSet(TFT_THRCREAM, "USER");  } // TODO: 'FACTORY'
+  if( maskCUpdate & maskPatchSet )
+  {
+    if( _uistate == UI_home_amp )        { drawPatchSet(TFT_THRCREAM, "THRII"); }
+    else if( _uistate == UI_home_patch ) { drawPatchSet(TFT_THRCREAM, "USER");  } // TODO: 'FACTORY'
+  }
 
 	// Amp select mode (COL/AMP/CAB)
-	switch( amp_select_mode )
-	{
-		case COL: drawAmpSelMode(TFT_THRCREAM, "COL"); break;
-		case AMP:	drawAmpSelMode(TFT_THRCREAM, "AMP"); break;
-		case CAB: drawAmpSelMode(TFT_THRCREAM, "CAB"); break;
-	}
+  if( maskCUpdate & maskAmpSelMode )
+  {  
+    switch( amp_select_mode )
+    {
+      case COL: drawAmpSelMode(TFT_THRCREAM, "COL"); break;
+      case AMP:	drawAmpSelMode(TFT_THRCREAM, "AMP"); break;
+      case CAB: drawAmpSelMode(TFT_THRCREAM, "CAB"); break;
+    }
+  }
 
 	// Amp/Cabinet ---------------------------------------------------------------
-	switch( thrs.col )
-	{
-		case BOUTIQUE: tft.setTextColor(TFT_BLUE,  TFT_BLACK);	break;
-		case MODERN:   tft.setTextColor(TFT_GREEN, TFT_BLACK); 	break;
-		case CLASSIC:  tft.setTextColor(TFT_RED, TFT_BLACK); 		break;
-	}
-  drawAmpUnit(80, 20, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab); // Place in manual mode layout
-
+  if( maskCUpdate & maskAmpUnit )
+  {
+    switch( thrs.col )
+    {
+      case BOUTIQUE: tft.setTextColor(TFT_BLUE,  TFT_BLACK);	break;
+      case MODERN:   tft.setTextColor(TFT_GREEN, TFT_BLACK); 	break;
+      case CLASSIC:  tft.setTextColor(TFT_RED, TFT_BLACK); 		break;
+    }
+    drawAmpUnit(80, 20, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab); // Place in manual mode layout
+  }
+  
 	String FXtitle;
 	uint16_t FXbgcolour  =  0;
 	uint16_t FXfgcolour  =  0;
@@ -539,293 +578,323 @@ void updateStatusMask(THR30II_Settings &thrs)
 	uint8_t nFXbars = 5;
 	uint8_t selectedFXparam = 0;
 
-	// Gain, Master, and EQ (B/M/T) ---------------------------------------------------------
-  drawPPChart( 0, FXy, 26, FXh, TFT_THRBROWN, TFT_THRCREAM, "GM", thrs.control[CTRL_GAIN],thrs.control[CTRL_MASTER]);
-  drawEQChart(26, FXy, 27, FXh, TFT_THRBROWN, TFT_THRCREAM, "EQ", thrs.control[CTRL_BASS], thrs.control[CTRL_MID], thrs.control[CTRL_TREBLE]);
-	
+	// Gain, Master, and EQ (B/M/T) -----------------------------------------------
+  if( maskCUpdate & maskGainMaster )
+  {
+     drawPPChart( 0, FXy, 26, FXh, TFT_THRBROWN, TFT_THRCREAM, "GM", thrs.control[CTRL_GAIN], thrs.control[CTRL_MASTER]);
+  }
+
+  // EQ (B/M/T) -----------------------------------------------------------------
+  if( maskCUpdate & maskEQChart )
+  {
+    drawEQChart(26, FXy, 27, FXh, TFT_THRBROWN, TFT_THRCREAM, "EQ", thrs.control[CTRL_BASS], thrs.control[CTRL_MID], thrs.control[CTRL_TREBLE]);
+  }
+
   FXx = FXw + FXx_offset; // Set FX unit position
 
 	// FX1 Compressor -------------------------------------------------------------
-	utilparams[0] = thrs.compressor_setting[CO_SUSTAIN];
-	utilparams[1] = thrs.compressor_setting[CO_LEVEL];
-  if(thrs.unit[COMPRESSOR]) { drawUtilUnit(FXx, FXy, 60, 40, 1, TFT_THRWHITE, TFT_THRDARKGREY,  "Comp", utilparams); }
-  else                      { drawUtilUnit(FXx, FXy, 60, 40, 1, TFT_THRGREY,  TFT_THRVDARKGREY, "Comp", utilparams); }
-	
+  if( maskCUpdate & maskCompressor )
+  {
+    utilparams[0] = thrs.compressor_setting[CO_SUSTAIN];
+    utilparams[1] = thrs.compressor_setting[CO_LEVEL];
+    if(thrs.unit[COMPRESSOR]) { drawUtilUnit(FXx, FXy, 60, 40, 1, TFT_THRWHITE, TFT_THRDARKGREY,  "Comp", utilparams); }
+    else                      { drawUtilUnit(FXx, FXy, 60, 40, 1, TFT_THRGREY,  TFT_THRVDARKGREY, "Comp", utilparams); }
+  }
+
  	// Gate -----------------------------------------------------------------------
-	utilparams[0] = thrs.gate_setting[GA_THRESHOLD];
-	utilparams[1] = thrs.gate_setting[GA_DECAY];
-  if(thrs.unit[GATE]) {	drawUtilUnit(FXx, FXy + 40, 60, 40, 0, TFT_THRYELLOW,    TFT_THRDIMYELLOW, "Gate", utilparams); }
-  else                { drawUtilUnit(FXx, FXy + 40, 60, 40, 0, TFT_THRDIMYELLOW, TFT_THRVDARKGREY, "Gate", utilparams); }
+  if( maskCUpdate & maskNoiseGate )
+  {
+    utilparams[0] = thrs.gate_setting[GA_THRESHOLD];
+    utilparams[1] = thrs.gate_setting[GA_DECAY];
+    if(thrs.unit[GATE]) {	drawUtilUnit(FXx, FXy + 40, 60, 40, 0, TFT_THRYELLOW,    TFT_THRDIMYELLOW, "Gate", utilparams); }
+    else                { drawUtilUnit(FXx, FXy + 40, 60, 40, 0, TFT_THRDIMYELLOW, TFT_THRVDARKGREY, "Gate", utilparams); }
+  }
 
 	// FX2 Effect (Chorus/Flanger/Phaser/Tremolo) ----------------------------------
-	switch( thrs.effecttype )
-	{
-		case CHORUS:
-			FXtitle = "Chor";	 // Set FX unit title
-			if( thrs.unit[EFFECT] ) // FX2 activated
-			{
-				FXbgcolour = TFT_THRFORESTGREEN;
-				FXfgcolour = TFT_THRDIMFORESTGREEN;
-			}
-			else // FX2 deactivated
-			{
-				FXbgcolour = TFT_THRDIMFORESTGREEN;
-				FXfgcolour = TFT_THRVDARKGREY;
-			}
-			FXparams[0] = thrs.effect_setting[CHORUS][CH_SPEED];
-			FXparams[1] = thrs.effect_setting[CHORUS][CH_DEPTH];
-			FXparams[2] = thrs.effect_setting[CHORUS][CH_PREDELAY];
-			FXparams[3] = thrs.effect_setting[CHORUS][CH_FEEDBACK];
-			FXparams[4] = thrs.effect_setting[CHORUS][CH_MIX];
-			nFXbars = 5;  
-		break;
+  if( maskCUpdate & maskFxUnit )
+  {
+    switch( thrs.effecttype )
+    {
+      case CHORUS:
+        FXtitle = "Chor";	 // Set FX unit title
+        if( thrs.unit[EFFECT] ) // FX2 activated
+        {
+          FXbgcolour = TFT_THRFORESTGREEN;
+          FXfgcolour = TFT_THRDIMFORESTGREEN;
+        }
+        else // FX2 deactivated
+        {
+          FXbgcolour = TFT_THRDIMFORESTGREEN;
+          FXfgcolour = TFT_THRVDARKGREY;
+        }
+        FXparams[0] = thrs.effect_setting[CHORUS][CH_SPEED];
+        FXparams[1] = thrs.effect_setting[CHORUS][CH_DEPTH];
+        FXparams[2] = thrs.effect_setting[CHORUS][CH_PREDELAY];
+        FXparams[3] = thrs.effect_setting[CHORUS][CH_FEEDBACK];
+        FXparams[4] = thrs.effect_setting[CHORUS][CH_MIX];
+        nFXbars = 5;  
+      break;
 
-		case FLANGER: 
-			FXtitle = "Flan";	 // Set FX unit title
-			if( thrs.unit[EFFECT] ) // FX2 activated
-			{
-				FXbgcolour = TFT_THRLIME;
-				FXfgcolour = TFT_THRDIMLIME;
-			}
-			else // FX2 deactivated
-			{
-				FXbgcolour = TFT_THRDIMLIME;
-				FXfgcolour = TFT_THRVDARKGREY;
-			}
-			FXparams[0] = thrs.effect_setting[FLANGER][FL_SPEED];
-			FXparams[1] = thrs.effect_setting[FLANGER][FL_DEPTH];
-			FXparams[2] = thrs.effect_setting[FLANGER][FL_MIX];
-			FXparams[3] = 0;
-			FXparams[4] = 0;
-			nFXbars = 3;
-		break;
+      case FLANGER: 
+        FXtitle = "Flan";	 // Set FX unit title
+        if( thrs.unit[EFFECT] ) // FX2 activated
+        {
+          FXbgcolour = TFT_THRLIME;
+          FXfgcolour = TFT_THRDIMLIME;
+        }
+        else // FX2 deactivated
+        {
+          FXbgcolour = TFT_THRDIMLIME;
+          FXfgcolour = TFT_THRVDARKGREY;
+        }
+        FXparams[0] = thrs.effect_setting[FLANGER][FL_SPEED];
+        FXparams[1] = thrs.effect_setting[FLANGER][FL_DEPTH];
+        FXparams[2] = thrs.effect_setting[FLANGER][FL_MIX];
+        FXparams[3] = 0;
+        FXparams[4] = 0;
+        nFXbars = 3;
+      break;
 
-		case PHASER:
-			FXtitle = "Phas";	 // Set FX unit title
-			if( thrs.unit[EFFECT] ) // FX2 activated
-			{
-				FXbgcolour = TFT_THRLEMON;
-				FXfgcolour = TFT_THRDIMLEMON;
-			}
-			else // FX2 deactivated
-			{
-				FXbgcolour = TFT_THRDIMLEMON;
-				FXfgcolour = TFT_THRVDARKGREY;
-			}
-			FXparams[0] = thrs.effect_setting[PHASER][PH_SPEED];
-			FXparams[1] = thrs.effect_setting[PHASER][PH_FEEDBACK];
-			FXparams[2] = thrs.effect_setting[PHASER][PH_MIX];
-			FXparams[3] = 0;
-			FXparams[4] = 0;
-			nFXbars = 3;		  
-		break;		
+      case PHASER:
+        FXtitle = "Phas";	 // Set FX unit title
+        if( thrs.unit[EFFECT] ) // FX2 activated
+        {
+          FXbgcolour = TFT_THRLEMON;
+          FXfgcolour = TFT_THRDIMLEMON;
+        }
+        else // FX2 deactivated
+        {
+          FXbgcolour = TFT_THRDIMLEMON;
+          FXfgcolour = TFT_THRVDARKGREY;
+        }
+        FXparams[0] = thrs.effect_setting[PHASER][PH_SPEED];
+        FXparams[1] = thrs.effect_setting[PHASER][PH_FEEDBACK];
+        FXparams[2] = thrs.effect_setting[PHASER][PH_MIX];
+        FXparams[3] = 0;
+        FXparams[4] = 0;
+        nFXbars = 3;		  
+      break;		
 
-		case TREMOLO:
-			FXtitle = "Trem";	 // Set FX unit title
-			if( thrs.unit[EFFECT] ) // FX2 activated
-			{
-				FXbgcolour = TFT_THRMANGO;
-				FXfgcolour = TFT_THRDIMMANGO;
-			}
-			else // FX2 deactivated
-			{
-				FXbgcolour = TFT_THRDIMMANGO;
-				FXfgcolour = TFT_THRVDARKGREY;
-			}
-			FXparams[0] = thrs.effect_setting[TREMOLO][TR_SPEED];
-			FXparams[1] = thrs.effect_setting[TREMOLO][TR_DEPTH];
-			FXparams[2] = thrs.effect_setting[TREMOLO][TR_MIX];
-			FXparams[3] = 0;
-			FXparams[4] = 0;
-			nFXbars = 3;
-		break;
-	} // of switch(effecttype)
-		
-	FXx = 2*FXw + FXx_offset; // Set FX unit position
-	drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
+      case TREMOLO:
+        FXtitle = "Trem";	 // Set FX unit title
+        if( thrs.unit[EFFECT] ) // FX2 activated
+        {
+          FXbgcolour = TFT_THRMANGO;
+          FXfgcolour = TFT_THRDIMMANGO;
+        }
+        else // FX2 deactivated
+        {
+          FXbgcolour = TFT_THRDIMMANGO;
+          FXfgcolour = TFT_THRVDARKGREY;
+        }
+        FXparams[0] = thrs.effect_setting[TREMOLO][TR_SPEED];
+        FXparams[1] = thrs.effect_setting[TREMOLO][TR_DEPTH];
+        FXparams[2] = thrs.effect_setting[TREMOLO][TR_MIX];
+        FXparams[3] = 0;
+        FXparams[4] = 0;
+        nFXbars = 3;
+      break;
+    } // of switch(effecttype)
+
+  	FXx = 2*FXw + FXx_offset; // Set FX unit position
+	  drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
+  }
 
   // FX3 Echo (Tape Echo/Digital Delay)
-  switch( thrs.echotype )
-	{
-		case TAPE_ECHO:
-			FXtitle = "Tape";	// Set FX unit title
-			if( thrs.unit[ECHO] )  // FX3 activated
-			{
-				FXbgcolour = TFT_THRROYALBLUE;
-				FXfgcolour = TFT_THRDIMROYALBLUE;
-			}
-			else // FX2 deactivated
-			{
-				FXbgcolour = TFT_THRDIMROYALBLUE;
-				FXfgcolour = TFT_THRVDARKGREY;
-			}
-			FXparams[0] = thrs.echo_setting[TAPE_ECHO][TA_TIME];
-			FXparams[1] = thrs.echo_setting[TAPE_ECHO][TA_FEEDBACK];
-			FXparams[2] = thrs.echo_setting[TAPE_ECHO][TA_BASS];
-			FXparams[3] = thrs.echo_setting[TAPE_ECHO][TA_TREBLE];
-			FXparams[4] = thrs.echo_setting[TAPE_ECHO][TA_MIX];
-			nFXbars = 5;
-		break;
+  if( maskCUpdate & maskEcho )
+  {
+    switch( thrs.echotype )
+    {
+      case TAPE_ECHO:
+        FXtitle = "Tape";	// Set FX unit title
+        if( thrs.unit[ECHO] )  // FX3 activated
+        {
+          FXbgcolour = TFT_THRROYALBLUE;
+          FXfgcolour = TFT_THRDIMROYALBLUE;
+        }
+        else // FX2 deactivated
+        {
+          FXbgcolour = TFT_THRDIMROYALBLUE;
+          FXfgcolour = TFT_THRVDARKGREY;
+        }
+        FXparams[0] = thrs.echo_setting[TAPE_ECHO][TA_TIME];
+        FXparams[1] = thrs.echo_setting[TAPE_ECHO][TA_FEEDBACK];
+        FXparams[2] = thrs.echo_setting[TAPE_ECHO][TA_BASS];
+        FXparams[3] = thrs.echo_setting[TAPE_ECHO][TA_TREBLE];
+        FXparams[4] = thrs.echo_setting[TAPE_ECHO][TA_MIX];
+        nFXbars = 5;
+      break;
 
-		case DIGITAL_DELAY:
-			FXtitle = "D.D.";	// Set FX unit title
-			if( thrs.unit[ECHO] )  // FX3 activated
-			{
-				FXbgcolour = TFT_THRSKYBLUE;
-				FXfgcolour = TFT_THRDIMSKYBLUE;
-			}
-			else // FX3 deactivated
-			{
-				FXbgcolour = TFT_THRDIMSKYBLUE;
-				FXfgcolour = TFT_THRVDARKGREY;
-			}
-			FXparams[0] = thrs.echo_setting[DIGITAL_DELAY][DD_TIME];
-			FXparams[1] = thrs.echo_setting[DIGITAL_DELAY][DD_FEEDBACK];
-			FXparams[2] = thrs.echo_setting[DIGITAL_DELAY][DD_BASS];
-			FXparams[3] = thrs.echo_setting[DIGITAL_DELAY][DD_TREBLE];
-			FXparams[4] = thrs.echo_setting[DIGITAL_DELAY][DD_MIX];
-			nFXbars = 5;  
-		break;
-	}	// of switch(effecttype)
-	
-	FXx = 3*FXw + FXx_offset;	// set FX unit position
-	drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
+      case DIGITAL_DELAY:
+        FXtitle = "D.D.";	// Set FX unit title
+        if( thrs.unit[ECHO] )  // FX3 activated
+        {
+          FXbgcolour = TFT_THRSKYBLUE;
+          FXfgcolour = TFT_THRDIMSKYBLUE;
+        }
+        else // FX3 deactivated
+        {
+          FXbgcolour = TFT_THRDIMSKYBLUE;
+          FXfgcolour = TFT_THRVDARKGREY;
+        }
+        FXparams[0] = thrs.echo_setting[DIGITAL_DELAY][DD_TIME];
+        FXparams[1] = thrs.echo_setting[DIGITAL_DELAY][DD_FEEDBACK];
+        FXparams[2] = thrs.echo_setting[DIGITAL_DELAY][DD_BASS];
+        FXparams[3] = thrs.echo_setting[DIGITAL_DELAY][DD_TREBLE];
+        FXparams[4] = thrs.echo_setting[DIGITAL_DELAY][DD_MIX];
+        nFXbars = 5;  
+      break;
+    }	// of switch(effecttype)
+    
+    FXx = 3*FXw + FXx_offset;	// set FX unit position
+    drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
+  }
 
  	// FX4 Reverb (Spring/Room/Plate/Hall)
-	switch( thrs.reverbtype )
-	{
-		case SPRING:
-			FXtitle = "Spr";   // Set FX unit title
-			if( thrs.unit[REVERB] ) // FX4 activated
-			{
-				FXbgcolour = TFT_THRRED;
-				FXfgcolour = TFT_THRDIMRED;
-			}
-			else // FX4 deactivated
-			{
-				FXbgcolour = TFT_THRDIMRED;
-				FXfgcolour = TFT_THRVDARKGREY;
-			}
-			FXparams[0] = thrs.reverb_setting[SPRING][SP_REVERB];
-			FXparams[1] = thrs.reverb_setting[SPRING][SP_TONE];
-			FXparams[2] = thrs.reverb_setting[SPRING][SP_MIX];
-			FXparams[3] = 0;
-			FXparams[4] = 0;
-			nFXbars = 3;  
-		break;
+  if( maskCUpdate & maskReverb )
+  {
+    switch( thrs.reverbtype )
+    {
+      case SPRING:
+        FXtitle = "Spr";   // Set FX unit title
+        if( thrs.unit[REVERB] ) // FX4 activated
+        {
+          FXbgcolour = TFT_THRRED;
+          FXfgcolour = TFT_THRDIMRED;
+        }
+        else // FX4 deactivated
+        {
+          FXbgcolour = TFT_THRDIMRED;
+          FXfgcolour = TFT_THRVDARKGREY;
+        }
+        FXparams[0] = thrs.reverb_setting[SPRING][SP_REVERB];
+        FXparams[1] = thrs.reverb_setting[SPRING][SP_TONE];
+        FXparams[2] = thrs.reverb_setting[SPRING][SP_MIX];
+        FXparams[3] = 0;
+        FXparams[4] = 0;
+        nFXbars = 3;  
+      break;
 
-		case ROOM:
-			FXtitle = "Room";  // Set FX unit title
-			if( thrs.unit[REVERB] ) // FX4 activated
-			{
-				FXbgcolour = TFT_THRMAGENTA;
-				FXfgcolour = TFT_THRDIMMAGENTA;
-			}
-			else // FX4 deactivated
-			{
-				FXbgcolour = TFT_THRDIMMAGENTA;
-				FXfgcolour = TFT_THRVDARKGREY;
-			}
-			FXparams[0] = thrs.reverb_setting[ROOM][RO_DECAY];
-			FXparams[1] = thrs.reverb_setting[ROOM][RO_PREDELAY];
-			FXparams[2] = thrs.reverb_setting[ROOM][RO_TONE];
-			FXparams[3] = thrs.reverb_setting[ROOM][RO_MIX];
-			FXparams[4] = 0;
-			nFXbars = 4;  
-		break;
+      case ROOM:
+        FXtitle = "Room";  // Set FX unit title
+        if( thrs.unit[REVERB] ) // FX4 activated
+        {
+          FXbgcolour = TFT_THRMAGENTA;
+          FXfgcolour = TFT_THRDIMMAGENTA;
+        }
+        else // FX4 deactivated
+        {
+          FXbgcolour = TFT_THRDIMMAGENTA;
+          FXfgcolour = TFT_THRVDARKGREY;
+        }
+        FXparams[0] = thrs.reverb_setting[ROOM][RO_DECAY];
+        FXparams[1] = thrs.reverb_setting[ROOM][RO_PREDELAY];
+        FXparams[2] = thrs.reverb_setting[ROOM][RO_TONE];
+        FXparams[3] = thrs.reverb_setting[ROOM][RO_MIX];
+        FXparams[4] = 0;
+        nFXbars = 4;  
+      break;
 
-		case PLATE:
-			FXtitle = "Plate"; // Set FX unit title
-			if( thrs.unit[REVERB] ) // FX4 activated
-			{
-				FXbgcolour = TFT_THRPURPLE;
-				FXfgcolour = TFT_THRDIMPURPLE;
-			}
-			else // FX4 deactivated
-			{
-				FXbgcolour = TFT_THRDIMPURPLE;
-				FXfgcolour = TFT_THRVDARKGREY;
-			}
-			FXparams[0] = thrs.reverb_setting[PLATE][PL_DECAY];
-			FXparams[1] = thrs.reverb_setting[PLATE][PL_PREDELAY];
-			FXparams[2] = thrs.reverb_setting[PLATE][PL_TONE];
-			FXparams[3] = thrs.reverb_setting[PLATE][PL_MIX];
-			FXparams[4] = 0;
-			nFXbars = 4;  
-		break;
+      case PLATE:
+        FXtitle = "Plate"; // Set FX unit title
+        if( thrs.unit[REVERB] ) // FX4 activated
+        {
+          FXbgcolour = TFT_THRPURPLE;
+          FXfgcolour = TFT_THRDIMPURPLE;
+        }
+        else // FX4 deactivated
+        {
+          FXbgcolour = TFT_THRDIMPURPLE;
+          FXfgcolour = TFT_THRVDARKGREY;
+        }
+        FXparams[0] = thrs.reverb_setting[PLATE][PL_DECAY];
+        FXparams[1] = thrs.reverb_setting[PLATE][PL_PREDELAY];
+        FXparams[2] = thrs.reverb_setting[PLATE][PL_TONE];
+        FXparams[3] = thrs.reverb_setting[PLATE][PL_MIX];
+        FXparams[4] = 0;
+        nFXbars = 4;  
+      break;
 
-		case HALL:
-			FXtitle = "Hall";	 // Set FX unit title
-			if( thrs.unit[REVERB] ) // FX4 activated
-			{
-				FXbgcolour = TFT_THRVIOLET;
-				FXfgcolour = TFT_THRDIMVIOLET;
-			}
-			else // FX4 deactivated
-			{
-				FXbgcolour = TFT_THRDIMVIOLET;
-				FXfgcolour = TFT_THRVDARKGREY;
-			}
-			FXparams[0] = thrs.reverb_setting[HALL][HA_DECAY];
-			FXparams[1] = thrs.reverb_setting[HALL][HA_PREDELAY];
-			FXparams[2] = thrs.reverb_setting[HALL][HA_TONE];
-			FXparams[3] = thrs.reverb_setting[HALL][HA_MIX];
-			FXparams[4] = 0;
-			nFXbars = 4;  
-		break;
-	}	// of switch(reverbtype)
-		
-	FXx = 4*FXw + FXx_offset; // Set FX unit position
-	drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
+      case HALL:
+        FXtitle = "Hall";	 // Set FX unit title
+        if( thrs.unit[REVERB] ) // FX4 activated
+        {
+          FXbgcolour = TFT_THRVIOLET;
+          FXfgcolour = TFT_THRDIMVIOLET;
+        }
+        else // FX4 deactivated
+        {
+          FXbgcolour = TFT_THRDIMVIOLET;
+          FXfgcolour = TFT_THRVDARKGREY;
+        }
+        FXparams[0] = thrs.reverb_setting[HALL][HA_DECAY];
+        FXparams[1] = thrs.reverb_setting[HALL][HA_PREDELAY];
+        FXparams[2] = thrs.reverb_setting[HALL][HA_TONE];
+        FXparams[3] = thrs.reverb_setting[HALL][HA_MIX];
+        FXparams[4] = 0;
+        nFXbars = 4;  
+      break;
+    }	// of switch(reverbtype)
+      
+    FXx = 4*FXw + FXx_offset; // Set FX unit position
+    drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
+  }
 
   // Show THRII Guitar and Audio volume values
-  // FIXME: Does not work if FXx is, and if not uint8_t... FXx = 5*FXw + FXx_offset; // Set FX unit position
-  drawPPChart(293, FXy, 27, FXh, TFT_THRBROWN, TFT_THRCREAM, "VA", thrs.guitar_volume, thrs.audio_volume);
-
-	String s2, s3;
-
-  if( _uistate == UI_home_amp || (_uistate == UI_manual && _uistate_prev == UI_home_amp) )
+  if( maskCUpdate & maskVolumeAudio )
   {
-    if( thrs.thrSettings )
-    {
-      s2 = thrs.THRII_MODEL_NAME();
-      if( s2 != "None") { s2 += " PANEL";       }
-      else              { s2 = "NOT CONNECTED"; }
-      drawPatchName(TFT_SKYBLUE, s2, thrs.boost_activated);
-    }
-    else if( thrs.getUserSettingsHaveChanged() )
-    {
-      s2 = thrs.getPatchName();
-      drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
-    }
-    else
-    {
-      s2 = thrs.getPatchName();
-//      drawPatchName(TFT_SKYBLUE, s2, thrs.boost_activated); // No need to be blue
-      drawPatchName(TFT_THRCREAM, s2, thrs.boost_activated);
-    }
+    // FIXME: Does not work if FXx is, and if not uint8_t... FXx = 5*FXw + FXx_offset; // Set FX unit position
+    drawPPChart(293, FXy, 27, FXh, TFT_THRBROWN, TFT_THRCREAM, "VA", thrs.guitar_volume, thrs.audio_volume);
   }
-  else if( _uistate == UI_home_patch || (_uistate == UI_manual && _uistate_prev == UI_home_patch) )
+
+  if( maskCUpdate & maskPatchName )
   {
-    // If unchanged User Memory setting is active:
-    if( !thrs.getUserSettingsHaveChanged() )
+    String s2, s3;
+
+    if( _uistate == UI_home_amp || (_uistate == UI_manual && _uistate_prev == UI_home_amp) )
     {
-      if( presel_patch_id != active_patch_id )
+      if( thrs.thrSettings )
       {
-        s2 = libraryPatchNames[presel_patch_id - 1]; // libraryPatchNames is 0-indexed
-        drawPatchName(ST7789_ORANGE, s2, thrs.boost_activated);
+        s2 = thrs.THRII_MODEL_NAME();
+        if( s2 != "None") { s2 += " PANEL";       }
+        else              { s2 = "NOT CONNECTED"; }
+        drawPatchName(TFT_SKYBLUE, s2, thrs.boost_activated);
+      }
+      else if( thrs.getUserSettingsHaveChanged() )
+      {
+        s2 = thrs.getPatchName();
+        drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
       }
       else
       {
-        s2 = libraryPatchNames[active_patch_id - 1];
+        s2 = thrs.getPatchName();
+//        drawPatchName(TFT_SKYBLUE, s2, thrs.boost_activated); // No need to be blue
         drawPatchName(TFT_THRCREAM, s2, thrs.boost_activated);
       }
     }
-    else
+    else if( _uistate == UI_home_patch || (_uistate == UI_manual && _uistate_prev == UI_home_patch) )
     {
-      s2 = libraryPatchNames[active_patch_id - 1]; // libraryPatchNames is 0-indexed; "(*)" removed to save space
-      drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
+      // If unchanged User Memory setting is active:
+      if( !thrs.getUserSettingsHaveChanged() )
+      {
+        if( presel_patch_id != active_patch_id )
+        {
+          s2 = libraryPatchNames[presel_patch_id - 1]; // libraryPatchNames is 0-indexed
+          drawPatchName(ST7789_ORANGE, s2, thrs.boost_activated);
+        }
+        else
+        {
+          s2 = libraryPatchNames[active_patch_id - 1];
+          drawPatchName(TFT_THRCREAM, s2, thrs.boost_activated);
+        }
+      }
+      else
+      {
+        s2 = libraryPatchNames[active_patch_id - 1]; // libraryPatchNames is 0-indexed; "(*)" removed to save space
+        drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
+      }
     }
   }
 	maskUpdate = false; // Tell local GUI that mask has been updated
+  maskCUpdate = 0;
 }
