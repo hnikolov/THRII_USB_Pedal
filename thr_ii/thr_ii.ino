@@ -149,12 +149,17 @@ extern int16_t presel_patch_id;   	 // ID of actually pre-selected patch (absolu
 extern int16_t active_patch_id;   	 // ID of actually selected patch     (absolute number)
 
 extern uint16_t npatches; // Counts the patches stored on SD-card or in PROGMEN
+extern uint16_t npatches_user;
+extern uint16_t npatches_factory;
 int8_t nUserPreset = -1; // Used to cycle the THRII User presets
 
-extern std::vector<std::string> patchesII; // patches are read in dynamically, not as a static PROGMEM array
+//extern std::vector<std::string> patchesII; // patches are read in dynamically, not as a static PROGMEM array
+extern std::vector <JsonDocument> json_patchesII_user;
+extern std::vector <JsonDocument> json_patchesII_factory;
 
-void init_patches_SDCard(); // Forward declaration
-void init_patch_names();    // Forward declaration
+//void init_patches_SDCard(); // Forward declaration
+//void init_patch_names();    // Forward declaration
+void init_patches_from_sdcard(); // Forward declaration
 
 //////////////////
 // FSM
@@ -206,7 +211,8 @@ void setup() // Do preparations
 
 	while( Serial.read() > 0 ) {}; // Make read buffer empty
   
-  init_patches_SDCard();
+//  init_patches_SDCard(); // FIXME: Does not work if commented
+  init_patches_from_sdcard();
 
   // ----------------------
   // Initialise the buttons
@@ -241,25 +247,22 @@ void setup() // Do preparations
   // -----------------------
 	// Initialise patch status
   // -----------------------
+  npatches = npatches_user;
 	if( npatches > 0 ) { presel_patch_id =  1; } // Preselect the first available patch
 	else               { presel_patch_id = -1; } // No preselected patch possible because no available patches
 
 	active_patch_id = presel_patch_id; // Always start up with local settings, however show the patch number of the preselected patch
 
-	TRACE_THR30IIPEDAL(Serial.printf(F("\n\rThere are %d JSON patches in patches.h / patches.txt.\n\r"), npatches);)
-	TRACE_THR30IIPEDAL(Serial.println(F("Fetching Library Patch Names:")); )
-
-  init_patch_names();
-
-//	delay(250); // Could be reduced in release version
+	TRACE_THR30IIPEDAL(Serial.printf(F("\n\rLoaded %d JSON user patches and %d JSON factory patches.\n\r"), npatches_user, npatches_factory);)
+	
+  //TRACE_THR30IIPEDAL(Serial.println(F("Fetching Library Patch Names:")); )
+  //init_patch_names();
 
   // -----------
 	// MIDI
   // -----------
   midi1.begin();
   midi1.setHandleSysEx(OnSysEx);
-	
-//	delay(250); // Could be reduced in release version
 } // End of Setup()
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -604,8 +607,14 @@ void patch_activate(uint16_t pnr) // Check patchnumber and send patch as a SysEx
 }
 
 void send_patch(uint8_t patch_id) // Send a patch from preset library to THRxxII
-{ 
-	DynamicJsonDocument djd(4096); // Contains accessible values from a JSON File (2048?)
+{
+  TRACE_THR30IIPEDAL(Serial.print(F("Send_patch(): "));)
+	TRACE_THR30IIPEDAL(Serial.println(json_patchesII_user[patch_id-1]["data"]["meta"]["name"].as<const char*>());)
+  THR_Values.SetLoadedPatch(json_patchesII_user[patch_id-1]);
+  /*
+//  DynamicJsonDocument djd(4096); // Contains accessible values from a JSON File (2048?)
+//	TODO: DynamicJsonDocument is depricated. Use JsonDocument istead
+  JsonDocument djd;
 	
 	DeserializationError dse = deserializeJson(djd, patchesII[patch_id-1]);	// patchesII is zero-indexed
 	
@@ -621,6 +630,7 @@ void send_patch(uint8_t patch_id) // Send a patch from preset library to THRxxII
 		 THR_Values.SetPatchName("error", -1); // -1 = actual settings
 		 TRACE_THR30IIPEDAL(Serial.println(F("Send_patch(): Error-Deserial"));)
 	}
+  */
 } // End of send_patch()
 
 int flag = 0;

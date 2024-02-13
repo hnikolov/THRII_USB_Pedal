@@ -294,7 +294,8 @@ class THR30II_Settings
 	static std::map<String, std::vector<byte>> tokens;
 	
 	int patch_setAll(uint8_t * buf, uint16_t buf_len );
-	int SetLoadedPatch(const DynamicJsonDocument &djd );
+//	int SetLoadedPatch(const DynamicJsonDocument &djd );
+	int SetLoadedPatch(const JsonDocument &djd );
 	void createPatch();
 	void SetControl(uint8_t ctrl, double value);
 	double GetControl(uint8_t ctrl);

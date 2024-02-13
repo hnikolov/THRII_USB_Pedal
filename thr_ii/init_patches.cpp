@@ -22,13 +22,19 @@ File32 file;
 #endif
 
 #if USE_SDCARD
-	std::vector<std::string> patchesII; // patches are read in dynamically, not as a static PROGMEM array
+  #define path_presets_user    "/thrii/user_presets"
+  #define path_presets_factory "/thrii/factory_presets"
+
+	//std::vector<std::string> patchesII; // patches are read in dynamically, not as a static PROGMEM array
+  std::vector <JsonDocument> json_patchesII_user;
+  std::vector <JsonDocument> json_patchesII_factory;
 #else
 	                                    // patchesII is declared in "patches.h" in this case
 #endif
 
-uint16_t npatches  =  0; // Counts the patches stored on SD-card or in PROGMEN
+uint16_t npatches, npatches_user, npatches_factory = 0; // Counts the patches stored on SD-card or in PROGMEN
 std::vector <String> libraryPatchNames; // All the names of the patches stored on SD-card or in PROGMEN
+std::vector <String> factoryPatchNames;
 
 ////////////////////////////////////////////////
 // Normal TRACE/DEBUG
@@ -40,7 +46,7 @@ std::vector <String> libraryPatchNames; // All the names of the patches stored o
 // #define TRACE_V_THR30IIPEDAL(x) // trace off
 
 /////////////////////////////////////////////////
-
+/*
 void init_patches_SDCard()
 {  
   // -------------
@@ -100,9 +106,9 @@ void init_patches_SDCard()
 
 									if(file.getReadError()==0)
 									{
-										patchesII.emplace_back(std::string(pat.c_str()));
+										//patchesII.emplace_back(std::string(pat.c_str()));
 										//TRACE_V_THR30IIPEDAL(Serial.println(patchesII.back().c_str()) ;)
-										npatches++;
+										//npatches++;
 										TRACE_V_THR30IIPEDAL(Serial.printf("Loaded npatches: %d",npatches) ;)
 									}
 									else
@@ -163,16 +169,17 @@ void init_patches_SDCard()
 			}
 	}
 	#else
-		npatches = patchesII.size();  //from file patches.h 
+		//npatches = patchesII.size();  //from file patches.h 
 		TRACE_V_THR30IIPEDAL(Serial.printf("From PROGMEM: npatches: %d",npatches) ;)
 	#endif
 }
-
-// =========================================================================
+*/
+/*
 void init_patch_names()
 {
-  DynamicJsonDocument djd (4096); // Buffer size for JSON decoding of thrl6p-files is at least 1967 (ArduinoJson Assistant) 2048 recommended
-	
+//  DynamicJsonDocument djd (4096); // Buffer size for JSON decoding of thrl6p-files is at least 1967 (ArduinoJson Assistant) 2048 recommended
+	JsonDocument djd;
+
 	for(int i = 0; i < npatches; i++ ) // Get the patch names by de-serializing
 	{
     using namespace std;
@@ -190,5 +197,75 @@ void init_patch_names()
       TRACE_THR30IIPEDAL(Serial.println("JSON-Deserialization error. PatchesII[i] contains:");)
       Serial.println(patchesII[i].c_str());
     }
+  }
+}
+*/
+// =========================================================================
+std::string readFile(File file)
+{
+  std::string str;
+
+  while( file.available() > 0 ) 
+  {
+    str += (char)file.read();
+  }
+
+  return str;
+}
+
+void initializePresets(File dir, std::vector <JsonDocument> &json_patchesII, std::vector <String> &patchNames, uint16_t &npatches)
+{
+  JsonDocument doc;
+
+  while( true )
+  {
+    File entry = dir.openNextFile();
+    //while(file.isBusy()); // File32
+    delay(10);
+    if( !entry ) { break; }  // No more files
+    
+    if( entry.available() ) // Zero is returned for directories
+    {
+      Serial.println( entry.name() ); // Check what name is given by the library
+      
+      std::string data = readFile(entry);
+//        Serial.println( data.c_str() );
+      
+      DeserializationError dse = deserializeJson(doc, data);
+      if( dse )
+      {
+          Serial.print("deserializeJson() failed: ");
+          Serial.println( dse.c_str() );
+          continue;
+      }
+      
+      json_patchesII.push_back( doc );
+      patchNames.push_back((const char*) (doc["data"]["meta"]["name"]));            
+      Serial.println((const char*) (doc["data"]["meta"]["name"]));   
+    }
+    entry.close();
+  }
+  // Serial.printf(F("\n\rThere are %d JSON patches found on SD Card\n\r"), json_patchesII.size());
+  npatches = json_patchesII.size();
+}
+
+void init_patches_from_sdcard()
+{
+  if (!SD.begin(sd_chipsel))
+	{
+    Serial.println(F("Card failed, or not present."));
+  }
+  else
+	{
+		Serial.println(F("Card initialized."));
+    TRACE_THR30IIPEDAL( Serial.print(F("VolumeBegin->success. FAT-Type: "));)
+
+    Serial.println("Initializing user presets from SDCard");
+    File dir = SD.open(path_presets_user);
+    initializePresets(dir, json_patchesII_user, libraryPatchNames, npatches_user);
+
+    Serial.println("Initializing factory presets from SDCard");
+    dir = SD.open(path_presets_factory);
+    initializePresets(dir, json_patchesII_factory, factoryPatchNames, npatches_factory);
   }
 }

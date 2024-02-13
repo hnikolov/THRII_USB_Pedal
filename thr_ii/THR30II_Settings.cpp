@@ -722,7 +722,8 @@ void THR30II_Settings::setUserSettingsHaveChanged(bool changed) // Setter for st
 	userSettingsHaveChanged = changed;
 }
 
-int THR30II_Settings::SetLoadedPatch(const DynamicJsonDocument &djd ) // Invoke all settings from a loaded patch
+//int THR30II_Settings::SetLoadedPatch(const DynamicJsonDocument &djd ) // Invoke all settings from a loaded patch
+int THR30II_Settings::SetLoadedPatch(const JsonDocument &djd ) // Invoke all settings from a loaded patch
 {
 	if (!MIDI_Activated)
 	{
