@@ -1,0 +1,72 @@
+{
+  "data": {
+    "device": 2359298,
+    "device_version": 19923043,
+    "meta": {
+      "name": "001 - Clean Blues",
+      "tnid": 0
+    },
+    "tone": {
+      "THRGroupAmp": {
+        "@asset": "THR10C_BJunior2",
+        "Bass": 0.354031,
+        "Drive": 0.401307,
+        "Master": 0.803704,
+        "Mid": 0.808497,
+        "Treble": 0.653159
+      },
+      "THRGroupCab": {
+        "@asset": "speakerSimulator",
+        "SpkSimType": 3
+      },
+      "THRGroupFX1Compressor": {
+        "@asset": "RedComp",
+        "@enabled": true,
+        "Level": 0.607778,
+        "Sustain": 0.6
+      },
+      "THRGroupFX2Effect": {
+        "@asset": "StereoSquareChorus",
+        "@enabled": false,
+        "@wetDry": 0.429216,
+        "Depth": 0.24942,
+        "Feedback": 0.122343,
+        "Freq": 0.113012,
+        "Pre": 0.5
+      },
+      "THRGroupFX3EffectEcho": {
+        "@asset": "TapeEcho",
+        "@enabled": true,
+        "@wetDry": 0.204662,
+        "Bass": 0.307407,
+        "Feedback": 0.303542,
+        "Time": 0.153963,
+        "Treble": 0.302986
+      },
+      "THRGroupFX4EffectReverb": {
+        "@asset": "LargePlate1",
+        "@enabled": true,
+        "@wetDry": 0.153355,
+        "Decay": 0.151852,
+        "PreDelay": 0.155556,
+        "Tone": 0.5
+      },
+      "THRGroupGate": {
+        "@asset": "noiseGate",
+        "@enabled": true,
+        "Decay": 0.205,
+        "Thresh": -47.2222
+      },
+      "global": {
+        "THRPresetParamTempo": 110
+      }
+    }
+  },
+  "meta": {
+    "original": 0,
+    "pbn": 0,
+    "premium": 0
+  },
+  "schema": "L6Preset",
+  "version": 5
+}

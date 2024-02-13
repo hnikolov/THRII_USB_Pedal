@@ -1,0 +1,70 @@
+{
+  "data": {
+    "device": 2359298,
+    "device_version": 20971617,
+    "meta": {
+      "name": "EarlyVH",
+      "tnid": 0
+    },
+    "tone": {
+      "THRGroupAmp": {
+        "@asset": "THR10X_Brown1",
+        "Bass": 0.409973,
+        "Drive": 0.525651,
+        "Master": 0.689062,
+        "Mid": 0.694118,
+        "Treble": 0.745062
+      },
+      "THRGroupCab": {
+        "@asset": "speakerSimulator",
+        "SpkSimType": 2
+      },
+      "THRGroupFX1Compressor": {
+        "@asset": "RedComp",
+        "@enabled": false,
+        "Level": 0.83,
+        "Sustain": 0.3
+      },
+      "THRGroupFX2Effect": {
+        "@asset": "Phaser",
+        "@enabled": false,
+        "@wetDry": 0.334071,
+        "Feedback": 0.434175,
+        "Speed": 0.0144242
+      },
+      "THRGroupFX3EffectEcho": {
+        "@asset": "TapeEcho",
+        "@enabled": true,
+        "@wetDry": 0.212781,
+        "Bass": 0.5,
+        "Feedback": 0.344024,
+        "Time": 0.422019,
+        "Treble": 0.320351
+      },
+      "THRGroupFX4EffectReverb": {
+        "@asset": "LargePlate1",
+        "@enabled": true,
+        "@wetDry": 0.19566,
+        "Decay": 0.237066,
+        "PreDelay": 0.314381,
+        "Tone": 0.536849
+      },
+      "THRGroupGate": {
+        "@asset": "noiseGate",
+        "@enabled": true,
+        "Decay": 0.205,
+        "Thresh": -33
+      },
+      "global": {
+        "THRPresetParamTempo": 110
+      }
+    }
+  },
+  "meta": {
+    "original": 0,
+    "pbn": 0,
+    "premium": 0
+  },
+  "schema": "L6Preset",
+  "version": 5
+}

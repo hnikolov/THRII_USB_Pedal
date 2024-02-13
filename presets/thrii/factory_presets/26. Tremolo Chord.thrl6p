@@ -1,0 +1,69 @@
+{
+  "data" : {
+    "meta" : {
+      "name" : "Tremolo Chord",
+      "tnid" : 0
+    },
+    "device" : 2359298,
+    "tone" : {
+      "THRGroupGate" : {
+        "Decay" : 0.60000002384185791,
+        "@enabled" : false,
+        "@asset" : "noiseGate",
+        "Thresh" : -38
+      },
+      "THRGroupFX3EffectEcho" : {
+        "@asset" : "TapeEcho",
+        "Time" : 0.11706887930631638,
+        "Bass" : 0.5,
+        "Treble" : 0.31650960445404053,
+        "@wetDry" : 0.22047947347164154,
+        "@enabled" : false,
+        "Feedback" : 0.17444299161434174
+      },
+      "global" : {
+        "THRPresetParamTempo" : 440
+      },
+      "THRGroupFX1Compressor" : {
+        "@enabled" : false,
+        "Sustain" : 0.37766203284263611,
+        "@asset" : "RedComp",
+        "Level" : 0.62550055980682373
+      },
+      "THRGroupFX4EffectReverb" : {
+        "@wetDry" : 0.1473524272441864,
+        "@enabled" : true,
+        "Time" : 0.11734664440155029,
+        "@asset" : "StandardSpring",
+        "Tone" : 1
+      },
+      "THRGroupCab" : {
+        "@asset" : "speakerSimulator",
+        "SpkSimType" : 13
+      },
+      "THRGroupFX2Effect" : {
+        "@wetDry" : 0.41351273655891418,
+        "@enabled" : true,
+        "@asset" : "BiasTremolo",
+        "Speed" : 0.34107062220573425,
+        "Depth" : 0.70685762166976929
+      },
+      "THRGroupAmp" : {
+        "Treble" : 0.76525908708572388,
+        "Bass" : 0.66986912488937378,
+        "Master" : 0.64660012722015381,
+        "@asset" : "THR10C_Deluxe",
+        "Drive" : 0.67870372533798218,
+        "Mid" : 0.54481214284896851
+      }
+    },
+    "device_version" : 18088037
+  },
+  "meta" : {
+    "original" : 0,
+    "pbn" : 0,
+    "premium" : 0
+  },
+  "schema" : "L6Preset",
+  "version" : 5
+}

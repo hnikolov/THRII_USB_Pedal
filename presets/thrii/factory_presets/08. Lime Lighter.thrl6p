@@ -1,0 +1,72 @@
+{
+  "data" : {
+    "meta" : {
+      "name" : "Lime Lighter",
+      "tnid" : 0
+    },
+    "device" : 2359298,
+    "tone" : {
+      "THRGroupGate" : {
+        "Decay" : 0.20499999821186066,
+        "@enabled" : true,
+        "@asset" : "noiseGate",
+        "Thresh" : -33
+      },
+      "THRGroupFX3EffectEcho" : {
+        "@asset" : "TapeEcho",
+        "Time" : 0.4440000057220459,
+        "Bass" : 0.5,
+        "Treble" : 0.32141762971878052,
+        "@wetDry" : 0.18128268420696259,
+        "@enabled" : true,
+        "Feedback" : 0.2653765082359314
+      },
+      "global" : {
+        "THRPresetParamTempo" : 444
+      },
+      "THRGroupFX1Compressor" : {
+        "@enabled" : false,
+        "Sustain" : 0.30000001192092896,
+        "@asset" : "RedComp",
+        "Level" : 0.82999998331069946
+      },
+      "THRGroupFX4EffectReverb" : {
+        "@wetDry" : 0.10507744550704956,
+        "Decay" : 0.15000000596046448,
+        "@enabled" : true,
+        "PreDelay" : 0.30000001192092896,
+        "@asset" : "LargePlate1",
+        "Tone" : 0.86664116382598877
+      },
+      "THRGroupCab" : {
+        "@asset" : "speakerSimulator",
+        "SpkSimType" : 3
+      },
+      "THRGroupFX2Effect" : {
+        "@asset" : "StereoSquareChorus",
+        "Depth" : 0.23754000663757324,
+        "Freq" : 0.13172771036624908,
+        "Pre" : 0.5,
+        "@wetDry" : 0.35463321208953857,
+        "@enabled" : true,
+        "Feedback" : 0.12648019194602966
+      },
+      "THRGroupAmp" : {
+        "Treble" : 0.45148593187332153,
+        "Bass" : 0.50220334529876709,
+        "Master" : 0.56844276189804077,
+        "@asset" : "THR30_FLead",
+        "Drive" : 0.36880788207054138,
+        "Mid" : 0.22733527421951294
+      }
+    },
+    "device_version" : 18088037
+  },
+  "meta" : {
+    "original" : 0,
+    "pbn" : 0,
+    "premium" : 0
+  },
+  "schema" : "L6Preset",
+  "version" : 5
+}

@@ -1,0 +1,72 @@
+{
+  "data": {
+    "meta": {
+      "name": "Angus",
+      "tnid": 0
+    },
+    "device": 2359298,
+    "tone": {
+      "THRGroupGate": {
+        "Decay": 0.20499999821186066,
+        "@enabled": true,
+        "@asset": "noiseGate",
+        "Thresh": -16
+      },
+      "THRGroupFX3EffectEcho": {
+        "@asset": "TapeEcho",
+        "Time": 0.2531510591506958,
+        "Bass": 0.3934606611728668,
+        "Treble": 0.26224517822265625,
+        "@wetDry": 0.19725489616394043,
+        "@enabled": false,
+        "Feedback": 0.3257642388343811
+      },
+      "global": {
+        "THRPresetParamTempo": 110
+      },
+      "THRGroupFX1Compressor": {
+        "@enabled": false,
+        "Sustain": 0.39503762125968933,
+        "@asset": "RedComp",
+        "Level": 0.6009634733200073
+      },
+      "THRGroupFX4EffectReverb": {
+        "@wetDry": 0.05674376338720322,
+        "Decay": 0.07835648208856583,
+        "@enabled": true,
+        "PreDelay": 0.29435762763023376,
+        "@asset": "LargePlate1",
+        "Tone": 0.48835358023643494
+      },
+      "THRGroupCab": {
+        "@asset": "speakerSimulator",
+        "SpkSimType": 5
+      },
+      "THRGroupFX2Effect": {
+        "@asset": "StereoSquareChorus",
+        "Depth": 0.2725200057029724,
+        "Freq": 0.10807058960199356,
+        "Pre": 0.38349246978759766,
+        "@wetDry": 0.408627450466156,
+        "@enabled": false,
+        "Feedback": 0.11429891735315323
+      },
+      "THRGroupAmp": {
+        "Treble": 0.4523948132991791,
+        "Bass": 0.5906479358673096,
+        "Master": 0.6561053395271301,
+        "@asset": "THR10_Brit",
+        "Drive": 0.4079163372516632,
+        "Mid": 0.6107307076454163
+      }
+    },
+    "device_version": 19988587
+  },
+  "meta": {
+    "original": 0,
+    "pbn": 0,
+    "premium": 0
+  },
+  "schema": "L6Preset",
+  "version": 5
+}

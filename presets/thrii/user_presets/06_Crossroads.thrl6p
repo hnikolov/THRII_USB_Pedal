@@ -1,0 +1,72 @@
+{
+  "data": {
+    "device": 2359298,
+    "device_version": 19923043,
+    "meta": {
+      "name": "Crossroads",
+      "tnid": 0
+    },
+    "tone": {
+      "THRGroupAmp": {
+        "@asset": "THR30_FLead",
+        "Bass": 0.713726,
+        "Drive": 0.698039,
+        "Master": 0.917647,
+        "Mid": 0.501961,
+        "Treble": 0.133333
+      },
+      "THRGroupCab": {
+        "@asset": "speakerSimulator",
+        "SpkSimType": 4
+      },
+      "THRGroupFX1Compressor": {
+        "@asset": "RedComp",
+        "@enabled": false,
+        "Level": 0.83,
+        "Sustain": 0.3
+      },
+      "THRGroupFX2Effect": {
+        "@asset": "StereoSquareChorus",
+        "@enabled": false,
+        "@wetDry": 0.408627,
+        "Depth": 0.27252,
+        "Feedback": 0.114299,
+        "Freq": 0.108071,
+        "Pre": 0.5
+      },
+      "THRGroupFX3EffectEcho": {
+        "@asset": "TapeEcho",
+        "@enabled": false,
+        "@wetDry": 0.18,
+        "Bass": 0.5,
+        "Feedback": 0.323528,
+        "Time": 0.391,
+        "Treble": 0.251544
+      },
+      "THRGroupFX4EffectReverb": {
+        "@asset": "ReallyLargeHall",
+        "@enabled": false,
+        "@wetDry": 0.785294,
+        "Decay": 0.428235,
+        "PreDelay": 0.1,
+        "Tone": 0.233812
+      },
+      "THRGroupGate": {
+        "@asset": "noiseGate",
+        "@enabled": true,
+        "Decay": 0.205,
+        "Thresh": -33
+      },
+      "global": {
+        "THRPresetParamTempo": 110
+      }
+    }
+  },
+  "meta": {
+    "original": 0,
+    "pbn": 0,
+    "premium": 0
+  },
+  "schema": "L6Preset",
+  "version": 5
+}

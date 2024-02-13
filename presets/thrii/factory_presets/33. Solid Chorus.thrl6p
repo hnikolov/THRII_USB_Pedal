@@ -1,0 +1,72 @@
+{
+ "data" : {
+  "device" : 2359298,
+  "device_version" : 20971617,
+  "meta" : {
+   "name" : "Solid Chorus",
+   "tnid" : 0
+  },
+  "tone" : {
+   "THRGroupAmp" : {
+    "@asset" : "THR10_Flat_V",
+    "Bass" : 0.388235,
+    "Drive" : 0.758886,
+    "Master" : 0.849599,
+    "Mid" : 0.407843,
+    "Treble" : 0.587148
+   },
+   "THRGroupCab" : {
+    "@asset" : "speakerSimulator",
+    "SpkSimType" : 16
+   },
+   "THRGroupFX1Compressor" : {
+    "@asset" : "RedComp",
+    "@enabled" : false,
+    "Level" : 0.830,
+    "Sustain" : 0.30
+   },
+   "THRGroupFX2Effect" : {
+    "@asset" : "StereoSquareChorus",
+    "@enabled" : true,
+    "@wetDry" : 0.50,
+    "Depth" : 0.321224,
+    "Feedback" : 0.185758,
+    "Freq" : 0.0772974,
+    "Pre" : 0.50
+   },
+   "THRGroupFX3EffectEcho" : {
+    "@asset" : "L6DigitalDelay",
+    "@enabled" : true,
+    "@wetDry" : 0.366667,
+    "Bass" : 0.603704,
+    "Feedback" : 0.354074,
+    "Time" : 0.3910,
+    "Treble" : 0.411111
+   },
+   "THRGroupFX4EffectReverb" : {
+    "@asset" : "ReallyLargeHall",
+    "@enabled" : true,
+    "@wetDry" : 0.595790,
+    "Decay" : 0.373452,
+    "PreDelay" : 0.373090,
+    "Tone" : 0.351577
+   },
+   "THRGroupGate" : {
+    "@asset" : "noiseGate",
+    "@enabled" : false,
+    "Decay" : 0.50,
+    "Thresh" : -32.0
+   },
+   "global" : {
+    "THRPresetParamTempo" : 780
+   }
+  }
+ },
+ "meta" : {
+  "original" : 0,
+  "pbn" : 0,
+  "premium" : 0
+ },
+ "schema" : "L6Preset",
+ "version" : 5
+}

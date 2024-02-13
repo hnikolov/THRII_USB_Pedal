@@ -1,0 +1,72 @@
+{
+  "data" : {
+    "meta" : {
+      "name" : "Finger Bass",
+      "tnid" : 0
+    },
+    "device" : 2359298,
+    "tone" : {
+      "THRGroupGate" : {
+        "Decay" : 0.5,
+        "@enabled" : false,
+        "@asset" : "noiseGate",
+        "Thresh" : -32
+      },
+      "THRGroupFX3EffectEcho" : {
+        "@asset" : "TapeEcho",
+        "Time" : 0.42201852798461914,
+        "Bass" : 0.5,
+        "Treble" : 0.26224517822265625,
+        "@wetDry" : 0.19725489616394043,
+        "@enabled" : false,
+        "Feedback" : 0.3257642388343811
+      },
+      "global" : {
+        "THRPresetParamTempo" : 110
+      },
+      "THRGroupFX1Compressor" : {
+        "@enabled" : true,
+        "Sustain" : 0.50879627466201782,
+        "@asset" : "RedComp",
+        "Level" : 0.5990104079246521
+      },
+      "THRGroupFX4EffectReverb" : {
+        "@wetDry" : 0.073365159332752228,
+        "Decay" : 0.098321758210659027,
+        "@enabled" : false,
+        "PreDelay" : 0.11186342686414719,
+        "@asset" : "LargePlate1",
+        "Tone" : 0.36698496341705322
+      },
+      "THRGroupCab" : {
+        "@asset" : "speakerSimulator",
+        "SpkSimType" : 16
+      },
+      "THRGroupFX2Effect" : {
+        "@asset" : "StereoSquareChorus",
+        "Depth" : 0.25426000356674194,
+        "Freq" : 0.11197647452354431,
+        "Pre" : 0.5,
+        "@wetDry" : 0.23348122835159302,
+        "@enabled" : false,
+        "Feedback" : 0.12065769731998444
+      },
+      "THRGroupAmp" : {
+        "Treble" : 0.35656061768531799,
+        "Bass" : 0.41115707159042358,
+        "Master" : 0.6825980544090271,
+        "@asset" : "THR10_Bass_Eden_Marcus",
+        "Drive" : 0.61420714855194092,
+        "Mid" : 0.69991916418075562
+      }
+    },
+    "device_version" : 18088037
+  },
+  "meta" : {
+    "original" : 0,
+    "pbn" : 0,
+    "premium" : 0
+  },
+  "schema" : "L6Preset",
+  "version" : 5
+}

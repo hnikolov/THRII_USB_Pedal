@@ -1,0 +1,69 @@
+{
+  "data": {
+    "device": 2359296,
+    "device_version": 19988587,
+    "meta": {
+      "name": "Love Story",
+      "tnid": 0
+    },
+    "tone": {
+      "THRGroupAmp": {
+        "@asset": "THR10X_Brown2",
+        "Bass": 0.239216,
+        "Drive": 0.21329,
+        "Master": 0.501961,
+        "Mid": 0.585621,
+        "Treble": 0.517647
+      },
+      "THRGroupCab": {
+        "@asset": "speakerSimulator",
+        "SpkSimType": 1
+      },
+      "THRGroupFX1Compressor": {
+        "@asset": "RedComp",
+        "@enabled": false,
+        "Level": 0.807407,
+        "Sustain": 0
+      },
+      "THRGroupFX2Effect": {
+        "@asset": "L6Flanger",
+        "@enabled": false,
+        "@wetDry": 0.114815,
+        "Depth": 0.0333336,
+        "Freq": 0.0437037
+      },
+      "THRGroupFX3EffectEcho": {
+        "@asset": "TapeEcho",
+        "@enabled": false,
+        "@wetDry": 0.310092,
+        "Bass": 0.430975,
+        "Feedback": 0.261538,
+        "Time": 0.415475,
+        "Treble": 0
+      },
+      "THRGroupFX4EffectReverb": {
+        "@asset": "StandardSpring",
+        "@enabled": true,
+        "@wetDry": 0.118519,
+        "Time": 0.162963,
+        "Tone": 0.874074
+      },
+      "THRGroupGate": {
+        "@asset": "noiseGate",
+        "@enabled": true,
+        "Decay": 0.281482,
+        "Thresh": -37.2667
+      },
+      "global": {
+        "THRPresetParamTempo": 110
+      }
+    }
+  },
+  "meta": {
+    "original": 0,
+    "pbn": 0,
+    "premium": 0
+  },
+  "schema": "L6Preset",
+  "version": 5
+}

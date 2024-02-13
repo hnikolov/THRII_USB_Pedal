@@ -1,0 +1,71 @@
+{
+  "data" : {
+    "meta" : {
+      "name" : "Hamamatsu Blues",
+      "tnid" : 0
+    },
+    "device" : 2359298,
+    "tone" : {
+      "THRGroupGate" : {
+        "Decay" : 0.60000002384185791,
+        "@enabled" : false,
+        "@asset" : "noiseGate",
+        "Thresh" : -38
+      },
+      "THRGroupFX3EffectEcho" : {
+        "@asset" : "TapeEcho",
+        "Time" : 0.21307288110256195,
+        "Bass" : 0.43097510933876038,
+        "Treble" : 0,
+        "@wetDry" : 0.23011508584022522,
+        "@enabled" : true,
+        "Feedback" : 0.26153844594955444
+      },
+      "global" : {
+        "THRPresetParamTempo" : 780
+      },
+      "THRGroupFX1Compressor" : {
+        "@enabled" : false,
+        "Sustain" : 0.30000001192092896,
+        "@asset" : "RedComp",
+        "Level" : 0.82999998331069946
+      },
+      "THRGroupFX4EffectReverb" : {
+        "@wetDry" : 0.18854166567325592,
+        "@enabled" : true,
+        "Time" : 0.25,
+        "@asset" : "StandardSpring",
+        "Tone" : 0.5
+      },
+      "THRGroupCab" : {
+        "@asset" : "speakerSimulator",
+        "SpkSimType" : 11
+      },
+      "THRGroupFX2Effect" : {
+        "@asset" : "StereoSquareChorus",
+        "Depth" : 0.41467744112014771,
+        "Freq" : 0.20066490769386292,
+        "Pre" : 0.24524016678333282,
+        "@wetDry" : 0.26886078715324402,
+        "@enabled" : false,
+        "Feedback" : 0.10784143209457397
+      },
+      "THRGroupAmp" : {
+        "Treble" : 0.56099021434783936,
+        "Bass" : 0.35827291011810303,
+        "Master" : 0.51247531175613403,
+        "@asset" : "THR10C_Mini",
+        "Drive" : 0.64744186401367188,
+        "Mid" : 0.67361283302307129
+      }
+    },
+    "device_version" : 18088037
+  },
+  "meta" : {
+    "original" : 0,
+    "pbn" : 0,
+    "premium" : 0
+  },
+  "schema" : "L6Preset",
+  "version" : 5
+}

@@ -1,0 +1,72 @@
+{
+  "data": {
+    "meta": {
+      "name": "Lukather Lead",
+      "tnid": 0
+    },
+    "device": 2359298,
+    "tone": {
+      "THRGroupGate": {
+        "Decay": 0.20499999821186066,
+        "@enabled": false,
+        "@asset": "noiseGate",
+        "Thresh": -44.94721984863281
+      },
+      "THRGroupFX3EffectEcho": {
+        "@asset": "TapeEcho",
+        "Time": 0.460999995470047,
+        "Bass": 0.5,
+        "Treble": 0.21740451455116272,
+        "@wetDry": 0.4273437559604645,
+        "@enabled": true,
+        "Feedback": 0.4181365966796875
+      },
+      "global": {
+        "THRPresetParamTempo": 461
+      },
+      "THRGroupFX1Compressor": {
+        "@enabled": false,
+        "Sustain": 0.30000001192092896,
+        "@asset": "RedComp",
+        "Level": 0.8299999833106995
+      },
+      "THRGroupFX4EffectReverb": {
+        "@wetDry": 0.09014756977558136,
+        "Decay": 0.36248552799224854,
+        "@enabled": true,
+        "PreDelay": 0.35810184478759766,
+        "@asset": "ReallyLargeHall",
+        "Tone": 0.5876302123069763
+      },
+      "THRGroupCab": {
+        "@asset": "speakerSimulator",
+        "SpkSimType": 3
+      },
+      "THRGroupFX2Effect": {
+        "@asset": "StereoSquareChorus",
+        "Depth": 0.20000000298023224,
+        "Freq": 0.03999999910593033,
+        "Pre": 0.5,
+        "@wetDry": 0.5,
+        "@enabled": false,
+        "Feedback": 0.12999999523162842
+      },
+      "THRGroupAmp": {
+        "Treble": 0.37995555996894836,
+        "Bass": 0.5305495858192444,
+        "Master": 0.7040892243385315,
+        "@asset": "THR10X_South",
+        "Drive": 0.5744383931159973,
+        "Mid": 0.3258782923221588
+      }
+    },
+    "device_version": 19988587
+  },
+  "meta": {
+    "original": 0,
+    "pbn": 0,
+    "premium": 0
+  },
+  "schema": "L6Preset",
+  "version": 5
+}

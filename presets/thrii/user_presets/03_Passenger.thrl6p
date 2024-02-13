@@ -1,0 +1,70 @@
+{
+  "data": {
+    "device": 2359298,
+    "device_version": 19923043,
+    "meta": {
+      "name": "Passenger",
+      "tnid": 0
+    },
+    "tone": {
+      "THRGroupAmp": {
+        "@asset": "THR10C_DC30",
+        "Bass": 0.384314,
+        "Drive": 0.934858,
+        "Master": 0.874074,
+        "Mid": 0.501961,
+        "Treble": 0.454902
+      },
+      "THRGroupCab": {
+        "@asset": "speakerSimulator",
+        "SpkSimType": 0
+      },
+      "THRGroupFX1Compressor": {
+        "@asset": "RedComp",
+        "@enabled": true,
+        "Level": 0.515344,
+        "Sustain": 0.439683
+      },
+      "THRGroupFX2Effect": {
+        "@asset": "Phaser",
+        "@enabled": false,
+        "@wetDry": 0.5,
+        "Feedback": 0.94836,
+        "Speed": 0.04
+      },
+      "THRGroupFX3EffectEcho": {
+        "@asset": "TapeEcho",
+        "@enabled": false,
+        "@wetDry": 0.386243,
+        "Bass": 0,
+        "Feedback": 0.445503,
+        "Time": 0,
+        "Treble": 0.042328
+      },
+      "THRGroupFX4EffectReverb": {
+        "@asset": "SmallRoom1",
+        "@enabled": true,
+        "@wetDry": 0.337566,
+        "Decay": 0.5,
+        "PreDelay": 0.5,
+        "Tone": 0.5
+      },
+      "THRGroupGate": {
+        "@asset": "noiseGate",
+        "@enabled": false,
+        "Decay": 0.6,
+        "Thresh": -38
+      },
+      "global": {
+        "THRPresetParamTempo": 110
+      }
+    }
+  },
+  "meta": {
+    "original": 0,
+    "pbn": 0,
+    "premium": 0
+  },
+  "schema": "L6Preset",
+  "version": 5
+}

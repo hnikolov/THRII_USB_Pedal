@@ -1,0 +1,71 @@
+{
+  "data": {
+    "meta": {
+      "name": "Fav Blues",
+      "tnid": 0
+    },
+    "device": 2359298,
+    "tone": {
+      "THRGroupGate": {
+        "Decay": 0.5,
+        "@enabled": false,
+        "@asset": "noiseGate",
+        "Thresh": -32
+      },
+      "THRGroupFX3EffectEcho": {
+        "@asset": "TapeEcho",
+        "Time": 0.2531510591506958,
+        "Bass": 0.3934606611728668,
+        "Treble": 0.26224517822265625,
+        "@wetDry": 0.18957260251045227,
+        "@enabled": true,
+        "Feedback": 0.192242830991745
+      },
+      "global": {
+        "THRPresetParamTempo": 110
+      },
+      "THRGroupFX1Compressor": {
+        "@enabled": false,
+        "Sustain": 0.21383102238178253,
+        "@asset": "RedComp",
+        "Level": 0.7758477330207825
+      },
+      "THRGroupFX4EffectReverb": {
+        "@wetDry": 0.08479642868041992,
+        "@enabled": true,
+        "Time": 0.22864583134651184,
+        "@asset": "StandardSpring",
+        "Tone": 0.5752025246620178
+      },
+      "THRGroupCab": {
+        "@asset": "speakerSimulator",
+        "SpkSimType": 7
+      },
+      "THRGroupFX2Effect": {
+        "@asset": "StereoSquareChorus",
+        "Depth": 0.5104955434799194,
+        "Freq": 0.10901176929473877,
+        "Pre": 0.38349246978759766,
+        "@wetDry": 0.40375274419784546,
+        "@enabled": false,
+        "Feedback": 0.30618128180503845
+      },
+      "THRGroupAmp": {
+        "Treble": 0.45651212334632874,
+        "Bass": 0.4290781617164612,
+        "Master": 0.9487702250480652,
+        "@asset": "THR30_JKBass2",
+        "Drive": 0.9337673783302307,
+        "Mid": 0.26014262437820435
+      }
+    },
+    "device_version": 19988587
+  },
+  "meta": {
+    "original": 0,
+    "pbn": 0,
+    "premium": 0
+  },
+  "schema": "L6Preset",
+  "version": 5
+}

@@ -1,0 +1,71 @@
+{
+  "data" : {
+    "meta" : {
+      "name" : "Old School Bass",
+      "tnid" : 0
+    },
+    "device" : 2359298,
+    "tone" : {
+      "THRGroupGate" : {
+        "Decay" : 0.5,
+        "@enabled" : false,
+        "@asset" : "noiseGate",
+        "Thresh" : -32
+      },
+      "THRGroupFX3EffectEcho" : {
+        "@asset" : "TapeEcho",
+        "Time" : 0.42201852798461914,
+        "Bass" : 0.5,
+        "Treble" : 0.26224517822265625,
+        "@wetDry" : 0.19725489616394043,
+        "@enabled" : false,
+        "Feedback" : 0.3257642388343811
+      },
+      "global" : {
+        "THRPresetParamTempo" : 110
+      },
+      "THRGroupFX1Compressor" : {
+        "@enabled" : true,
+        "Sustain" : 0.46834489703178406,
+        "@asset" : "RedComp",
+        "Level" : 0.6219559907913208
+      },
+      "THRGroupFX4EffectReverb" : {
+        "@wetDry" : 0.5,
+        "@enabled" : false,
+        "Time" : 0.25,
+        "@asset" : "StandardSpring",
+        "Tone" : 0.5
+      },
+      "THRGroupCab" : {
+        "@asset" : "speakerSimulator",
+        "SpkSimType" : 16
+      },
+      "THRGroupFX2Effect" : {
+        "@asset" : "StereoSquareChorus",
+        "Depth" : 0.25426000356674194,
+        "Freq" : 0.11197647452354431,
+        "Pre" : 0.5,
+        "@wetDry" : 0.42490196228027344,
+        "@enabled" : false,
+        "Feedback" : 0.12065769731998444
+      },
+      "THRGroupAmp" : {
+        "Treble" : 0.76174765825271606,
+        "Bass" : 0.47843137383460999,
+        "Master" : 0.53991860151290894,
+        "@asset" : "THR10_Bass_Mesa",
+        "Drive" : 0.73631364107131958,
+        "Mid" : 0.39515933394432068
+      }
+    },
+    "device_version" : 18088037
+  },
+  "meta" : {
+    "original" : 0,
+    "pbn" : 0,
+    "premium" : 0
+  },
+  "schema" : "L6Preset",
+  "version" : 5
+}

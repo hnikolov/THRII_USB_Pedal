@@ -1,0 +1,72 @@
+{
+ "data" : {
+  "device" : 2359298,
+  "device_version" : 20971617,
+  "meta" : {
+   "name" : "90s Brown",
+   "tnid" : 0
+  },
+  "tone" : {
+   "THRGroupAmp" : {
+    "@asset" : "THR10X_Brown2",
+    "Bass" : 0.618301,
+    "Drive" : 0.632244,
+    "Master" : 0.662872,
+    "Mid" : 0.252768,
+    "Treble" : 0.339465
+   },
+   "THRGroupCab" : {
+    "@asset" : "speakerSimulator",
+    "SpkSimType" : 2
+   },
+   "THRGroupFX1Compressor" : {
+    "@asset" : "RedComp",
+    "@enabled" : false,
+    "Level" : 0.830,
+    "Sustain" : 0.30
+   },
+   "THRGroupFX2Effect" : {
+    "@asset" : "StereoSquareChorus",
+    "@enabled" : true,
+    "@wetDry" : 0.370481,
+    "Depth" : 0.129478,
+    "Feedback" : 0.252291,
+    "Freq" : 0.145124,
+    "Pre" : 0.471615
+   },
+   "THRGroupFX3EffectEcho" : {
+    "@asset" : "L6DigitalDelay",
+    "@enabled" : true,
+    "@wetDry" : 0.303704,
+    "Bass" : 0.170370,
+    "Feedback" : 0.383704,
+    "Time" : 0.428037,
+    "Treble" : 0.440741
+   },
+   "THRGroupFX4EffectReverb" : {
+    "@asset" : "ReallyLargeHall",
+    "@enabled" : true,
+    "@wetDry" : 0.142549,
+    "Decay" : 0.211936,
+    "PreDelay" : 0.417231,
+    "Tone" : 0.536256
+   },
+   "THRGroupGate" : {
+    "@asset" : "noiseGate",
+    "@enabled" : true,
+    "Decay" : 0.2050,
+    "Thresh" : -33.0
+   },
+   "global" : {
+    "THRPresetParamTempo" : 780
+   }
+  }
+ },
+ "meta" : {
+  "original" : 0,
+  "pbn" : 0,
+  "premium" : 0
+ },
+ "schema" : "L6Preset",
+ "version" : 5
+}
