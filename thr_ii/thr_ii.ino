@@ -12,7 +12,7 @@
 *  - Library "Bounce2"   Web: https://github.com/thomasfredericks/Bounce2
 *  - Library "SPI" version=1.0  Web: http://www.arduino.cc/en/Reference/SPI  , architectures=sam
 *  - Library "SDFAT"   (only if you want to use a SD-card for the patches, can be avoided with Teensy's big PROGMEM)
-*  - Library "ArduinoJson"  https://arduinojson.org (Copyright Benoit Blanchon 2014-2021)
+*  - Library "ArduinoJson"  https://arduinojson.org (Copyright Benoit Blanchon 2014-2024), version 7 is used
 *  - Library "Adafruit_gfx.h" https://github.com/adafruit/Adafruit-GFX-Library
 *	-Library "ArduinoQueue.h"  https://github.com/EinarArnason/ArduinoQueue
 *
@@ -163,6 +163,7 @@ void setup()
 	// This is the magic trick for printf to support float
   asm(".global _printf_float");  //make printf work for float values on Teensy
 
+  /* NOTE: Comment this section in release version
 	delay(100); // TODO: Do we need this?
 	uint32_t t_out = millis();
 	while( !Serial )
@@ -170,6 +171,7 @@ void setup()
     // Timeout, if no serial monitor is used  (make shorter in release version)
 		if(millis() - t_out > 3000) { break; }
 	} // wait for Arduino Serial Monitor
+  //*/
 
   // Serial.begin(230400); // Debug via USB-Serial (Teensy's programming interface, where 250000 is maximum speed)
   Serial.begin(250000);
@@ -340,7 +342,6 @@ void loop()
   else
   {
     drawConnIcon(midi_connected); // Default: not connected
-    maskCUpdate = maskAll; // TODO: Do we need this here?
   }
 	
   // Timing

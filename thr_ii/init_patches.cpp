@@ -45,7 +45,6 @@ void initializePresets(File dir, std::vector <JsonDocument> &json_patchesII, std
   {
     File entry = dir.openNextFile();
     //while(file.isBusy()); // File32
-    delay(10); // TODO: Do we need this?
     if( !entry ) { break; } // No more files
     
     if( entry.available() ) // Zero is returned for directories
