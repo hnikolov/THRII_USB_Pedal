@@ -39,8 +39,6 @@ extern int16_t active_patch_id; // ID of actually selected patch     (absolute n
 extern int8_t nUserPreset;      // Used to cycle the THRII User presets
 extern bool show_patch_num;     // Used to show match numbers only when switching banks
 
-extern byte maskUpdate;
-
 /////////////////////////
 uint32_t maskCUpdate = 0;
 
@@ -895,6 +893,5 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       }
     }
   }
-	maskUpdate = false; // Tell local GUI that mask has been updated
-  maskCUpdate = 0;
+  maskCUpdate = 0; // Display has been updated
 }
