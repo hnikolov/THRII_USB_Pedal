@@ -161,10 +161,12 @@ extern void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate);
 void setup()
 {
 	// This is the magic trick for printf to support float
-  asm(".global _printf_float");  //make printf work for float values on Teensy
+  asm(".global _printf_float"); // Make printf work for float values on Teensy
 
+  // -----------------
+  // Initialise Serial
+  // -----------------
   /* NOTE: Comment this section in release version
-	delay(100); // TODO: Do we need this?
 	uint32_t t_out = millis();
 	while( !Serial )
 	{
@@ -173,15 +175,12 @@ void setup()
 	} // wait for Arduino Serial Monitor
   //*/
 
-  // Serial.begin(230400); // Debug via USB-Serial (Teensy's programming interface, where 250000 is maximum speed)
-  Serial.begin(250000);
+  Serial.begin(250000); // Debug via USB-Serial (Teensy's programming interface, where 250000 is maximum speed)
   Serial.println();
   Serial.println("THRxxII Footswitch");
 
 	while( Serial.read() > 0 ) {}; // Make read buffer empty
   
-  init_patches_from_sdcard(); // TODO: Move this to npatches below
-
   // ----------------------
   // Initialise the buttons
   // ----------------------
@@ -211,9 +210,11 @@ void setup()
   spr.setColorDepth(16); // 16 bit colour needed to show antialiased fonts
   tft.fillScreen(TFT_THRCREAM); // Show a splash screen instead? :)
 
-  // -----------------------
-	// Initialise patch status
-  // -----------------------
+  // --------------------------
+	// Initialise patches/presets
+  // --------------------------
+  init_patches_from_sdcard(); // TODO: Move this to npatches below
+
   npatches = npatches_user;
 	if( npatches > 0 ) { presel_patch_id =  1; } // Preselect the first available patch
 	else               { presel_patch_id = -1; } // No preselected patch possible because no available patches
