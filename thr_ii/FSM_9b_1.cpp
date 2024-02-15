@@ -16,15 +16,19 @@ extern ampSelectModes amp_select_mode;
 dynModes dyn_mode = Comp; // Used only in the FSM
 
 extern std::array< THR30II_Settings, 5 > thr_user_presets;
+int8_t nUserPreset = -1; // Used to cycle the THRII User presets
 
-extern uint16_t npatches;  // Counts the patches stored on SD-card or in PROGMEN
-extern int8_t nUserPreset; // Used to cycle the THRII User presets
+int16_t factory_bank_first_patch = 1; // The first patch in a bank
+int16_t factory_presel_patch_id  = 1; // ID of actually pre-selected patch (absolute number)
+int16_t factory_active_patch_id  = 1; // ID of actually selected patch     (absolute number)
+int16_t user_bank_first_patch = 1; // The first patch in a bank
+int16_t user_presel_patch_id  = 1; // ID of actually pre-selected patch (absolute number)
+int16_t user_active_patch_id  = 1; // ID of actually selected patch     (absolute number)
 
-int16_t bank_first_patch = 1; // The first patch in a bank
-int16_t presel_patch_id  = 1; // ID of actually pre-selected patch (absolute number)
-int16_t active_patch_id  = 1; // ID of actually selected patch     (absolute number)
-// Test FSM_10b_v1 that still works with current updateStatusMask(), note button 3 behavior in the button handler
-//bool send_patch_now = false; // pre-select patch to send (false) or send immediately (true) - Used in updateStatusMask (TODO))
+int16_t *bank_first_patch = &user_bank_first_patch;
+int16_t *presel_patch_id  = &user_presel_patch_id;
+int16_t *active_patch_id  = &user_active_patch_id;
+
 bool show_patch_num = false;
 
 extern uint32_t maskCUpdate;
@@ -46,6 +50,18 @@ extern uint32_t maskFxUnit;
 extern uint32_t maskEcho;
 extern uint32_t maskReverb;
 extern uint32_t maskAll;
+
+extern std::vector <JsonDocument> json_patchesII_user;
+extern std::vector <JsonDocument> json_patchesII_factory;
+extern std::vector <JsonDocument> *active_json_patchesII;
+extern std::vector <String> libraryPatchNames;
+extern std::vector <String> factoryPatchNames;
+extern std::vector <String> *active_patch_names;
+bool factory_presets_active = false;
+
+extern uint16_t npatches_user;    // Counts the user patches stored on SD-card
+extern uint16_t npatches_factory; // Counts the factory patches stored on SD-card
+extern uint16_t *npatches; // Reference to npathces_user or npatches_factory
 
 UIStates _uistate_prev = UI_home_patch; // To remember amp vs custom patches state
 /////////////////////////////////////////////////////////////////
@@ -69,6 +85,29 @@ void toggle_boost()
     do_gain_boost();
     Serial.println("Gain boost activated");
   }
+}
+
+void toggle_factory_user_presets()
+{
+  if( factory_presets_active == true )
+  {
+    active_json_patchesII = &json_patchesII_user;
+    active_patch_names    = &libraryPatchNames;
+    npatches              = &npatches_user;
+    bank_first_patch      = &user_bank_first_patch;
+    presel_patch_id       = &user_presel_patch_id;
+    active_patch_id       = &user_active_patch_id;
+  }
+  else
+  {
+    active_json_patchesII = &json_patchesII_factory;
+    active_patch_names    = &factoryPatchNames;
+    npatches              = &npatches_factory;
+    bank_first_patch      = &factory_bank_first_patch;
+    presel_patch_id       = &factory_presel_patch_id;
+    active_patch_id       = &factory_active_patch_id;
+  }
+  factory_presets_active = !factory_presets_active;
 }
 
 void select_thrii_preset(byte nThriiPreset)
@@ -99,16 +138,17 @@ void select_thrii_preset(byte nThriiPreset)
   }  
 }
 
-void select_user_patch(int16_t &presel_patch_id, uint8_t pnr)
+void select_user_patch(int16_t *presel_patch_id, uint8_t pnr)
 {
-  if( bank_first_patch + pnr <= npatches ) // The new patch-id is available
+  if( *bank_first_patch + pnr <= *npatches ) // The new patch-id is available
   {
-    presel_patch_id = bank_first_patch + pnr;
-    if(presel_patch_id != active_patch_id) // A new patch to be activated
+    *presel_patch_id = *bank_first_patch + pnr;
+    if( *presel_patch_id != *active_patch_id ) // A new patch to be activated
     {
-      Serial.printf("\n\rActivating patch %d ...\n\r", presel_patch_id);
+      Serial.printf("\n\rActivating patch %d ...\n\r", *presel_patch_id);
       show_patch_num = false;
-      patch_activate(presel_patch_id);
+      *active_patch_id = *presel_patch_id;
+      patch_activate(*presel_patch_id);
     }
     else // Solo switch
     {
@@ -117,7 +157,7 @@ void select_user_patch(int16_t &presel_patch_id, uint8_t pnr)
   }
   else
   {
-    Serial.printf("\n\rActivating patch - Invalid patch number: %d ...\n\r", bank_first_patch + pnr);
+    Serial.printf("\n\rActivating patch - Invalid patch number: %d ...\n\r", *bank_first_patch + pnr);
   }
 }
 
@@ -175,25 +215,22 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
     {
         case 1:
           maskCUpdate = maskAll;
-          button_state = 0;  // Remove flag, because it is handled
         break;
 
         case 2: 
           maskCUpdate = maskAll;
-          button_state = 0;  // Remove flag, because it is handled      
         break;
 
         case 3: // Toggle between amp and custom patches
           _uistate = UI_home_patch;
-          patch_activate(presel_patch_id);
+          *active_patch_id = *presel_patch_id;
+          patch_activate(*presel_patch_id);
           maskCUpdate = maskAll;
-          button_state = 0;  // Remove flag, because it is handled
         break;
 
         case 4: // Tap tempo
           THR_Values.EchoTempoTap(); // Get tempo tap input and apply to echo unit
           maskCUpdate |= maskEcho;         
-          button_state = 0;          // Remove flag, because it is handled
         break;
             
         case 5: // Activate the patch 1 in a bank
@@ -208,8 +245,6 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
             toggle_boost();
             maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);
           }
-          //maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 6: // Activate the patch 2 in a bank
@@ -224,8 +259,6 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
             toggle_boost();
             maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);
           }
-          //maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 7: // Activate the patch 3 in a bank
@@ -240,8 +273,6 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
             toggle_boost();
             maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);
           }
-          //maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 8: // Activate the patch 4 in a bank
@@ -256,8 +287,6 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
             toggle_boost();
             maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);
           }
-          //maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
         
         case 9: // Activate the patch 5 in a bank
@@ -272,85 +301,54 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
             toggle_boost();
             maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);
           }
-          button_state = 0;  // Button is handled
         break;
 
         // Buttons hold ============================================================
-        case 11: // Rotate col/amp/cab, depending on which amp_select_mode is active
-          switch(amp_select_mode)
-          {
-            case COL:
-              THR_Values.next_col();
-              Serial.println("Amp collection switched to: " + String(THR_Values.col));
-            break;
-
-            case AMP:
-              THR_Values.next_amp();
-              Serial.println("Amp type switched to: " + String(THR_Values.amp));
-            break;
-
-            case CAB:
-              THR_Values.next_cab();
-              Serial.println("Cabinet switched to: " + String(THR_Values.cab));
-            break;
-          }
-          THR_Values.createPatch();
-          maskCUpdate |= maskAmpUnit;
-          button_state = 0;  // Button is handled
+        case 11:
+          maskCUpdate = maskAll;
         break;
 
-        case 12: // Rotate amp select mode ( COL -> AMP -> CAB -> )
-          switch(amp_select_mode)
-          {
-              case COL:	amp_select_mode = AMP;	break;
-              case AMP:	amp_select_mode = CAB; 	break;
-              case CAB:	amp_select_mode = COL; 	break;
-          }
-          Serial.println("Amp Select Mode: " + String(amp_select_mode));
-          maskCUpdate |= maskAmpSelMode;
-          button_state = 0;  // Button is handled
+        case 12: // Select between Factory and User presets
+          toggle_factory_user_presets();
+          *active_patch_id = *presel_patch_id;
+          patch_activate(*presel_patch_id);
+          maskCUpdate = maskAll;
         break;
 
-        case 13:
+        case 13: // Switch to Manual mode
           _uistate = UI_manual;
           _uistate_prev = UI_home_amp;
-          maskCUpdate |= maskPatchSelMode; 
-          button_state = 0;  // Button is handled
+          maskCUpdate |= (maskPatchSelMode | maskAmpSelMode); 
         break;
 
         case 14: 
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 15:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 16:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 17:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 18:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
         
         case 19:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
         
         default:
         break;
     }
+    button_state = 0; // Button is handled
 }
 
 // ================================================================
@@ -361,153 +359,114 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
     switch (button_state)
     {
         case 1: // Decrement patch to first entry in previous bank of 5 (bank size = 5)
-          bank_first_patch = ((bank_first_patch-1)/5 - 1) * 5 + 1; // Decrement pre-selected patch-ID to first of next bank
-          if (bank_first_patch < 1)	// Detect if went below first patch
+          *bank_first_patch = ((*bank_first_patch-1)/5 - 1) * 5 + 1; // Decrement pre-selected patch-ID to first of next bank
+          if (*bank_first_patch < 1)	// Detect if went below first patch
           {
-            bank_first_patch = ((npatches-1)/5) * 5 + 1; // Wrap back round to the last bank in library
+            *bank_first_patch = ((*npatches-1)/5) * 5 + 1; // Wrap back round to the last bank in library
           }
-          presel_patch_id = bank_first_patch;
+          *presel_patch_id = *bank_first_patch;
           THR_Values.boost_activated = false;
           show_patch_num = true;
           
-          Serial.printf("Patch #%d pre-selected\n\r", bank_first_patch);
+          Serial.printf("Patch #%d pre-selected\n\r", *bank_first_patch);
           maskCUpdate |= (maskPatchName | maskPatchIconBank); 
-          button_state = 0;  // Remove flag, because it is handled
         break;
 
         case 2: 
-          bank_first_patch = ((bank_first_patch-1)/5 + 1) * 5 + 1; // Increment pre-selected patch-ID to first of next bank
-          if (bank_first_patch > npatches) // Detect if went beyond last patch
+          *bank_first_patch = ((*bank_first_patch-1)/5 + 1) * 5 + 1; // Increment pre-selected patch-ID to first of next bank
+          if (*bank_first_patch > *npatches) // Detect if went beyond last patch
           {
-              bank_first_patch = 1;	// Wrap back round to first patch in library
+              *bank_first_patch = 1;	// Wrap back round to first patch in library
           }
-          presel_patch_id = bank_first_patch;
+          *presel_patch_id = *bank_first_patch;
           THR_Values.boost_activated = false;
           show_patch_num = true;
-          Serial.printf("Patch #%d pre-selected\n\r", bank_first_patch);
+          Serial.printf("Patch #%d pre-selected\n\r", *bank_first_patch);
           maskCUpdate |= (maskPatchName | maskPatchIconBank); 
-          button_state = 0;  // Remove flag, because it is handled      
         break;
 
-        case 3: // Toggle between amp and custom patches
+        case 3: // Toggle between amp and user/factory patches
           _uistate = UI_home_amp;
-          select_thrii_preset(nUserPreset);
+          select_thrii_preset( nUserPreset );
           maskCUpdate = maskAll; 
-          button_state = 0;  // Remove flag, because it is handled
         break;
 
         case 4: // Tap tempo
           THR_Values.EchoTempoTap(); // Get tempo tap input and apply to echo unit
           maskCUpdate |= maskEcho;         
-          button_state = 0;          // Remove flag, because it is handled
         break;
             
         case 5: // Activate the patch 1 in a bank
           select_user_patch( presel_patch_id, 0 );
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 6: // Activate the patch 2 in a bank
           select_user_patch( presel_patch_id, 1 );
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 7: // Activate the patch 3 in a bank
           select_user_patch( presel_patch_id, 2 );
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 8: // Activate the patch 4 in a bank
           select_user_patch( presel_patch_id, 3 );
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
         
         case 9: // Activate the patch 5 in a bank
           select_user_patch( presel_patch_id, 4 );
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         // Buttons hold ============================================================
-        case 11: // Rotate col/amp/cab, depending on which amp_select_mode is active
-          switch(amp_select_mode)
-          {
-            case COL:
-              THR_Values.next_col();
-              Serial.println("Amp collection switched to: " + String(THR_Values.col));
-            break;
-
-            case AMP:
-              THR_Values.next_amp();
-              Serial.println("Amp type switched to: " + String(THR_Values.amp));
-            break;
-
-            case CAB:
-              THR_Values.next_cab();
-              Serial.println("Cabinet switched to: " + String(THR_Values.cab));
-            break;
-          }
-          THR_Values.createPatch();
-          maskCUpdate |= maskAmpUnit;
-          button_state = 0;  // Button is handled
+        case 11:      
+          maskCUpdate = maskAll;
         break;
 
-        case 12: // Rotate amp select mode ( COL -> AMP -> CAB -> )
-          switch(amp_select_mode)
-          {
-              case COL:	amp_select_mode = AMP;	break;
-              case AMP:	amp_select_mode = CAB; 	break;
-              case CAB:	amp_select_mode = COL; 	break;
-          }
-          Serial.println("Amp Select Mode: " + String(amp_select_mode));
-          maskCUpdate |= maskAmpSelMode; 
-          button_state = 0;  // Button is handled
+        case 12: // Select between Factory and User presets
+          toggle_factory_user_presets();
+          *active_patch_id = *presel_patch_id;
+          patch_activate(*presel_patch_id);
+          maskCUpdate = maskAll; 
         break;
 
-        case 13:
+        case 13: // Switch to Manual mode
           _uistate = UI_manual;
           _uistate_prev = UI_home_patch;
-          maskCUpdate |= maskPatchSelMode; 
-          button_state = 0;  // Button is handled
+          maskCUpdate |= (maskPatchSelMode | maskAmpSelMode); 
         break;
 
         case 14: 
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 15:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 16:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 17:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 18:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
         
         case 19:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
         
         default:
         break;
     }
+    button_state = 0; // Button is handled
 }
 
 // ================================================================
@@ -519,29 +478,24 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
     {
         case 1:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Remove flag, because it is handled
         break;
 
         case 2: 
           maskCUpdate = maskAll; 
-          button_state = 0;  // Remove flag, because it is handled      
         break;
 
-        case 3: // Toggle between...?
+        case 3:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Remove flag, because it is handled
         break;
 
         case 4: // Tap tempo
           THR_Values.EchoTempoTap(); // Get tempo tap input and apply to echo unit
           maskCUpdate |= maskEcho;    
-          button_state = 0;          // Remove flag, because it is handled
         break;
             
         case 5:
           toggle_boost();
           maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);
-          button_state = 0;  // Button is handled
         break;
 
         case 6: // Toggle the Compressor Unit
@@ -549,7 +503,6 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           else                            { Serial.println("Compressor unit switched on");  }
           THR_Values.Switch_On_Off_Compressor_Unit( !THR_Values.unit[COMPRESSOR] );
           maskCUpdate |= maskCompressor;
-          button_state = 0;  // Button is handled
         break;
 
         case 7: // Toggle Effect
@@ -557,7 +510,6 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           else                        { Serial.println("Effect unit switched on");  }
           THR_Values.Switch_On_Off_Effect_Unit( !THR_Values.unit[EFFECT] );
           maskCUpdate |= maskFxUnit; 
-          button_state = 0;  // Button is handled
         break;
 
         case 8: // Toggle Echo
@@ -565,7 +517,6 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           else                      { Serial.println("Echo unit switched on");  }
           THR_Values.Switch_On_Off_Echo_Unit( ! THR_Values.unit[ECHO] );
           maskCUpdate |= maskEcho; 
-          button_state = 0;  // Button is handled
         break;
         
         case 9: // Toggle Reverb
@@ -573,7 +524,6 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           else                        { Serial.println("Reverb unit switched on");  }
           THR_Values.Switch_On_Off_Reverb_Unit( !THR_Values.unit[REVERB] );
           maskCUpdate |= maskReverb; 
-          button_state = 0;  // Button is handled
         break;
 
         // Buttons hold ============================================================
@@ -597,7 +547,6 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           }
           THR_Values.createPatch();
           maskCUpdate |= maskAmpUnit;
-          button_state = 0;  // Button is handled
         break;
 
         case 12: // Rotate amp select mode ( COL -> AMP -> CAB -> )
@@ -609,23 +558,19 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           }
           Serial.println("Amp Select Mode: " + String(amp_select_mode));
           maskCUpdate |= maskAmpSelMode;
-          button_state = 0;  // Button is handled
         break;
 
-        case 13:
+        case 13: // Switch to previous mode (amp/presets)
           _uistate = _uistate_prev;
-          maskCUpdate |= maskPatchSelMode;
-          button_state = 0;  // Button is handled
+          maskCUpdate |= (maskPatchSelMode | maskAmpSelMode);
         break;
 
         case 14: 
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 15:
           maskCUpdate = maskAll; 
-          button_state = 0;  // Button is handled
         break;
 
         case 16: // Toggle the Gate Unit
@@ -633,7 +578,6 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           else                      { Serial.println("Gate unit switched on");  }
           THR_Values.Switch_On_Off_Gate_Unit( !THR_Values.unit[GATE] );
           maskCUpdate |= maskNoiseGate;
-          button_state = 0;  // Button is handled
         break;
 
         case 17: // Rotate Effect Mode ( Chorus > Flanger > Phaser > Tremolo > )
@@ -647,7 +591,6 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           THR_Values.createPatch();
           Serial.println("Effect unit switched to: " + String(THR_Values.effecttype));
           maskCUpdate |= maskFxUnit;
-          button_state = 0;  // Button is handled
         break;
 
         case 18: // Rotate Echo Mode ( Tape Echo > Digital Delay > )
@@ -659,7 +602,6 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           THR_Values.createPatch();
           Serial.println("Echo unit switched to: " + String(THR_Values.echotype));
           maskCUpdate |= maskEcho;
-          button_state = 0;  // Button is handled
         break;
         
         case 19: // Rotate Reverb Mode ( Spring > Room > Plate > Hall > )
@@ -673,10 +615,10 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           THR_Values.createPatch();
           Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));
           maskCUpdate |= maskReverb; 
-          button_state = 0;  // Button is handled
         break;
         
         default:
         break;
     }
+    button_state = 0; // Button is handled
 }

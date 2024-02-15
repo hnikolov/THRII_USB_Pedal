@@ -119,16 +119,9 @@ volatile static byte midi_connected = false; // TODO: Why 'volatile static'?
 /////////////////////////////////////////////////////////////////////////////////////////
 // PATCHES
 /////////////////////////////////////////////////////////////////////////////////////////
-extern int16_t presel_patch_id; // ID of actually pre-selected patch (absolute number)
-extern int16_t active_patch_id; // ID of actually selected patch     (absolute number)
-
-extern uint16_t npatches; // Counts the patches stored on SD-card or in PROGMEN
-extern uint16_t npatches_user;
-extern uint16_t npatches_factory;
-int8_t nUserPreset = -1; // Used to cycle the THRII User presets
-
-extern std::vector <JsonDocument> json_patchesII_user;
-extern std::vector <JsonDocument> json_patchesII_factory;
+extern std::vector <JsonDocument> *active_json_patchesII; // Reference to json_patchesII_user or json_patchesII_factory
+extern uint16_t *npatches; // Reference to npathces_user or npatches_factory
+extern int8_t nUserPreset; // Used to cycle the THRII User presets
 
 void init_patches_from_sdcard(); // Forward declaration
 
@@ -148,7 +141,7 @@ class THR30II_Settings stored_THR_Values; // Stored settings, when applying a pa
 // Current behavior: The first time usere preset is selected from the pedal board, it switches the preset on the THRII and request the settings for the display
 //                   Next time, switch to the same user preset via command and use the local THR_Values_x data to update the display - it is faster this way
 class THR30II_Settings THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5;
-std::array< THR30II_Settings, 10 > thr_user_presets = {{ THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5 }};
+std::array< THR30II_Settings, 5 > thr_user_presets = {{ THR_Values_1, THR_Values_2, THR_Values_3, THR_Values_4, THR_Values_5 }};
 
 extern uint32_t maskCUpdate; // Set if a value changed and (part of) the display has to be updated
 extern uint32_t maskAll;
@@ -213,15 +206,7 @@ void setup()
   // --------------------------
 	// Initialise patches/presets
   // --------------------------
-  init_patches_from_sdcard(); // TODO: Move this to npatches below
-
-  npatches = npatches_user;
-	if( npatches > 0 ) { presel_patch_id =  1; } // Preselect the first available patch
-	else               { presel_patch_id = -1; } // No preselected patch possible because no available patches
-
-	active_patch_id = presel_patch_id; // Always start up with local settings, however show the patch number of the preselected patch
-
-	TRACE_THR30IIPEDAL(Serial.printf(F("\n\rLoaded %d JSON user patches and %d JSON factory patches.\n\r"), npatches_user, npatches_factory);)
+  init_patches_from_sdcard();
 
   // -----------
 	// MIDI
@@ -484,12 +469,11 @@ void undo_volume_patch()
 //////////////////////////////////////////////
 void patch_activate(uint16_t pnr) // Check patchnumber and send patch as a SysEx message to THR30II
 {
-	if( pnr <= npatches ) // This patch-id is available
+	if( pnr <= *npatches ) // This patch-id is available
 	{
 		// Activate the patch (overwrite either the actual patch or the local settings)
 		TRACE_THR30IIPEDAL(Serial.printf("Patch_activate(): Activating patch #%d \n\r", pnr);)
 		send_patch( pnr ); // Now send this patch as a SysEx message to THR30II 
-		active_patch_id = pnr;
 		THR_Values.boost_activated = false;
 		_uistate = UI_home_patch;
 	} 
@@ -502,9 +486,9 @@ void patch_activate(uint16_t pnr) // Check patchnumber and send patch as a SysEx
 void send_patch(uint8_t patch_id) // Send a patch from preset library to THRxxII
 {
   TRACE_THR30IIPEDAL(Serial.print(F("Send_patch(): "));)
-  // TODO: Has to be able to select between json_patchesII_user and json_patchesII_factory
-	TRACE_THR30IIPEDAL(Serial.println(json_patchesII_user[patch_id-1]["data"]["meta"]["name"].as<const char*>());)
-  THR_Values.SetLoadedPatch(json_patchesII_user[patch_id-1]);
+  // NOTE: active_json_patchesII is a reference to json_patchesII_user or json_patchesII_factory
+	TRACE_THR30IIPEDAL(Serial.println((*active_json_patchesII)[patch_id-1]["data"]["meta"]["name"].as<const char*>());)
+  THR_Values.SetLoadedPatch((*active_json_patchesII)[patch_id-1]);
 }
 
 int flag = 0; // TODO

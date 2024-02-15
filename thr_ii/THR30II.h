@@ -283,18 +283,18 @@ extern col_amp THR30IIAmpKey_ToColAmp(uint16_t ampkey);
 extern byte * dump;     // Dynamic Array because of big size
 extern size_t dump_len; // Size of the dynamic dump array
 
-class Outmessage;    // Forward declaration
-class SysExMessage;  // Forward declaration
+class Outmessage;   // Forward declaration
+class SysExMessage; // Forward declaration
 
 // The main class for handling all settings and transfers of THR30II
 class THR30II_Settings
 {
   public:
-	uint32_t ConnectedModel;  // FamilyID (2 Byte) + ModelNr.(2 Byte) , 0x00240002=THR30II
+	uint32_t ConnectedModel; // FamilyID (2 Byte) + ModelNr.(2 Byte) , 0x00240002=THR30II
 	static std::map<String, std::vector<byte>> tokens;
 	
 	int patch_setAll(uint8_t * buf, uint16_t buf_len );
-	int SetLoadedPatch(const JsonDocument &djd );
+	int SetLoadedPatch( const JsonDocument djd );
 	void createPatch();
 	void SetControl(uint8_t ctrl, double value);
 	double GetControl(uint8_t ctrl);

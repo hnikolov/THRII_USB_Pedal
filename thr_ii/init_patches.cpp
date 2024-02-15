@@ -12,10 +12,15 @@ const int sd_chipsel = BUILTIN_SDCARD;
 
 std::vector <JsonDocument> json_patchesII_user;
 std::vector <JsonDocument> json_patchesII_factory;
+std::vector <JsonDocument> *active_json_patchesII = &json_patchesII_user;
 
-uint16_t npatches, npatches_user, npatches_factory = 0; // Counts the patches stored on SD-card or in PROGMEN
-std::vector <String> libraryPatchNames; // All the names of the patches stored on SD-card or in PROGMEN
-std::vector <String> factoryPatchNames;
+std::vector <String> libraryPatchNames; // All the names of the user patches stored on SD-card
+std::vector <String> factoryPatchNames; // All the names of the factory patches stored on SD-card
+std::vector <String> *active_patch_names = &libraryPatchNames;
+
+uint16_t npatches_user = 0;    // Counts the user patches stored on SD-card
+uint16_t npatches_factory = 0; // Counts the factory patches stored on SD-card
+uint16_t *npatches = &npatches_user;
 
 // Normal TRACE/DEBUG
 #define TRACE_THR30IIPEDAL(x) x	  // trace on
@@ -94,5 +99,7 @@ void init_patches_from_sdcard()
     dir = SD.open(path_presets_factory);
     dir.seek(0); // Always start from the first file in the directory?
     initializePresets(dir, json_patchesII_factory, factoryPatchNames, npatches_factory);
+
+    TRACE_THR30IIPEDAL(Serial.printf(F("\n\rLoaded %d JSON user patches and %d JSON factory patches.\n\r"), npatches_user, npatches_factory);)
   }
 }

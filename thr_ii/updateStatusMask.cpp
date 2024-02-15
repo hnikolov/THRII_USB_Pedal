@@ -31,13 +31,15 @@ extern TFT_eSprite spr;
 #define AA_FONT_LARGE Latin_Hiragana_24
 #define AA_FONT_MONO  NotoSansMonoSCB20 // NotoSansMono-SemiCondensedBold 20pt
 
-extern std::vector <String> libraryPatchNames;
+extern std::vector <String> *active_patch_names;
 
-extern uint16_t npatches;
-extern int16_t presel_patch_id; // ID of actually pre-selected patch (absolute number)
-extern int16_t active_patch_id; // ID of actually selected patch     (absolute number)
+//extern uint16_t &npatches;      // Reference to npathces_user or npatches_factory
+extern uint16_t *npatches;      // Reference to npathces_user or npatches_factory
+extern int16_t *presel_patch_id; // ID of actually pre-selected patch (absolute number)
+extern int16_t *active_patch_id; // ID of actually selected patch     (absolute number)
 extern int8_t nUserPreset;      // Used to cycle the THRII User presets
 extern bool show_patch_num;     // Used to show match numbers only when switching banks
+extern bool factory_presets_active;
 
 /////////////////////////
 uint32_t maskCUpdate = 0;
@@ -168,7 +170,7 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
 				{
 					iconcolour = TFT_THRBROWN; // Colour for unselected patch icons
 				}
-				if( i > npatches )
+				if( i > *npatches )
 				{
 					iconcolour = TFT_BLACK;
 				}
@@ -516,14 +518,14 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 	// Patch number
   if( maskCUpdate & maskPatchID )
   {
-    if( _uistate == UI_home_amp )        { drawPatchID(TFT_THRCREAM, nUserPreset + 1); }
-    else if( _uistate == UI_home_patch ) { drawPatchID(TFT_THRCREAM, active_patch_id); }
+    if( _uistate == UI_home_amp )        { drawPatchID(TFT_THRCREAM, nUserPreset + 1);  }
+    else if( _uistate == UI_home_patch ) { drawPatchID(TFT_THRCREAM, *active_patch_id); }
   }
 
 	// Patch icon bank
   if( maskCUpdate & maskPatchIconBank )
   {
-	  drawPatchIconBank(presel_patch_id, active_patch_id, nUserPreset + 1, show_patch_num);
+	  drawPatchIconBank(*presel_patch_id, *active_patch_id, nUserPreset + 1, show_patch_num);
   }
 
 	// Use Patch select mode to indicate manual mode
@@ -536,18 +538,25 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   // Show which set of patches is used
   if( maskCUpdate & maskPatchSet )
   {
-    if( _uistate == UI_home_amp )        { drawPatchSet(TFT_THRCREAM, "THRII"); }
-    else if( _uistate == UI_home_patch ) { drawPatchSet(TFT_THRCREAM, "USER");  } // TODO: 'FACTORY'
+    if( _uistate == UI_home_amp )          { drawPatchSet(TFT_THRCREAM, "THRII");   }
+    else if( _uistate == UI_home_patch ) 
+    {
+      if( factory_presets_active == true ) { drawPatchSet(TFT_THRCREAM, "FACTORY"); }
+      else                                 { drawPatchSet(TFT_THRCREAM, "USER");    }
+    }
   }
 
-	// Amp select mode (COL/AMP/CAB)
+	// Amp select mode (COL/AMP/CAB); Highlighted only in Manual mode
   if( maskCUpdate & maskAmpSelMode )
-  {  
+  {
+    uint16_t colour = TFT_THRBROWN;
+    if( _uistate == UI_manual ) { colour = TFT_THRCREAM; }
+
     switch( amp_select_mode )
     {
-      case COL: drawAmpSelMode(TFT_THRCREAM, "COL"); break;
-      case AMP:	drawAmpSelMode(TFT_THRCREAM, "AMP"); break;
-      case CAB: drawAmpSelMode(TFT_THRCREAM, "CAB"); break;
+      case COL: drawAmpSelMode(colour, "COL"); break;
+      case AMP:	drawAmpSelMode(colour, "AMP"); break;
+      case CAB: drawAmpSelMode(colour, "CAB"); break;
     }
   }
 
@@ -866,7 +875,6 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       else
       {
         s2 = thrs.getPatchName();
-//        drawPatchName(TFT_SKYBLUE, s2, thrs.boost_activated); // No need to be blue
         drawPatchName(TFT_THRCREAM, s2, thrs.boost_activated);
       }
     }
@@ -875,20 +883,20 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       // If unchanged User Memory setting is active:
       if( !thrs.getUserSettingsHaveChanged() )
       {
-        if( presel_patch_id != active_patch_id )
+        if( *presel_patch_id != *active_patch_id )
         {
-          s2 = libraryPatchNames[presel_patch_id - 1]; // libraryPatchNames is 0-indexed
+          s2 = (*active_patch_names)[*presel_patch_id - 1]; // Patch names are 0-indexed
           drawPatchName(ST7789_ORANGE, s2, thrs.boost_activated);
         }
         else
         {
-          s2 = libraryPatchNames[active_patch_id - 1];
+          s2 = (*active_patch_names)[*active_patch_id - 1]; // Patch names are 0-indexed
           drawPatchName(TFT_THRCREAM, s2, thrs.boost_activated);
         }
       }
       else
       {
-        s2 = libraryPatchNames[active_patch_id - 1]; // libraryPatchNames is 0-indexed; "(*)" removed to save space
+        s2 = (*active_patch_names)[*active_patch_id - 1]; // Patch names are 0-indexed
         drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
       }
     }
