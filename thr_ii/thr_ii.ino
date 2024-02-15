@@ -37,11 +37,11 @@
 #include <AceButton.h>
 using namespace ace_button;
 
-const int NUM_BUTTONS = 10;
+const int NUM_BUTTONS = 9;
 
 // Use an array
 AceButton buttons[NUM_BUTTONS];
-uint8_t pins[NUM_BUTTONS] = {14, 15, 16, 17, 18, 19, 20, 21, 22, 23}; // Buttons range from 1 to 10, therefore, we subtract 13 in the handler
+uint8_t pins[NUM_BUTTONS] = {14, 15, 16, 17, 18, 19, 20, 21, 22}; // Buttons range from 1 to 9, therefore, we subtract 13 in the handler
 
 // Forward reference to prevent Arduino compiler becoming confused.
 void handleEvent(AceButton*, uint8_t, uint8_t);
@@ -75,6 +75,10 @@ uint8_t button_state = 0;
 
 TFT_eSPI tft = TFT_eSPI(); // Declare object "tft"
 TFT_eSprite spr = TFT_eSprite(&tft); // Declare Sprite object "spr" with pointer to "tft" object
+
+// TFT backlight brightness
+int brightness = 128; // 0 - 255
+int pin_backlight = 24;
 
 // Normal TRACE/DEBUG
 #define TRACE_THR30IIPEDAL(x) x	  // trace on
@@ -202,6 +206,12 @@ void setup()
   tft.setRotation(3);    // for the 3.2" tft (ILI9341)
   spr.setColorDepth(16); // 16 bit colour needed to show antialiased fonts
   tft.fillScreen(TFT_THRCREAM); // Show a splash screen instead? :)
+
+  // ----------------------------
+  // Initialise the TFT backlight
+  // ----------------------------
+  pinMode(pin_backlight, OUTPUT); 
+  analogWrite(pin_backlight, brightness);  
 
   // --------------------------
 	// Initialise patches/presets
