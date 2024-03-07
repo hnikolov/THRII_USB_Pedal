@@ -150,6 +150,10 @@ std::array< THR30II_Settings, 5 > thr_user_presets = {{ THR_Values_1, THR_Values
 extern uint32_t maskCUpdate; // Set if a value changed and (part of) the display has to be updated
 extern uint32_t maskAll;
 extern void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate);
+extern void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate);
+
+#include "stompBoxes.h"
+extern std::vector <StompBox*> sboxes;
 
 // Family-ID 24, Model-Nr: 1 = THR10II-W
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,6 +217,14 @@ void setup()
   pinMode(pin_backlight, OUTPUT); 
   analogWrite(pin_backlight, brightness);  
 
+  // -----------------------------------
+  // Initialise Components for Edit mode
+  // -----------------------------------
+  for(auto & sbox: sboxes) 
+  {
+    sbox->init();
+  }
+
   // --------------------------
 	// Initialise patches/presets
   // --------------------------
@@ -254,9 +266,12 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
 // Global variables, because values must be stored in between two calls of "parse_thr"
 //////////////////////////////////////////////////////////////////////////////////////
 UIStates _uistate = UI_home_amp; // TODO: idle state not needed?
+//UIStates _uistate = UI_edit; // TODO: idle state not needed?
 
 uint32_t tick1 = millis(); // Timer for regular mask update
 //uint32_t tick2 = millis(); // Timer for switching back to display layout after showing something else for a while
+
+extern uint32_t maskEditAmpUnit, maskEditReverb;
 
 ////////////////////////
 // GUI TIMING
@@ -267,7 +282,15 @@ void gui_timing()
   {
     if( maskCUpdate )
     {
-      updateStatusMask(THR_Values, maskCUpdate);
+      if( _uistate == UI_edit )
+      {
+        tftUpdateEdit(THR_Values, maskCUpdate);
+      }
+      else
+      {
+        updateStatusMask(THR_Values, maskCUpdate);
+      }
+
       tick1 = millis(); // Start new waiting period
       return;
     }

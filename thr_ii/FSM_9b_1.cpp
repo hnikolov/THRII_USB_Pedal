@@ -49,6 +49,20 @@ extern uint32_t maskNoiseGate;
 extern uint32_t maskFxUnit;
 extern uint32_t maskEcho;
 extern uint32_t maskReverb;
+
+// Used in Edit mode
+extern uint32_t maskAmpUnitPar;
+extern uint32_t maskCompressorEn;
+extern uint32_t maskCompressorPar;
+extern uint32_t maskNoiseGateEn;
+extern uint32_t maskNoiseGatePar;
+extern uint32_t maskFxUnitEn;
+extern uint32_t maskFxUnitPar;
+extern uint32_t maskEchoEn;
+extern uint32_t maskEchoPar;
+extern uint32_t maskReverbEn;
+extern uint32_t maskReverbPar;
+
 extern uint32_t maskAll;
 
 extern std::vector <JsonDocument> json_patchesII_user;
@@ -164,6 +178,7 @@ void select_user_patch(int16_t *presel_patch_id, uint8_t pnr)
 void handle_home_amp(UIStates &_uistate, uint8_t &button_state);
 void handle_home_patch(UIStates &_uistate, uint8_t &button_state);
 void handle_patch_manual(UIStates &_uistate, uint8_t &button_state);
+void handle_edit_mode(UIStates &_uistate, uint8_t &button_state);
 
 //                0        1            2              3        4        5        6                7
 // enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_manual, UI_edit, UI_save, UI_name, UI_init_act_set, UI_act_vol_sol, UI_patch, UI_ded_sol, UI_pat_vol_sol};
@@ -191,6 +206,7 @@ void fsm_9b_1(UIStates &_uistate, uint8_t &button_state)
 			break;
 
 			case UI_edit:
+        handle_edit_mode(_uistate, button_state);
 			break;
 
 			case UI_save:
@@ -617,6 +633,241 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           maskCUpdate |= maskReverb; 
         break;
         
+        default:
+        break;
+    }
+    button_state = 0; // Button is handled
+}
+
+#include "stompBoxes.h"
+extern std::vector <StompBox*> sboxes;
+
+uint8_t selected_sbox = 12;
+// ================================================================
+// Edit mode
+// ================================================================
+void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
+{
+    switch (button_state)
+    {
+        case 1:
+          sboxes[selected_sbox]->setFocusPrev();
+//          maskCUpdate = maskAll;
+        break;
+
+        case 2:
+          sboxes[selected_sbox]->setFocusNext();
+//          maskCUpdate = maskAll;
+        break;
+
+        case 3:
+//          maskCUpdate = maskAll;
+        break;
+
+        case 4: // Tap tempo
+          THR_Values.EchoTempoTap(); // Get tempo tap input and apply to echo unit
+          selected_sbox = 7; // TODO: or 8?
+          maskCUpdate |= maskEchoPar;
+        break;
+
+        case 5: // Edit the Amp
+          if( selected_sbox != 0 )
+          {
+            selected_sbox = 0;
+            maskCUpdate |= (maskAmpUnit | maskAmpUnitPar);
+          }
+        break;
+
+        case 6: // Edit the Compressor Unit
+          if( selected_sbox != 1 )
+          {
+            Serial.println("Compressor selected");
+            selected_sbox = 1;
+            maskCUpdate |= (maskCompressor | maskCompressorPar);
+          }
+          else
+          {
+            if(THR_Values.unit[COMPRESSOR])	{ Serial.println("Compressor unit switched off"); }
+            else                            { Serial.println("Compressor unit switched on");  }
+            THR_Values.Switch_On_Off_Compressor_Unit( !THR_Values.unit[COMPRESSOR] );
+            maskCUpdate |= maskCompressorEn;
+          }
+        break;
+
+        case 7: // Edit Effect
+          if( selected_sbox < 3 || selected_sbox > 6 )
+          {
+            Serial.println("Effect unit selected");
+            switch(THR_Values.effecttype)
+            {
+              case CHORUS:  selected_sbox = 3; break;
+              case FLANGER: selected_sbox = 4; break;
+              case PHASER:  selected_sbox = 5; break;
+              case TREMOLO: selected_sbox = 6; break;
+            }
+            maskCUpdate |= (maskFxUnit | maskFxUnitPar);
+          }
+          else
+          {
+            if(THR_Values.unit[EFFECT]) { Serial.println("Effect unit switched off"); }
+            else                        { Serial.println("Effect unit switched on");  }
+            THR_Values.Switch_On_Off_Effect_Unit( !THR_Values.unit[EFFECT] );
+            maskCUpdate |= maskFxUnitEn;
+          }
+        break;
+
+        case 8: // Edit Echo
+          if( selected_sbox < 7 || selected_sbox > 8 )
+          {
+            Serial.println("Echo unit selected");
+            switch(THR_Values.echotype)
+            {
+              case TAPE_ECHO:     selected_sbox = 7; break;
+              case DIGITAL_DELAY: selected_sbox = 8; break;
+            }
+            maskCUpdate |= (maskEcho | maskEchoPar);
+          }
+          else
+          {
+            if(THR_Values.unit[ECHO]) { Serial.println("Echo unit switched off"); }
+            else                      { Serial.println("Echo unit switched on");  }
+            THR_Values.Switch_On_Off_Echo_Unit( !THR_Values.unit[ECHO] );
+            maskCUpdate |= maskEchoEn;
+          }          
+        break;
+
+        case 9: // Edit Reverb
+          if( selected_sbox < 9 || selected_sbox > 12 )
+          {
+            Serial.println("Echo unit selected");
+            switch(THR_Values.reverbtype)
+            {
+              case SPRING: selected_sbox =  9; break;
+              case ROOM:   selected_sbox = 10; break;
+              case PLATE:  selected_sbox = 11; break;
+              case HALL:   selected_sbox = 10; break;
+            }
+            maskCUpdate |= (maskReverb | maskReverbPar);
+          }
+          else
+          {
+            if(THR_Values.unit[REVERB]) { Serial.println("Reverb unit switched off"); }
+            else                        { Serial.println("Reverb unit switched on");  }
+            THR_Values.Switch_On_Off_Reverb_Unit( !THR_Values.unit[REVERB] );
+            maskCUpdate |= maskReverbEn;
+          } 
+        break;
+
+        // Buttons hold ============================================================
+        case 11: // Rotate col/amp/cab, depending on which amp_select_mode is active
+          switch(amp_select_mode)
+          {
+            case COL:
+              THR_Values.next_col();
+              Serial.println("Amp collection switched to: " + String(THR_Values.col));
+            break;
+
+            case AMP:
+              THR_Values.next_amp();
+              Serial.println("Amp type switched to: " + String(THR_Values.amp));
+            break;
+
+            case CAB:
+              THR_Values.next_cab();
+              Serial.println("Cabinet switched to: " + String(THR_Values.cab));
+            break;
+          }
+          THR_Values.createPatch();
+          maskCUpdate |= maskAmpUnit;
+        break;
+
+        case 12: // Rotate amp select mode ( COL -> AMP -> CAB -> )
+          switch(amp_select_mode)
+          {
+              case COL:	amp_select_mode = AMP;	break;
+              case AMP:	amp_select_mode = CAB; 	break;
+              case CAB:	amp_select_mode = COL; 	break;
+          }
+          Serial.println("Amp Select Mode: " + String(amp_select_mode));
+//          maskCUpdate |= maskAmpSelMode;
+          maskCUpdate |= maskAmpUnit;
+        break;
+
+        case 13: // Switch to previous mode (amp/presets) - cancel the edit mode
+          _uistate = _uistate_prev;
+          maskCUpdate = maskAll;
+        break;
+
+        case 14:
+//          maskCUpdate = maskAll;
+        break;
+
+        case 15:
+//          maskCUpdate = maskAll;
+        break;
+
+        case 16: // Edit the Gate Unit
+          if( selected_sbox != 2 )
+          {
+            Serial.println("Gate unit selected");
+            selected_sbox = 2;
+            maskCUpdate |= (maskNoiseGate | maskNoiseGatePar);
+          }
+          else
+          {
+            if(THR_Values.unit[GATE])	{ Serial.println("Gate unit switched off"); }
+            else                      { Serial.println("Gate unit switched on");  }
+            THR_Values.Switch_On_Off_Gate_Unit( !THR_Values.unit[GATE] );
+            maskCUpdate |= maskNoiseGateEn;
+          }
+        break;
+
+        case 17: // Rotate Effect Mode ( Chorus > Flanger > Phaser > Tremolo > )
+          if( selected_sbox >= 3 && selected_sbox <= 6 )
+          {
+            switch(THR_Values.effecttype)
+            {
+              case CHORUS:  THR_Values.EffectSelect(FLANGER); selected_sbox = 4; break;
+              case FLANGER: THR_Values.EffectSelect(PHASER);  selected_sbox = 5; break;
+              case PHASER:  THR_Values.EffectSelect(TREMOLO); selected_sbox = 6; break;
+              case TREMOLO: THR_Values.EffectSelect(CHORUS);  selected_sbox = 3; break;
+            }
+            THR_Values.createPatch();
+            Serial.println("Effect unit switched to: " + String(THR_Values.effecttype));
+            maskCUpdate |= (maskFxUnit | maskFxUnitPar);
+          }
+        break;
+
+        case 18: // Rotate Echo Mode ( Tape Echo > Digital Delay > )
+          if( selected_sbox >= 7 && selected_sbox <= 8 )
+          {
+            switch(THR_Values.echotype)
+            {
+              case TAPE_ECHO:     THR_Values.EchoSelect(DIGITAL_DELAY); selected_sbox = 8; break;
+              case DIGITAL_DELAY: THR_Values.EchoSelect(TAPE_ECHO);     selected_sbox = 7; break;
+            }
+            THR_Values.createPatch();
+            Serial.println("Echo unit switched to: " + String(THR_Values.echotype));
+            maskCUpdate |= (maskEcho | maskEchoPar);
+          }
+        break;
+
+        case 19: // Rotate Reverb Mode ( Spring > Room > Plate > Hall > )
+          if( selected_sbox >= 9 && selected_sbox <= 12 )
+          {
+            switch(THR_Values.reverbtype)
+            {
+              case SPRING: THR_Values.ReverbSelect(ROOM);   selected_sbox = 10; break;
+              case ROOM:   THR_Values.ReverbSelect(PLATE);  selected_sbox = 11; break;
+              case PLATE:  THR_Values.ReverbSelect(HALL);   selected_sbox = 12; break;
+              case HALL:   THR_Values.ReverbSelect(SPRING); selected_sbox =  9; break;
+            }
+            THR_Values.createPatch();
+            Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));
+            maskCUpdate |= (maskReverb | maskReverbPar);
+          }
+        break;
+
         default:
         break;
     }

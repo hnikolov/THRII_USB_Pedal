@@ -231,6 +231,7 @@ const byte TFT_DIR_RIGHT_LEFT = 3;
 #define TFT_THRDIMSKYBLUE       tft.color565(  0,  95, 127)
 
 #define TFT_THRRED              tft.color565(255,   0,   0)
+#define TFT_THRDRED             tft.color565( 96,   0,   0)
 #define TFT_THRDIMRED           tft.color565(111,   0,   0)
 #define TFT_THRMAGENTA          tft.color565(255,   0, 159)
 #define TFT_THRDIMMAGENTA       tft.color565( 95,   0,  79)
@@ -238,5 +239,8 @@ const byte TFT_DIR_RIGHT_LEFT = 3;
 #define TFT_THRDIMPURPLE        tft.color565(127,   0, 127)
 #define TFT_THRVIOLET           tft.color565(191,   0, 255)
 #define TFT_THRDIMVIOLET        tft.color565( 95,   0, 127)
+
+#define TFT_THRDIMAMP           tft.color565(155, 135,   5)
+#define TFT_THRAMP              tft.color565(222, 197,  67)
 
 #endif // _THR30II_PEDAL_H_

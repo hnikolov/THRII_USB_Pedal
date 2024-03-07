@@ -25,6 +25,9 @@ extern TFT_eSprite spr;
 #include "fonts/Latin_Hiragana_24.h"
 //#include "fonts/Final_Frontier_28.h"
 
+#include "stompBoxes.h"
+extern std::vector <StompBox*> sboxes;
+
 // The font names are arrays references, thus must NOT be in quotes ""
 #define AA_FONT_SMALL NotoSansBold15
 #define AA_FONT_XLARGE NotoSansBold36
@@ -60,9 +63,25 @@ uint32_t maskNoiseGate     = 1 << 12; // drawUtilUnit
 uint32_t maskFxUnit        = 1 << 13; // drawFxUnit
 uint32_t maskEcho          = 1 << 14; // drawFxUnit
 uint32_t maskReverb        = 1 << 15; // drawFxUnit
+
+// Used in Edit mode
+uint32_t maskAmpUnitPar    = 1 << 16;
+uint32_t maskCompressorEn  = 1 << 17; // drawUtilUnit (Edit mode)
+uint32_t maskCompressorPar = 1 << 18; // drawUtilUnit (Edit mode)
+uint32_t maskNoiseGateEn   = 1 << 19; // drawUtilUnit (Edit mode)
+uint32_t maskNoiseGatePar  = 1 << 20; // drawUtilUnit (Edit mode)
+uint32_t maskFxUnitEn      = 1 << 21; // drawFxUnit   (Edit mode)
+uint32_t maskFxUnitPar     = 1 << 22; // drawFxUnit   (Edit mode)
+uint32_t maskEchoEn        = 1 << 23; // drawFxUnit   (Edit mode)
+uint32_t maskEchoPar       = 1 << 24; // drawFxUnit   (Edit mode)
+uint32_t maskReverbEn      = 1 << 25; // drawFxUnit   (Edit mode)
+uint32_t maskReverbPar     = 1 << 26; // drawFxUnit   (Edit mode)
+
 uint32_t maskAll           = 0xffffffff;
 
 ampSelectModes amp_select_mode = COL; // Currently used in updateStatusMask()
+
+bool bgfill = true;
 
 // Can be: THRII (5 presets), User, and Factory (TODO) set
 void drawPatchSet(uint16_t colour, String ps_name)
@@ -72,7 +91,7 @@ void drawPatchSet(uint16_t colour, String ps_name)
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
   spr.setTextDatum(MC_DATUM);
-  spr.setTextColor(TFT_BLACK, colour);
+  spr.setTextColor(TFT_BLACK, colour, bgfill);
   spr.drawString(ps_name, w/2, h/2+1);
   spr.pushSprite(x, y);
   spr.deleteSprite();
@@ -94,9 +113,9 @@ void drawPatchID(uint16_t fgcolour, int patchID, bool inverted = false)
 	spr.setTextFont(7);
 	spr.setTextSize(1);
 	spr.setTextDatum(MR_DATUM);
-	spr.setTextColor(TFT_BLACK); // TODO in case of inverted
+	spr.setTextColor(TFT_BLACK, bgcolour, bgfill); // TODO in case of inverted
 	spr.drawNumber(88, w-7, h/2);
-  spr.setTextColor(fg_colour, bg_colour);
+  spr.setTextColor(fg_colour, bg_colour, bgfill);
 	spr.drawNumber(patchID, w-7, h/2);
 	spr.pushSprite(x, y);
 	spr.unloadFont();
@@ -107,17 +126,17 @@ void drawPatchID(uint16_t fgcolour, int patchID)
 {
 // 	int x = 0, y = 0, w = 80, h = 80;
  	int x = 0, y = 20, w = 80, h = 60;
-	uint16_t bgcolour = TFT_THRVDARKGREY;
+//	uint16_t bgcolour = TFT_THRVDARKGREY;
 	spr.createSprite(w, h);
 	//spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, bgcolour, TFT_BLACK);
 	spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, TFT_THRBROWN, TFT_BLACK);
 	spr.setTextFont(7);
 	spr.setTextSize(1);
 	spr.setTextDatum(MR_DATUM);
-//	spr.setTextColor(TFT_BLACK);
-	spr.setTextColor(TFT_THRDARKBROWN);
+//	spr.setTextColor(TFT_BLACK, bgcolour, bgfill);
+	spr.setTextColor(TFT_THRDARKBROWN, TFT_THRDARKBROWN, bgfill);
 	spr.drawNumber(88, w-10, h/2);
-	spr.setTextColor(fgcolour);
+	spr.setTextColor(fgcolour, fgcolour, bgfill);
 	spr.drawNumber(patchID, w-10, h/2);
 	spr.pushSprite(x, y);
 	spr.unloadFont();
@@ -131,7 +150,7 @@ void drawPatchIcon(int x, int y, int w, int h, uint16_t colour, int patchID, boo
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
   spr.setTextDatum(MC_DATUM);
-  spr.setTextColor(TFT_BLACK, colour);
+  spr.setTextColor(TFT_BLACK, colour, bgfill);
   if( show_num ) { spr.drawNumber(patchID, 10, 11); }
   spr.pushSprite(x, y);
   spr.deleteSprite();
@@ -156,6 +175,7 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
 		break;
 		
 		case UI_home_patch:
+		case UI_edit:
 			for(int i = first; i < first+banksize; i++)
 			{
 				if( i == active_patch_id )
@@ -191,8 +211,9 @@ void drawPatchSelMode(uint16_t colour)
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
   spr.setTextDatum(MC_DATUM);
-  spr.setTextColor(TFT_BLACK, colour);
+  spr.setTextColor(TFT_BLACK, colour, bgfill);
   spr.drawString("MAN", w/2, h/2+1);
+  //spr.drawString("EDIT", w/2, h/2+1);
   spr.pushSprite(x, y);
   spr.deleteSprite();
 }
@@ -204,7 +225,7 @@ void drawAmpSelMode(uint16_t colour, String string)
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
   spr.setTextDatum(MC_DATUM);
-  spr.setTextColor(TFT_BLACK, colour);
+  spr.setTextColor(TFT_BLACK, colour, bgfill);
   spr.drawString(string, w/2, h/2+1);
   spr.pushSprite(x, y);
   spr.deleteSprite();
@@ -275,7 +296,7 @@ void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
   //if( spr.textWidth(patchname) > w ) {spr.loadFont(Latin_Hiragana_24);}
   //else                               {spr.loadFont(NotoSansBold36);}
   spr.setTextDatum(MC_DATUM);
-  spr.setTextColor(fg_colour, bg_colour);
+  spr.setTextColor(fg_colour, bg_colour, bgfill);
 
   if( spr.textWidth(patchname) > w )
   {
@@ -305,7 +326,7 @@ void drawBarChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolo
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, bgcolour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
   spr.setTextDatum(MC_DATUM);
-  spr.setTextColor(fgcolour, bgcolour);
+  spr.setTextColor(fgcolour, bgcolour, bgfill);
   spr.drawString(label, w/2-1, 11);
   spr.fillRect(pad, h-(h-tpad-pad)*barh/100, w-1-2*pad, (h-tpad-pad)*barh/100, fgcolour);
   spr.pushSprite(x, y);
@@ -320,7 +341,7 @@ void draw2BarChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcol
   spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
   spr.setTextDatum(MC_DATUM);
-  spr.setTextColor(fgcolour, bgcolour);
+  spr.setTextColor(fgcolour, bgcolour, bgfill);
   spr.drawString(label, w/2, 11);
   spr.fillRect(pad, h-(h-tpad-pad)*b1/100, w/2-1-2*pad, (h-tpad-pad)*b1/100, fgcolour);
   spr.fillRect(w/2+pad, h-(h-tpad-pad)*b2/100, w/2-1-2*pad, (h-tpad-pad)*b2/100, fgcolour);
@@ -338,7 +359,7 @@ void drawPPChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolou
 	spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);
 	spr.loadFont(AA_FONT_SMALL);
 	spr.setTextDatum(MC_DATUM);
-	spr.setTextColor(fgcolour, bgcolour);
+	spr.setTextColor(fgcolour, bgcolour, bgfill);
 	spr.drawString(label, w/2-1, 12);
 	spr.fillRect(pad, h-ped1height, w/2-1-2*pad, ped1height, fgcolour);
 	spr.fillRect(w/2+pad, h-ped2height, w/2-1-2*pad, ped2height, fgcolour);
@@ -354,7 +375,7 @@ void drawEQChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolou
   spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
   spr.setTextDatum(MC_DATUM);
-  spr.setTextColor(fgcolour, bgcolour);
+  spr.setTextColor(fgcolour, bgcolour, bgfill);
   spr.drawString(label, w/2, 12);
   spr.fillRect(pad, h-(h-tpad-pad)*b/100, w/3-1-2*pad, (h-tpad-pad)*b/100, fgcolour);
   spr.fillRect(w/3+pad, h-(h-tpad-pad)*m/100, w/3-1-2*pad, (h-tpad-pad)*m/100, fgcolour);
@@ -377,7 +398,7 @@ void drawAmpUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolou
 	spr.drawSpot(19, 13, 1.5, ampcolour2[col], ampcolour1[col]);	// Col status light
 	spr.loadFont(AA_FONT_MONO);
 	spr.setTextDatum(ML_DATUM);
-	spr.setTextColor(bgcolour, fgcolour);
+	spr.setTextColor(bgcolour, fgcolour, bgfill);
 	spr.drawString(THR30II_AMP_NAMES[amp], 28, 18);	// Unit label
 	spr.drawString(THR30II_CAB_NAMES[cab], 12, 43);	// Unit label
 	
@@ -440,7 +461,8 @@ void drawUtilUnit(int x, int y, int w, int h, int bpad, uint16_t bgcolour, uint1
 	spr.fillSmoothRoundRect(0, 0, w-1, h-bpad, 3, bgcolour, TFT_BLACK);
 	spr.loadFont(AA_FONT_SMALL);
 	spr.setTextDatum(MC_DATUM);
-	spr.setTextColor(fgcolour, bgcolour);
+//	spr.setTextColor(fgcolour, bgcolour, bgfill);
+	spr.setTextColor(TFT_BLACK, bgcolour, bgfill);
 	spr.drawString(label, w/2, 13);
 	spr.fillRect(grx, gry, grw, grh, fgcolour);	// Draw graph area
 	barw = grw * utilparams[0]/100;
@@ -462,7 +484,8 @@ void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour
 	spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);	// Draw FX unit
 	spr.loadFont(AA_FONT_SMALL);
 	spr.setTextDatum(MC_DATUM);
-	spr.setTextColor(fgcolour, bgcolour);
+//	spr.setTextColor(fgcolour, bgcolour, bgfill);
+	spr.setTextColor(TFT_BLACK, bgcolour, bgfill);
 	spr.drawString(label, w/2, 13);	// Write label
 	spr.fillRect(grx, gry, grw, grh, fgcolour);	// Draw graph area
 	for(int i = 0; i < nbars; i++)
@@ -498,7 +521,7 @@ void THR30II_Settings::updateConnectedBanner() // Show the connected Model
 	// {
 	// 	tft.loadFont(AA_FONT_LARGE); // Set current font    
 	// 	tft.setTextSize(1);
-	// 	tft.setTextColor(TFT_BLUE, TFT_BLACK);
+	// 	tft.setTextColor(TFT_BLUE, TFT_BLACK, bgfill);
 	// 	tft.setTextDatum(TL_DATUM);
 	// 	tft.setTextPadding(160);
 	// 	tft.drawString(s1, 0, 0);//printAt(tft,0,0, s1 ); // Print e.g. "THR30II" in blue in header position
@@ -565,9 +588,9 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   {
     switch( thrs.col )
     {
-      case BOUTIQUE: tft.setTextColor(TFT_BLUE,  TFT_BLACK);	break;
-      case MODERN:   tft.setTextColor(TFT_GREEN, TFT_BLACK); 	break;
-      case CLASSIC:  tft.setTextColor(TFT_RED, TFT_BLACK); 		break;
+      case BOUTIQUE: tft.setTextColor(TFT_BLUE,  TFT_BLACK, bgfill);	break;
+      case MODERN:   tft.setTextColor(TFT_GREEN, TFT_BLACK, bgfill); 	break;
+      case CLASSIC:  tft.setTextColor(TFT_RED,   TFT_BLACK, bgfill); 	break;
     }
     drawAmpUnit(80, 20, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab); // Place in manual mode layout
   }
@@ -900,6 +923,318 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
         drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
       }
     }
+  }
+  maskCUpdate = 0; // Display has been updated
+}
+
+uint8_t last_updated_sbox = 12;
+
+////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////
+void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
+{
+// =================================================================================
+	// Patch icon bank
+  if( maskCUpdate )
+  {
+	  drawPatchIconBank(*presel_patch_id, *active_patch_id, nUserPreset + 1, true);
+  }
+
+	// Use Patch select mode to indicate manual mode
+  if( maskCUpdate )
+  {
+    drawPatchSelMode(TFT_THRCREAM); // TODO: "EDIT"
+  }
+
+  // Show which set of patches is used
+  if( maskCUpdate )
+  {
+    if( _uistate == UI_home_amp || _uistate == UI_edit ) { drawPatchSet(TFT_THRCREAM, "THRII"); }
+    else if( _uistate == UI_home_patch  || _uistate == UI_edit ) 
+    {
+      if( factory_presets_active == true ) { drawPatchSet(TFT_THRCREAM, "FACTORY"); }
+      else                                 { drawPatchSet(TFT_THRCREAM, "USER");    }
+    }
+  }
+
+	// Amp select mode (COL/AMP/CAB); Highlighted only in Manual mode
+  if( maskCUpdate )
+  {
+    uint16_t colour = TFT_THRCREAM;
+
+    switch( amp_select_mode )
+    {
+      case COL: drawAmpSelMode(colour, "COL"); break;
+      case AMP:	drawAmpSelMode(colour, "AMP"); break;
+      case CAB: drawAmpSelMode(colour, "CAB"); break;
+    }
+  }
+// =================================================================================
+
+	// Amp/Cabinet ---------------------------------------------------------------
+  if( maskCUpdate & maskAmpUnit )
+  {
+    if( last_updated_sbox != 0 )
+    {
+      sboxes[last_updated_sbox]->erase();
+      last_updated_sbox = 0;
+      sboxes[0]->draw();
+    }
+
+    switch( thrs.col )
+    {
+      case BOUTIQUE: tft.setTextColor(TFT_BLUE,  TFT_BLACK, bgfill);	break;
+      case MODERN:   tft.setTextColor(TFT_GREEN, TFT_BLACK, bgfill); 	break;
+      case CLASSIC:  tft.setTextColor(TFT_RED,   TFT_BLACK, bgfill); 	break;
+    }
+    drawAmpUnit(40, 35, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab);    
+  }
+
+  if( maskCUpdate & maskAmpUnitPar )
+  {
+    // TODO: Draw selected knob only???
+    sboxes[0]->draw_knob(0, thrs.control[CTRL_GAIN]);
+    sboxes[0]->draw_knob(1, thrs.control[CTRL_MASTER]);
+    sboxes[0]->draw_knob(2, thrs.control[CTRL_BASS]);
+    sboxes[0]->draw_knob(3, thrs.control[CTRL_TREBLE]);
+    sboxes[0]->draw_knob(4, thrs.control[CTRL_MID]);
+  }
+
+  // FX1 Compressor -------------------------------------------------------------
+  if( maskCUpdate & maskCompressor )
+  {
+    if( last_updated_sbox != 1 )
+    {
+      sboxes[last_updated_sbox]->erase();
+      last_updated_sbox = 1;
+      sboxes[1]->draw();
+    }
+  }
+  if( maskCUpdate & maskCompressorEn  ) { sboxes[1]->setEnabled(thrs.unit[COMPRESSOR]); }
+  if( maskCUpdate & maskCompressorPar )
+  {
+    // TODO: Draw selected knob only???
+    sboxes[1]->draw_knob(0, thrs.compressor_setting[CO_SUSTAIN]);
+    sboxes[1]->draw_knob(1, thrs.compressor_setting[CO_LEVEL]);
+  }
+
+ 	// Gate -----------------------------------------------------------------------
+  if( maskCUpdate & maskNoiseGate )
+  {
+    if( last_updated_sbox != 2 )
+    {
+      sboxes[last_updated_sbox]->erase();
+      last_updated_sbox = 2;
+      sboxes[2]->draw();
+    }
+  }
+  if( maskCUpdate & maskNoiseGateEn  ) { sboxes[2]->setEnabled(thrs.unit[GATE]); }
+  if( maskCUpdate & maskNoiseGatePar )
+  {
+    // TODO: Draw selected knob only???
+    sboxes[2]->draw_knob(0, thrs.gate_setting[GA_THRESHOLD]);
+    sboxes[2]->draw_knob(1, thrs.gate_setting[GA_DECAY]);    
+  }
+
+	// FX2 Effect (Chorus/Flanger/Phaser/Tremolo) ----------------------------------
+  if( (maskCUpdate & maskFxUnit) || (maskCUpdate & maskFxUnitEn) || (maskCUpdate & maskFxUnitPar) )
+  {
+    switch( thrs.effecttype )
+    {
+      case CHORUS:
+        if( last_updated_sbox != 3 )
+        {
+          sboxes[last_updated_sbox]->erase();
+          last_updated_sbox = 3;
+          sboxes[3]->draw();
+        }
+        if( maskCUpdate & maskFxUnitEn  ) { sboxes[3]->setEnabled(thrs.unit[EFFECT]); }
+        if( maskCUpdate & maskFxUnitPar )
+        {
+          // TODO: Draw selected knob only???
+          sboxes[3]->draw_knob(0, thrs.effect_setting[CHORUS][CH_SPEED]);
+          sboxes[3]->draw_knob(1, thrs.effect_setting[CHORUS][CH_DEPTH]);    
+          sboxes[3]->draw_knob(2, thrs.effect_setting[CHORUS][CH_PREDELAY]);    
+          sboxes[3]->draw_knob(3, thrs.effect_setting[CHORUS][CH_FEEDBACK]);    
+          sboxes[3]->draw_knob(4, thrs.effect_setting[CHORUS][CH_MIX]);    
+        }
+      break;
+
+      case FLANGER: 
+        if( last_updated_sbox != 4 )
+        {
+          sboxes[last_updated_sbox]->erase();
+          last_updated_sbox = 4;
+          sboxes[4]->draw();
+        }
+        if( maskCUpdate & maskFxUnitEn  ) { sboxes[4]->setEnabled(thrs.unit[EFFECT]); }
+        if( maskCUpdate & maskFxUnitPar )
+        {
+          // TODO: Draw selected knob only???
+          sboxes[4]->draw_knob(0, thrs.effect_setting[FLANGER][FL_SPEED]);
+          sboxes[4]->draw_knob(1, thrs.effect_setting[FLANGER][FL_DEPTH]);    
+          sboxes[4]->draw_knob(2, thrs.effect_setting[FLANGER][FL_MIX]);       
+        }
+      break;
+
+      case PHASER:
+        if( last_updated_sbox != 5 )
+        {
+          sboxes[last_updated_sbox]->erase();
+          last_updated_sbox = 5;
+          sboxes[5]->draw();
+        }
+        if( maskCUpdate & maskFxUnitEn  ) { sboxes[5]->setEnabled(thrs.unit[EFFECT]); }
+        if( maskCUpdate & maskFxUnitPar )
+        {
+          // TODO: Draw selected knob only???
+          sboxes[5]->draw_knob(0, thrs.effect_setting[PHASER][PH_SPEED]);
+          sboxes[5]->draw_knob(1, thrs.effect_setting[PHASER][PH_FEEDBACK]);    
+          sboxes[5]->draw_knob(2, thrs.effect_setting[PHASER][PH_MIX]);       
+        }
+      break;		
+
+      case TREMOLO:
+        if( last_updated_sbox != 6 )
+        {
+          sboxes[last_updated_sbox]->erase();
+          last_updated_sbox = 6;
+          sboxes[6]->draw();
+        }
+        if( maskCUpdate & maskFxUnitEn  ) { sboxes[6]->setEnabled(thrs.unit[EFFECT]); }
+        if( maskCUpdate & maskFxUnitPar )
+        {
+          // TODO: Draw selected knob only???
+          sboxes[6]->draw_knob(0, thrs.effect_setting[TREMOLO][TR_SPEED]);
+          sboxes[6]->draw_knob(1, thrs.effect_setting[TREMOLO][TR_DEPTH]);    
+          sboxes[6]->draw_knob(2, thrs.effect_setting[TREMOLO][TR_MIX]);       
+        }
+      break;
+    } // of switch(effecttype)
+  }
+
+  // FX3 Echo (Tape Echo/Digital Delay)
+  if( (maskCUpdate & maskEcho) || (maskCUpdate & maskEchoEn) || (maskCUpdate & maskEchoPar) )
+  {
+    switch( thrs.echotype )
+    {
+      case TAPE_ECHO:
+        if( last_updated_sbox != 7 )
+        {
+          sboxes[last_updated_sbox]->erase();
+          last_updated_sbox = 7;
+          sboxes[7]->draw();
+        }
+        if( maskCUpdate & maskEchoEn  ) { sboxes[7]->setEnabled(thrs.unit[ECHO]); }
+        if( maskCUpdate & maskEchoPar )
+        {
+          // TODO: Draw selected knob only???
+          sboxes[7]->draw_knob(0, thrs.echo_setting[TAPE_ECHO][TA_TIME]);
+          sboxes[7]->draw_knob(1, thrs.echo_setting[TAPE_ECHO][TA_FEEDBACK]);    
+          sboxes[7]->draw_knob(2, thrs.echo_setting[TAPE_ECHO][TA_BASS]);       
+          sboxes[7]->draw_knob(3, thrs.echo_setting[TAPE_ECHO][TA_TREBLE]);       
+          sboxes[7]->draw_knob(4, thrs.echo_setting[TAPE_ECHO][TA_MIX]);       
+        }
+      break;
+
+      case DIGITAL_DELAY:
+        if( last_updated_sbox != 8 )
+        {
+          sboxes[last_updated_sbox]->erase();
+          last_updated_sbox = 8;
+          sboxes[8]->draw();
+        }
+        if( maskCUpdate & maskEchoEn  ) { sboxes[8]->setEnabled(thrs.unit[ECHO]); }
+        if( maskCUpdate & maskEchoPar )
+        {
+          // TODO: Draw selected knob only???
+          sboxes[8]->draw_knob(0, thrs.echo_setting[TAPE_ECHO][TA_TIME]);
+          sboxes[8]->draw_knob(1, thrs.echo_setting[TAPE_ECHO][TA_FEEDBACK]);    
+          sboxes[8]->draw_knob(2, thrs.echo_setting[TAPE_ECHO][TA_BASS]);       
+          sboxes[8]->draw_knob(3, thrs.echo_setting[TAPE_ECHO][TA_TREBLE]);       
+          sboxes[8]->draw_knob(4, thrs.echo_setting[TAPE_ECHO][TA_MIX]);       
+        } 
+      break;
+    }	// of switch(effecttype)
+  }
+
+ 	// FX4 Reverb (Spring/Room/Plate/Hall)
+  if( (maskCUpdate & maskReverb) || (maskCUpdate & maskReverbEn) || (maskCUpdate & maskReverbPar) )
+  {
+    switch( thrs.reverbtype )
+    {
+      case SPRING:
+        if( last_updated_sbox != 9 )
+        {
+          sboxes[last_updated_sbox]->erase();
+          last_updated_sbox = 9;
+          sboxes[9]->draw();
+        }
+        if( maskCUpdate & maskReverbEn  ) { sboxes[9]->setEnabled(thrs.unit[REVERB]); }
+        if( maskCUpdate & maskReverbPar )
+        {
+          // TODO: Draw selected knob only???
+          sboxes[9]->draw_knob(0, thrs.reverb_setting[SPRING][SP_REVERB]);
+          sboxes[9]->draw_knob(1, thrs.reverb_setting[SPRING][SP_TONE]);    
+          sboxes[9]->draw_knob(2, thrs.reverb_setting[SPRING][SP_MIX]);           
+        }
+      break;
+
+      case ROOM:
+        if( last_updated_sbox != 10 )
+        {
+          sboxes[last_updated_sbox]->erase();
+          last_updated_sbox = 10;
+          sboxes[10]->draw();
+        }
+        if( maskCUpdate & maskReverbEn  ) { sboxes[10]->setEnabled(thrs.unit[REVERB]); }
+        if( maskCUpdate & maskReverbPar )
+        {
+          // TODO: Draw selected knob only???
+          sboxes[10]->draw_knob(0, thrs.reverb_setting[ROOM][RO_DECAY]);
+          sboxes[10]->draw_knob(1, thrs.reverb_setting[ROOM][RO_PREDELAY]);    
+          sboxes[10]->draw_knob(2, thrs.reverb_setting[ROOM][RO_TONE]);           
+          sboxes[10]->draw_knob(3, thrs.reverb_setting[ROOM][RO_MIX]);           
+        }
+      break;
+
+      case PLATE:
+        if( last_updated_sbox != 11 )
+        {
+          sboxes[last_updated_sbox]->erase();
+          last_updated_sbox = 11;
+          sboxes[11]->draw();
+        }
+        if( maskCUpdate & maskReverbEn  ) { sboxes[11]->setEnabled(thrs.unit[REVERB]); }
+        if( maskCUpdate & maskReverbPar )
+        {
+          // TODO: Draw selected knob only???
+          sboxes[11]->draw_knob(0, thrs.reverb_setting[PLATE][PL_DECAY]);
+          sboxes[11]->draw_knob(1, thrs.reverb_setting[PLATE][PL_PREDELAY]);    
+          sboxes[11]->draw_knob(2, thrs.reverb_setting[PLATE][PL_TONE]);           
+          sboxes[11]->draw_knob(3, thrs.reverb_setting[PLATE][PL_MIX]);           
+        }
+      break;
+
+      case HALL:
+        if( last_updated_sbox != 12 )
+        {
+          sboxes[last_updated_sbox]->erase();
+          last_updated_sbox = 12;
+          sboxes[12]->draw();
+        }
+        if( maskCUpdate & maskReverbEn  ) { sboxes[12]->setEnabled(thrs.unit[REVERB]); }
+        if( maskCUpdate & maskReverbPar )
+        {
+          // TODO: Draw selected knob only???
+          sboxes[12]->draw_knob(0, thrs.reverb_setting[HALL][HA_DECAY]);
+          sboxes[12]->draw_knob(1, thrs.reverb_setting[HALL][HA_PREDELAY]);    
+          sboxes[12]->draw_knob(2, thrs.reverb_setting[HALL][HA_TONE]);           
+          sboxes[12]->draw_knob(3, thrs.reverb_setting[HALL][HA_MIX]);           
+        }
+      break;
+    }	// of switch(reverbtype)
   }
   maskCUpdate = 0; // Display has been updated
 }
