@@ -219,12 +219,12 @@ public:
     draw_led();
 
     // The Knobs
-//    for(auto & knob: knobs)
-//    {
-//      knob.setFocus(false);
+    for(auto & knob: knobs)
+    {
+      knob.setFocus(false);
 //      knob.draw(0);
-//    }
-//    knobs[f_idx].setFocus(true);
+    }
+    knobs[f_idx].setFocus(true);
   }
 
 private:
@@ -286,7 +286,7 @@ public:
     for(auto & knob: knobs)
     {
       knob.setFocus(false);
-      knob.draw(0);
+//      knob.draw(0);
     }
     knobs[f_idx].setFocus(true);
   }
