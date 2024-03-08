@@ -17,6 +17,13 @@ extern TFT_eSprite spr;
 //#include <Fonts/FreeMono9pt7b.h>
 //#include <Fonts/FreeSans9pt7b.h>
 
+
+#include "stompBoxes.h"
+extern std::vector <StompBox*> sboxes;
+
+/*
+// FIXME: Memory not enough if fonts included from stompboxes.h
+// Moved to stompboxes.h
 // Locally supplied fonts
 // #fonts/include "Free_Fonts.h"
 #include "fonts/NotoSansBold15.h"
@@ -25,14 +32,13 @@ extern TFT_eSprite spr;
 #include "fonts/Latin_Hiragana_24.h"
 //#include "fonts/Final_Frontier_28.h"
 
-#include "stompBoxes.h"
-extern std::vector <StompBox*> sboxes;
-
 // The font names are arrays references, thus must NOT be in quotes ""
 #define AA_FONT_SMALL NotoSansBold15
 #define AA_FONT_XLARGE NotoSansBold36
 #define AA_FONT_LARGE Latin_Hiragana_24
 #define AA_FONT_MONO  NotoSansMonoSCB20 // NotoSansMono-SemiCondensedBold 20pt
+*/
+
 
 extern std::vector <String> *active_patch_names;
 
@@ -89,11 +95,13 @@ void drawPatchSet(uint16_t colour, String ps_name)
   int x = 0, y = 0, w = 80, h = 20;
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
+//  spr.setTextFont(2);
   spr.loadFont(AA_FONT_SMALL);
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(TFT_BLACK, colour, bgfill);
   spr.drawString(ps_name, w/2, h/2+1);
   spr.pushSprite(x, y);
+  spr.unloadFont();
   spr.deleteSprite();
 }
 /*
@@ -149,10 +157,12 @@ void drawPatchIcon(int x, int y, int w, int h, uint16_t colour, int patchID, boo
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
+//  spr.setTextFont(2);  
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(TFT_BLACK, colour, bgfill);
   if( show_num ) { spr.drawNumber(patchID, 10, 11); }
   spr.pushSprite(x, y);
+  spr.unloadFont();
   spr.deleteSprite();
 }
 
@@ -210,11 +220,13 @@ void drawPatchSelMode(uint16_t colour)
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
+  //spr.setTextFont(2);
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(TFT_BLACK, colour, bgfill);
   spr.drawString("MAN", w/2, h/2+1);
   //spr.drawString("EDIT", w/2, h/2+1);
   spr.pushSprite(x, y);
+  spr.unloadFont();
   spr.deleteSprite();
 }
 
@@ -224,10 +236,12 @@ void drawAmpSelMode(uint16_t colour, String string)
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
+  //spr.setTextFont(2);
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(TFT_BLACK, colour, bgfill);
   spr.drawString(string, w/2, h/2+1);
   spr.pushSprite(x, y);
+  spr.unloadFont();
   spr.deleteSprite();
 }
 
@@ -292,6 +306,7 @@ void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w, h-1, 3, bg_colour, TFT_BLACK);
   spr.loadFont(AA_FONT_XLARGE);
+  //spr.setTextFont(4);
   // FIXME: free for local variables:-23904: Error program exceeds memory space
   //if( spr.textWidth(patchname) > w ) {spr.loadFont(Latin_Hiragana_24);}
   //else                               {spr.loadFont(NotoSansBold36);}
@@ -325,6 +340,7 @@ void drawBarChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolo
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, bgcolour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
+  //spr.setTextFont(2);
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(fgcolour, bgcolour, bgfill);
   spr.drawString(label, w/2-1, 11);
@@ -340,6 +356,7 @@ void draw2BarChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcol
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
+  //spr.setTextFont(2);
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(fgcolour, bgcolour, bgfill);
   spr.drawString(label, w/2, 11);
@@ -358,7 +375,8 @@ void drawPPChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolou
 	spr.createSprite(w, h);
 	spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);
 	spr.loadFont(AA_FONT_SMALL);
-	spr.setTextDatum(MC_DATUM);
+	//spr.setTextFont(2);
+  spr.setTextDatum(MC_DATUM);
 	spr.setTextColor(fgcolour, bgcolour, bgfill);
 	spr.drawString(label, w/2-1, 12);
 	spr.fillRect(pad, h-ped1height, w/2-1-2*pad, ped1height, fgcolour);
@@ -374,6 +392,7 @@ void drawEQChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolou
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
+  //spr.setTextFont(2);
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(fgcolour, bgcolour, bgfill);
   spr.drawString(label, w/2, 12);
@@ -397,7 +416,8 @@ void drawAmpUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolou
 	spr.drawSpot(16, 16, 6, ampcolour1[col], ampcolour2[col]);
 	spr.drawSpot(19, 13, 1.5, ampcolour2[col], ampcolour1[col]);	// Col status light
 	spr.loadFont(AA_FONT_MONO);
-	spr.setTextDatum(ML_DATUM);
+	//spr.setTextFont(4);
+  spr.setTextDatum(ML_DATUM);
 	spr.setTextColor(bgcolour, fgcolour, bgfill);
 	spr.drawString(THR30II_AMP_NAMES[amp], 28, 18);	// Unit label
 	spr.drawString(THR30II_CAB_NAMES[cab], 12, 43);	// Unit label
@@ -460,7 +480,8 @@ void drawUtilUnit(int x, int y, int w, int h, int bpad, uint16_t bgcolour, uint1
 	spr.createSprite(w, h);
 	spr.fillSmoothRoundRect(0, 0, w-1, h-bpad, 3, bgcolour, TFT_BLACK);
 	spr.loadFont(AA_FONT_SMALL);
-	spr.setTextDatum(MC_DATUM);
+	//spr.setTextFont(2);
+  spr.setTextDatum(MC_DATUM);
 //	spr.setTextColor(fgcolour, bgcolour, bgfill);
 	spr.setTextColor(TFT_BLACK, bgcolour, bgfill);
 	spr.drawString(label, w/2, 13);
@@ -483,7 +504,8 @@ void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour
 	spr.createSprite(w, h);
 	spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);	// Draw FX unit
 	spr.loadFont(AA_FONT_SMALL);
-	spr.setTextDatum(MC_DATUM);
+	//spr.setTextFont(2);
+  spr.setTextDatum(MC_DATUM);
 //	spr.setTextColor(fgcolour, bgcolour, bgfill);
 	spr.setTextColor(TFT_BLACK, bgcolour, bgfill);
 	spr.drawString(label, w/2, 13);	// Write label

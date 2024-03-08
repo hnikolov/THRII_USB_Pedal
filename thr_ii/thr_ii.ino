@@ -26,7 +26,7 @@
 #include <Arduino.h>
 #include <USBHost_t36.h>  // Without Paul Stoffregen's Teensy3.6-Midi library nothing will work! (Mind increasing rx queue size in MIDI_big_buffer class in "USBHost_t36.h" :   RX_QUEUE_SIZE = 2048)
 // NOTE: Adafruit_GFX.h include has to be here to avoid compilation error!
-#include <Adafruit_GFX.h> // Virtual superclass for drawing (included in "2_8_Friendly_t3.h")
+//#include <Adafruit_GFX.h> // Virtual superclass for drawing (included in "2_8_Friendly_t3.h")
 
 #include "THR30II_Pedal.h"
 #include "Globals.h"		 	// For the global keys	
@@ -75,6 +75,8 @@ uint8_t button_state = 0;
 
 TFT_eSPI tft = TFT_eSPI(); // Declare object "tft"
 TFT_eSprite spr = TFT_eSprite(&tft); // Declare Sprite object "spr" with pointer to "tft" object
+
+//#include "fonts/Free_Fonts.h" // Needs to be anabled in my_custom_setup.h as well
 
 // TFT backlight brightness
 int brightness = 128; // 0 - 255
@@ -210,6 +212,13 @@ void setup()
   tft.setRotation(3);    // for the 3.2" tft (ILI9341)
   spr.setColorDepth(16); // 16 bit colour needed to show antialiased fonts
   tft.fillScreen(TFT_THRCREAM); // Show a splash screen instead? :)
+
+  //tft.setTextColor(TFT_BLACK);
+  //tft.setFreeFont(FSB18);       // Select Free Serif 24 point font
+  //tft.println();                // Move cursor down a line
+  //tft.print("UserSetting2");
+  //tft.println();                // Move cursor down a line
+  //tft.print("USB MIDI pedal board for THRII");
 
   // ----------------------------
   // Initialise the TFT backlight

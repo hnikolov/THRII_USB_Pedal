@@ -9,6 +9,22 @@
 extern TFT_eSPI tft;
 extern TFT_eSprite spr;
 
+// FIXME: Memory not enough if fonts included from here
+// Locally supplied fonts
+#include "fonts/Free_Fonts.h" // Needs to be anabled in my_custom_setup.h as well
+#include "fonts/NotoSansBold15.h"
+#include "fonts/NotoSansBold36.h"
+#include "fonts/NotoSansMonoSCB20.h"
+//#include "fonts/Latin_Hiragana_24.h"
+//#include "fonts/Final_Frontier_28.h"
+
+
+// The font names are arrays references, thus must NOT be in quotes ""
+#define AA_FONT_SMALL NotoSansBold15
+#define AA_FONT_XLARGE NotoSansBold36
+//#define AA_FONT_LARGE Latin_Hiragana_24
+#define AA_FONT_MONO  NotoSansMonoSCB20 // NotoSansMono-SemiCondensedBold 20pt
+
 ////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////
@@ -198,10 +214,21 @@ public:
     spr.fillSmoothRoundRect(5, 175, w-10, 15, 10, TFT_BLACK, TFT_BLACK);      
 
     // Name
-    spr.setTextColor(TFT_BLACK, fg, true);
-    spr.drawCentreString(name, w/2, 145, 4);
+    //spr.setTextColor(TFT_BLACK, fg, true);
+    //spr.drawCentreString(name, w/2, 145, 4);
+
+    //spr.setTextColor(TFT_BLACK, fg, true);
+    //spr.loadFont(NotoSansMonoSCB20);
+    //spr.setTextDatum(TC_DATUM); // Middle center
+    //spr.drawString(name, w/2, 145);
+
+    spr.setTextColor(TFT_BLACK);
+    spr.setFreeFont(FSB9);       // Select Free Serif font
+    spr.setTextDatum(TC_DATUM); // Middle center
+    spr.drawString(name, w/2, 145, GFXFF);
 
     spr.pushSprite(x, y);
+    spr.unloadFont();
     spr.deleteSprite();
 
     // Jacks
