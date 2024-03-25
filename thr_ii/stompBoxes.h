@@ -108,7 +108,7 @@ public:
   uint16_t yk;     // y position of knobs
 
   std::vector <Knob> knobs;
-  uint8_t f_idx = 0; // Currently selected knob
+  uint8_t f_idx = 0; // ndex of the currently selected knob
 
 public:
   StompBox(const String &sName, std::vector <String> &vParamNames, uint16_t fgColor, uint16_t bgColor):
@@ -186,6 +186,11 @@ public:
     if( idx > n ) { return; } // Should not happen
     knobs[idx].setFocus(status);
     f_idx = idx;
+  }
+
+  uint8_t getFocus() // Index of the selected knob
+  {
+    return f_idx;
   }
 
   virtual void setEnabled( bool status )

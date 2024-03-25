@@ -62,8 +62,14 @@ extern uint32_t maskEchoEn;
 extern uint32_t maskEchoPar;
 extern uint32_t maskReverbEn;
 extern uint32_t maskReverbPar;
+extern uint32_t maskClearTft;
 
 extern uint32_t maskAll;
+
+#include "stompBoxes.h"
+extern std::vector <StompBox*> sboxes;
+
+uint8_t selected_sbox = 12;
 
 extern std::vector <JsonDocument> json_patchesII_user;
 extern std::vector <JsonDocument> json_patchesII_factory;
@@ -237,11 +243,10 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
           maskCUpdate = maskAll;
         break;
 
-        case 3: // Toggle between amp and custom patches
-          _uistate = UI_home_patch;
-          *active_patch_id = *presel_patch_id;
-          patch_activate(*presel_patch_id);
-          maskCUpdate = maskAll;
+        case 3: // Switch to Manual mode
+          _uistate = UI_manual;
+          _uistate_prev = UI_home_amp;
+          maskCUpdate |= (maskPatchSelMode | maskAmpSelMode);
         break;
 
         case 4: // Tap tempo
@@ -320,21 +325,25 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         break;
 
         // Buttons hold ============================================================
-        case 11:
+        case 11:  // Toggle between amp and custom patches
+          _uistate = UI_home_patch;
+          *active_patch_id = *presel_patch_id;
+          patch_activate(*presel_patch_id);
           maskCUpdate = maskAll;
         break;
 
-        case 12: // Select between Factory and User presets
+        case 12: // Toggle between Factory and User presets
           toggle_factory_user_presets();
           *active_patch_id = *presel_patch_id;
           patch_activate(*presel_patch_id);
           maskCUpdate = maskAll;
         break;
 
-        case 13: // Switch to Manual mode
-          _uistate = UI_manual;
+        case 13: // Select the Edit mode
+          _uistate = UI_edit;
           _uistate_prev = UI_home_amp;
-          maskCUpdate |= (maskPatchSelMode | maskAmpSelMode); 
+          selected_sbox = 0; // Amp unit
+          maskCUpdate = (maskClearTft | maskAmpUnit | maskGainMaster);
         break;
 
         case 14: 
@@ -401,10 +410,10 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
           maskCUpdate |= (maskPatchName | maskPatchIconBank); 
         break;
 
-        case 3: // Toggle between amp and user/factory patches
-          _uistate = UI_home_amp;
-          select_thrii_preset( nUserPreset );
-          maskCUpdate = maskAll; 
+        case 3: // Switch to Manual mode
+          _uistate = UI_manual;
+          _uistate_prev = UI_home_patch;
+          maskCUpdate |= (maskPatchSelMode | maskAmpSelMode);
         break;
 
         case 4: // Tap tempo
@@ -438,21 +447,24 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
         break;
 
         // Buttons hold ============================================================
-        case 11:      
-          maskCUpdate = maskAll;
+        case 11: // Toggle between amp and user/factory patches
+          _uistate = UI_home_amp;
+          select_thrii_preset( nUserPreset );
+          maskCUpdate = maskAll; 
         break;
 
-        case 12: // Select between Factory and User presets
+        case 12: // Toggle between Factory and User presets
           toggle_factory_user_presets();
           *active_patch_id = *presel_patch_id;
           patch_activate(*presel_patch_id);
           maskCUpdate = maskAll; 
         break;
 
-        case 13: // Switch to Manual mode
-          _uistate = UI_manual;
+        case 13: // Switch to Edit mode
+          _uistate = UI_edit;
           _uistate_prev = UI_home_patch;
-          maskCUpdate |= (maskPatchSelMode | maskAmpSelMode); 
+          selected_sbox = 0; // Amp unit
+          maskCUpdate = (maskClearTft | maskAmpUnit | maskGainMaster);
         break;
 
         case 14: 
@@ -493,15 +505,16 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
     switch (button_state)
     {
         case 1:
-          maskCUpdate = maskAll; 
+          maskCUpdate = maskAll;
         break;
 
         case 2: 
-          maskCUpdate = maskAll; 
+          maskCUpdate = maskAll;
         break;
 
-        case 3:
-          maskCUpdate = maskAll; 
+        case 3: // Switch to previous mode (amp/presets)
+          _uistate = _uistate_prev;
+          maskCUpdate |= (maskPatchSelMode | maskAmpSelMode);
         break;
 
         case 4: // Tap tempo
@@ -576,9 +589,12 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           maskCUpdate |= maskAmpSelMode;
         break;
 
-        case 13: // Switch to previous mode (amp/presets)
-          _uistate = _uistate_prev;
-          maskCUpdate |= (maskPatchSelMode | maskAmpSelMode);
+        case 13:
+          _uistate = UI_edit;
+          // _uistate_prev not set here. Will return to the previous-previuos state, issues when returning to manual mode
+//          _uistate_prev = UI_manual; 
+          selected_sbox = 0; // Amp unit
+          maskCUpdate = (maskClearTft | maskAmpUnit | maskAmpUnitPar);
         break;
 
         case 14: 
@@ -623,10 +639,10 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
         case 19: // Rotate Reverb Mode ( Spring > Room > Plate > Hall > )
           switch(THR_Values.reverbtype)
           {
-            case SPRING: THR_Values.ReverbSelect(ROOM);   break;
-            case ROOM:   THR_Values.ReverbSelect(PLATE);  break;
+            case SPRING: THR_Values.ReverbSelect(PLATE);   break;
             case PLATE:  THR_Values.ReverbSelect(HALL);   break;
-            case HALL:   THR_Values.ReverbSelect(SPRING); break;
+            case HALL:   THR_Values.ReverbSelect(ROOM); break;
+            case ROOM:   THR_Values.ReverbSelect(SPRING);  break;
           }
           THR_Values.createPatch();
           Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));
@@ -639,10 +655,6 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
     button_state = 0; // Button is handled
 }
 
-#include "stompBoxes.h"
-extern std::vector <StompBox*> sboxes;
-
-uint8_t selected_sbox = 12;
 // ================================================================
 // Edit mode
 // ================================================================
@@ -660,13 +672,15 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
 //          maskCUpdate = maskAll;
         break;
 
-        case 3:
-//          maskCUpdate = maskAll;
+        case 3: // Switch to previous mode (amp/presets) - cancel the edit mode
+          _uistate = _uistate_prev;
+//          _uistate = UI_home_amp; // FIXME: Issues if UI_manual
+          maskCUpdate = maskAll;
         break;
 
         case 4: // Tap tempo
           THR_Values.EchoTempoTap(); // Get tempo tap input and apply to echo unit
-          selected_sbox = 7; // TODO: or 8?
+          selected_sbox = 7;
           maskCUpdate |= maskEchoPar;
         break;
 
@@ -674,7 +688,8 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           if( selected_sbox != 0 )
           {
             selected_sbox = 0;
-            maskCUpdate |= (maskAmpUnit | maskAmpUnitPar);
+//            maskCUpdate |= (maskAmpUnit | maskAmpUnitPar);
+            maskCUpdate |= (maskAmpUnit | maskGainMaster);
           }
         break;
 
@@ -683,7 +698,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           {
             Serial.println("Compressor selected");
             selected_sbox = 1;
-            maskCUpdate |= (maskCompressor | maskCompressorPar);
+            maskCUpdate |= (maskCompressor | maskCompressorPar | maskCompressorEn);
           }
           else
           {
@@ -705,7 +720,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               case PHASER:  selected_sbox = 5; break;
               case TREMOLO: selected_sbox = 6; break;
             }
-            maskCUpdate |= (maskFxUnit | maskFxUnitPar);
+            maskCUpdate |= (maskFxUnit | maskFxUnitPar | maskFxUnitEn);
           }
           else
           {
@@ -725,7 +740,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               case TAPE_ECHO:     selected_sbox = 7; break;
               case DIGITAL_DELAY: selected_sbox = 8; break;
             }
-            maskCUpdate |= (maskEcho | maskEchoPar);
+            maskCUpdate |= (maskEcho | maskEchoPar | maskEchoEn);
           }
           else
           {
@@ -743,11 +758,11 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             switch(THR_Values.reverbtype)
             {
               case SPRING: selected_sbox =  9; break;
-              case ROOM:   selected_sbox = 10; break;
-              case PLATE:  selected_sbox = 11; break;
-              case HALL:   selected_sbox = 10; break;
+              case PLATE:  selected_sbox = 10; break;
+              case HALL:   selected_sbox = 11; break;
+              case ROOM:   selected_sbox = 12; break;
             }
-            maskCUpdate |= (maskReverb | maskReverbPar);
+            maskCUpdate |= (maskReverb | maskReverbPar | maskReverbEn);
           }
           else
           {
@@ -778,7 +793,8 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             break;
           }
           THR_Values.createPatch();
-          maskCUpdate |= maskAmpUnit;
+          selected_sbox = 0;
+          maskCUpdate |= (maskAmpUnit | maskGainMaster);
         break;
 
         case 12: // Rotate amp select mode ( COL -> AMP -> CAB -> )
@@ -789,12 +805,14 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               case CAB:	amp_select_mode = COL; 	break;
           }
           Serial.println("Amp Select Mode: " + String(amp_select_mode));
-//          maskCUpdate |= maskAmpSelMode;
-          maskCUpdate |= maskAmpUnit;
+          selected_sbox = 0;
+          maskCUpdate |= (maskAmpUnit | maskGainMaster);
         break;
 
-        case 13: // Switch to previous mode (amp/presets) - cancel the edit mode
+        case 13: // TODO: Save the changes and Switch to previous mode (amp/presets)
+          // TODO
           _uistate = _uistate_prev;
+//          _uistate = UI_home_amp; // FIXME: Issues if UI_manual
           maskCUpdate = maskAll;
         break;
 
@@ -811,7 +829,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           {
             Serial.println("Gate unit selected");
             selected_sbox = 2;
-            maskCUpdate |= (maskNoiseGate | maskNoiseGatePar);
+            maskCUpdate |= (maskNoiseGate | maskNoiseGatePar | maskNoiseGateEn);
           }
           else
           {
@@ -857,10 +875,10 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           {
             switch(THR_Values.reverbtype)
             {
-              case SPRING: THR_Values.ReverbSelect(ROOM);   selected_sbox = 10; break;
-              case ROOM:   THR_Values.ReverbSelect(PLATE);  selected_sbox = 11; break;
-              case PLATE:  THR_Values.ReverbSelect(HALL);   selected_sbox = 12; break;
-              case HALL:   THR_Values.ReverbSelect(SPRING); selected_sbox =  9; break;
+              case SPRING: THR_Values.ReverbSelect(PLATE);  selected_sbox = 10; break;
+              case PLATE:  THR_Values.ReverbSelect(HALL);   selected_sbox = 11; break;
+              case HALL:   THR_Values.ReverbSelect(ROOM);   selected_sbox = 12; break;
+              case ROOM:   THR_Values.ReverbSelect(SPRING); selected_sbox =  9; break;
             }
             THR_Values.createPatch();
             Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));
