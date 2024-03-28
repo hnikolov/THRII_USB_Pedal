@@ -563,9 +563,22 @@ void THR30II_Settings::SendCab() // Send cabinet setting to THR
 //--------- FUNCTION FOR SENDING UNIT STATE TO THR30II -----------------
 void THR30II_Settings::SendUnitState(THR30II_UNITS un) //Send unit state setting to THR30II
 {
+  //uint16_t ak = THR30IIAmpKeys[(col_amp){col, amp}];
+
 	type_val<uint16_t> tmp = {(byte){0x03}, unit[un]};
 	SendParameterSetting((un_cmd) {THR30II_UNITS_VALS[THR30II_UNITS::GATE].key, THR30II_UNIT_ON_OFF_COMMANDS[un]}, tmp);
 }
+
+/////////////////////////////////////////////////////////////
+//void THR30II_Settings::SendColAmp() // TODO
+//{
+//  uint16_t ak = THR30IIAmpKeys[(col_amp){col, amp}];
+//	type_val<uint16_t> tmp = {(byte){0x03}, ak};
+//
+//  // AMP UKey = 0x0000013C;
+//	SendParameterSetting((un_cmd) {THR30II_UNITS_VALS[THR30II_UNITS::CONTROL].key, /* NONE */}, tmp);
+//}
+//////////////////////////////////////////////////////////////
 
 void THR30II_Settings::next_col()
 {
