@@ -77,7 +77,7 @@ public:
     return running;
   }
 
-  virtual void start()
+  void start()
   {
     _tbstate = Tb_rest;
     rest_cnt = 4; // Ready: 3-2-1 count before start practicing
@@ -86,7 +86,7 @@ public:
     Serial.println("Tabata start");
   }
 
-  virtual void stop()
+  void stop()
   {
     if( running == true )
     {
@@ -101,7 +101,7 @@ public:
     else              { start(); }
   }
 
-  virtual void update()
+  void update()
   // Not using interrupts, so this function must be called very regularly in the Arduino loop() function
   {
     if( running == true )

@@ -71,7 +71,7 @@ public:
     bpm += val;
     if( bpm > 300 ) { bpm = 300; }
     interval = bpm_to_interval();
-    Serial.println("Metronome bpm decreased to: " + String(bpm) + ", interval: " + String(interval));
+    Serial.println("Metronome bpm increased to: " + String(bpm) + ", interval: " + String(interval));
   }
 
   void decBPM( uint16_t val )
@@ -79,7 +79,7 @@ public:
     if( bpm < val ) { bpm  = 0;   }
     else            { bpm -= val; }
     interval = bpm_to_interval();
-    Serial.println("Metronome bpm increased to: " + String(bpm) + ", interval: " + String(interval));
+    Serial.println("Metronome bpm decreased to: " + String(bpm) + ", interval: " + String(interval));
   }
 
   void tapBPM()

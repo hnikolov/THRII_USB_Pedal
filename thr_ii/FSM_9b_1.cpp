@@ -81,12 +81,10 @@ bool factory_presets_active = false;
 
 extern uint16_t npatches_user;    // Counts the user patches stored on SD-card
 extern uint16_t npatches_factory; // Counts the factory patches stored on SD-card
-extern uint16_t *npatches; // Reference to npathces_user or npatches_factory
+extern uint16_t *npatches;        // Reference to npathces_user or npatches_factory
 
-#include "metronome.h"
 #include "tabata_metronome.h"
-extern Metronome metronome;
-extern Tabata_Metronome tabata_m;
+extern Tabata_Metronome tm;
 
 UIStates _uistate_prev = UI_home_patch; // To remember amp vs custom patches state
 /////////////////////////////////////////////////////////////////
@@ -923,70 +921,67 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
     switch (button_state)
     {
         case 1:
-          if( _uistate == UI_metronome )   { metronome.prevTimeSignature(); }
-          else if( _uistate == UI_tabata ) { tabata_m.metronome.prevTimeSignature(); }
+          tm.metronome.prevTimeSignature();
 //          maskCUpdate = maskAll;
         break;
 
         case 2:
-          if( _uistate == UI_metronome )   { metronome.nextTimeSignature(); }
-          else if( _uistate == UI_tabata ) { tabata_m.metronome.nextTimeSignature(); }
+          tm.metronome.nextTimeSignature();
 //          maskCUpdate = maskAll;
         break;
 
         case 3:
-          if( _uistate == UI_tabata ) { tabata_m.toggleMetronome(); }
+          if( _uistate == UI_tabata ) { tm.toggleMetronomeInTabata(); }
 //          maskCUpdate = maskAll;
         break;
 
         case 4: // Tap tempo
-          if( _uistate == UI_metronome )   { metronome.tapBPM(); } // Get tempo tap input and apply to the metronome unit
-          else if( _uistate == UI_tabata ) { tabata_m.metronome.tapBPM(); }
+          tm.metronome.tapBPM(); // Get tempo tap input and apply to the metronome unit
 //          maskCUpdate = maskAll;
         break;
 
         case 5:
-          if( _uistate == UI_metronome ) { metronome.decBPM(10); }
+          if( _uistate == UI_metronome ) { tm.metronome.decBPM(10); }
           else if( _uistate == UI_tabata )
           {
-            if( tabata_m.with_metronome ) { tabata_m.metronome.decBPM(10); }
-            else                          { tabata_m.decPracticeTime(10);  } // Note: Practice time
+            if( tm.with_metronome ) { tm.metronome.decBPM(10);       }
+            else                    { tm.tabata.decPracticeTime(10); } // Note: Practice time
           }
 //          maskCUpdate = maskAll;
         break;
 
         case 6:
-          if( _uistate == UI_metronome ) { metronome.decBPM(5); }
+          if( _uistate == UI_metronome ) { tm.metronome.decBPM(5); }
           else if( _uistate == UI_tabata )
           {
-            if( tabata_m.with_metronome ) { tabata_m.metronome.decBPM(5); }
-            else                          { tabata_m.decPracticeTime(5);  }
+            if( tm.with_metronome ) { tm.metronome.decBPM(5);       }
+            else                    { tm.tabata.decPracticeTime(5); }
           }
 //          maskCUpdate = maskAll;
         break;
 
-        case 7: // Toggle Start / Stop
-          if( _uistate == UI_metronome )   { metronome.toggle(); }
-          else if( _uistate == UI_tabata ) { tabata_m.toggle();  }
+        case 7: // Start / Stop
+          if( _uistate == UI_metronome )   { tm.metronome.toggle(); }
+          else if( _uistate == UI_tabata ) { tm.tabata.toggle();    }
 //          maskCUpdate = maskAll;
         break;
 
         case 8:
-          if( _uistate == UI_metronome ) { metronome.incBPM(5); }
+          if( _uistate == UI_metronome ) { tm.metronome.incBPM(5); }
           else if( _uistate == UI_tabata )
           {
-            if( tabata_m.with_metronome ) { tabata_m.metronome.incBPM(5); }
-            else                          { tabata_m.incPracticeTime(5);  }
+            if( tm.with_metronome ) { tm.metronome.incBPM(5);       }
+            else                    { tm.tabata.incPracticeTime(5); }
           }
 //          maskCUpdate = maskAll;
         break;
 
         case 9:
-          if( _uistate == UI_metronome ) { metronome.incBPM(10); }
+          if( _uistate == UI_metronome ) { tm.metronome.incBPM(10); }
           else if( _uistate == UI_tabata )
           {
-            if( tabata_m.with_metronome ) { tabata_m.metronome.incBPM(10); }
-            else                          { tabata_m.incPracticeTime(10);  }
+            if( tm.with_metronome ) { tm.metronome.incBPM(10);       }
+            else                    { tm.tabata.incPracticeTime(10); }
           }
 //          maskCUpdate = maskAll;
         break;
@@ -1006,54 +1001,54 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
 
         case 14: // Switch to previous mode - cancel the metronome/tabata mode
           _uistate = _uistate_prev;
-          if( _uistate == UI_metronome )   { metronome.stop(); }
-          else if( _uistate == UI_tabata ) { tabata_m.stop();  }
+          tm.stop();
 //          maskCUpdate = maskAll;
         break;
 
         case 15:
-          if( _uistate == UI_metronome ) { metronome.decBPM(20); }
+          if( _uistate == UI_metronome ) { tm.metronome.decBPM(20); }
           else if( _uistate == UI_tabata )
           {
-            if( tabata_m.with_metronome ) { tabata_m.metronome.decBPM(20); }
-            else                          { tabata_m.decRestTime(10); } // Note: Rest time
+            if( tm.with_metronome ) { tm.metronome.decBPM(20);   }
+            else                    { tm.tabata.decRestTime(10); } // Note: Rest time
           }
 //          maskCUpdate = maskAll;
         break;
 
         case 16:
-          if( _uistate == UI_metronome ) { metronome.decBPM(1); }
+          if( _uistate == UI_metronome ) { tm.metronome.decBPM(1); }
           else if( _uistate == UI_tabata )
           {
-            if( tabata_m.with_metronome ) { tabata_m.metronome.decBPM(1); }
-            else                          { tabata_m.decRestTime(5); }
+            if( tm.with_metronome ) { tm.metronome.decBPM(1);   }
+            else                    { tm.tabata.decRestTime(5); }
           }
 //          maskCUpdate = maskAll;
         break;
 
-        case 17:
-          if( _uistate == UI_metronome )   { metronome.stop(); _uistate = UI_tabata; }
-          else if( _uistate == UI_tabata ) { tabata_m.stop(); _uistate = UI_metronome; }
+        case 17: // Switch between Tabata and Metronome
+          tm.toggleTabataMetronomeMode();
+          if( _uistate == UI_metronome )   { _uistate = UI_tabata;    }
+          else if( _uistate == UI_tabata ) { _uistate = UI_metronome; }
           Serial.println("Toggle Metronome/Tabata");
 //          maskCUpdate = maskAll;
         break;
 
         case 18:
-          if( _uistate == UI_metronome ) { metronome.incBPM(1); }
+          if( _uistate == UI_metronome ) { tm.metronome.incBPM(1); }
           else if( _uistate == UI_tabata )
           {
-            if( tabata_m.with_metronome ) { tabata_m.metronome.incBPM(1); }
-            else                          { tabata_m.incRestTime(5); }
+            if( tm.with_metronome ) { tm.metronome.incBPM(1);   }
+            else                    { tm.tabata.incRestTime(5); }
           }
 //          maskCUpdate = maskAll;
         break;
 
         case 19:
-          if( _uistate == UI_metronome ) { metronome.incBPM(20); }
+          if( _uistate == UI_metronome ) { tm.metronome.incBPM(20); }
           else if( _uistate == UI_tabata )
           {
-            if( tabata_m.with_metronome ) { tabata_m.metronome.incBPM(20); }
-            else                          { tabata_m.incRestTime(10); }
+            if( tm.with_metronome ) { tm.metronome.incBPM(20);   }
+            else                    { tm.tabata.incRestTime(10); }
           }
 //          maskCUpdate = maskAll;
         break;
