@@ -137,6 +137,17 @@ void init_patches_from_sdcard(); // Forward declaration
 void fsm_9b_1(UIStates &_uistate, uint8_t &button_state); // Forward declaration
 
 /////////////////////////////////////////////////////////////////////////////////////////
+// Metronome and Tabata
+/////////////////////////////////////////////////////////////////////////////////////////
+#include "metronome.h"
+#include "tabata_metronome.h"
+
+#define TICK_PIN 25
+
+Metronome metronome = Metronome(TICK_PIN);
+Tabata_Metronome tabata_m = Tabata_Metronome(45, 15, TICK_PIN);
+
+/////////////////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
 /////////////////////////////////////////////////////////////////////////////////////////
 class THR30II_Settings THR_Values;			  // Actual settings of the connected THR30II
@@ -378,6 +389,10 @@ void loop()
 
   // Should be called every 4-5ms or faster, for the default debouncing time of ~20ms.
   for(uint8_t i = 0; i < NUM_BUTTONS; i++) { buttons[i].check(); }
+
+  // Metronome and tabata must call update() regularly
+  if( _uistate == UI_metronome )   { metronome.update(); }
+  else if( _uistate == UI_tabata ) { tabata_m.update();  }
 
   // Finate State Machine(s) managing the buttons
   fsm_9b_1(_uistate, button_state);

@@ -26,7 +26,7 @@ enum ampSelectModes {COL, AMP, CAB};
 enum dynModes {Boost, Comp, Gate};
 
 // enum UIStates { UI_idle, UI_init_act_set, UI_act_vol_sol, UI_patch, UI_ded_sol, UI_pat_vol_sol}; //States for the patch/solo activation user interface
-enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_manual,  UI_edit, UI_save, UI_name};
+enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_manual, UI_edit, UI_save, UI_name, UI_metronome, UI_tabata};
 extern UIStates _uistate;
 extern UIStates _uistate_prev;
 

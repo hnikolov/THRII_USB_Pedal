@@ -83,6 +83,11 @@ extern uint16_t npatches_user;    // Counts the user patches stored on SD-card
 extern uint16_t npatches_factory; // Counts the factory patches stored on SD-card
 extern uint16_t *npatches; // Reference to npathces_user or npatches_factory
 
+#include "metronome.h"
+#include "tabata_metronome.h"
+extern Metronome metronome;
+extern Tabata_Metronome tabata_m;
+
 UIStates _uistate_prev = UI_home_patch; // To remember amp vs custom patches state
 /////////////////////////////////////////////////////////////////
 
@@ -181,13 +186,14 @@ void select_user_patch(int16_t *presel_patch_id, uint8_t pnr)
   }
 }
 
+// Forward declarations
 void handle_home_amp(UIStates &_uistate, uint8_t &button_state);
 void handle_home_patch(UIStates &_uistate, uint8_t &button_state);
 void handle_patch_manual(UIStates &_uistate, uint8_t &button_state);
 void handle_edit_mode(UIStates &_uistate, uint8_t &button_state);
+void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state);
 
-//                0        1            2              3        4        5        6                7
-// enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_manual, UI_edit, UI_save, UI_name, UI_init_act_set, UI_act_vol_sol, UI_patch, UI_ded_sol, UI_pat_vol_sol};
+// enum UIStates {UI_idle, UI_home_amp, UI_home_patch, UI_manual, UI_edit, UI_save, UI_name, UI_metronome, UI_tabata};
 void fsm_9b_1(UIStates &_uistate, uint8_t &button_state) 
 {
 	if( button_state != 0 ) // A foot switch was pressed
@@ -220,6 +226,11 @@ void fsm_9b_1(UIStates &_uistate, uint8_t &button_state)
 
 			case UI_name:
 			break;
+
+      case UI_metronome:
+      case UI_tabata:
+        handle_metronome_mode(_uistate, button_state);
+      break;
 
 			default:
 			break;
@@ -346,7 +357,10 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
           maskCUpdate = (maskClearTft | maskAmpUnit | maskGainMaster);
         break;
 
-        case 14: 
+        case 14:
+          Serial.println("Activating Metronome mode");
+          _uistate = UI_metronome;
+          _uistate_prev = UI_home_amp;
           maskCUpdate = maskAll; 
         break;
 
@@ -467,7 +481,10 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
           maskCUpdate = (maskClearTft | maskAmpUnit | maskGainMaster);
         break;
 
-        case 14: 
+        case 14:
+          Serial.println("Activating Metronome mode");
+          _uistate = UI_metronome;
+          _uistate_prev = UI_home_patch;
           maskCUpdate = maskAll; 
         break;
 
@@ -597,7 +614,10 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           maskCUpdate = (maskClearTft | maskAmpUnit | maskAmpUnitPar);
         break;
 
-        case 14: 
+        case 14:
+          // _uistate_prev not set here. Will return to the previous-previuos state, issues when returning to manual mode
+          Serial.println("Activating Metronome mode");
+          _uistate = UI_metronome;
           maskCUpdate = maskAll; 
         break;
 
@@ -817,6 +837,9 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 14:
+          Serial.println("Activating Metronome mode");
+          _uistate = UI_metronome;
+          _uistate_prev = UI_edit;
 //          maskCUpdate = maskAll;
         break;
 
@@ -884,6 +907,155 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));
             maskCUpdate |= (maskReverb | maskReverbPar);
           }
+        break;
+
+        default:
+        break;
+    }
+    button_state = 0; // Button is handled
+}
+
+// ==================================================================
+// Metronome/Tabata mode
+// ==================================================================
+void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
+{
+    switch (button_state)
+    {
+        case 1:
+          if( _uistate == UI_metronome )   { metronome.prevTimeSignature(); }
+          else if( _uistate == UI_tabata ) { tabata_m.metronome.prevTimeSignature(); }
+//          maskCUpdate = maskAll;
+        break;
+
+        case 2:
+          if( _uistate == UI_metronome )   { metronome.nextTimeSignature(); }
+          else if( _uistate == UI_tabata ) { tabata_m.metronome.nextTimeSignature(); }
+//          maskCUpdate = maskAll;
+        break;
+
+        case 3:
+          if( _uistate == UI_tabata ) { tabata_m.toggleMetronome(); }
+//          maskCUpdate = maskAll;
+        break;
+
+        case 4: // Tap tempo
+          if( _uistate == UI_metronome )   { metronome.tapBPM(); } // Get tempo tap input and apply to the metronome unit
+          else if( _uistate == UI_tabata ) { tabata_m.metronome.tapBPM(); }
+//          maskCUpdate = maskAll;
+        break;
+
+        case 5:
+          if( _uistate == UI_metronome ) { metronome.decBPM(10); }
+          else if( _uistate == UI_tabata )
+          {
+            if( tabata_m.with_metronome ) { tabata_m.metronome.decBPM(10); }
+            else                          { tabata_m.decPracticeTime(10);  } // Note: Practice time
+          }
+//          maskCUpdate = maskAll;
+        break;
+
+        case 6:
+          if( _uistate == UI_metronome ) { metronome.decBPM(5); }
+          else if( _uistate == UI_tabata )
+          {
+            if( tabata_m.with_metronome ) { tabata_m.metronome.decBPM(5); }
+            else                          { tabata_m.decPracticeTime(5);  }
+          }
+//          maskCUpdate = maskAll;
+        break;
+
+        case 7: // Toggle Start / Stop
+          if( _uistate == UI_metronome )   { metronome.toggle(); }
+          else if( _uistate == UI_tabata ) { tabata_m.toggle();  }
+//          maskCUpdate = maskAll;
+        break;
+
+        case 8:
+          if( _uistate == UI_metronome ) { metronome.incBPM(5); }
+          else if( _uistate == UI_tabata )
+          {
+            if( tabata_m.with_metronome ) { tabata_m.metronome.incBPM(5); }
+            else                          { tabata_m.incPracticeTime(5);  }
+          }
+//          maskCUpdate = maskAll;
+        break;
+
+        case 9:
+          if( _uistate == UI_metronome ) { metronome.incBPM(10); }
+          else if( _uistate == UI_tabata )
+          {
+            if( tabata_m.with_metronome ) { tabata_m.metronome.incBPM(10); }
+            else                          { tabata_m.incPracticeTime(10);  }
+          }
+//          maskCUpdate = maskAll;
+        break;
+
+        // Buttons hold ============================================================
+        case 11:
+//          maskCUpdate = maskAll;
+        break;
+
+        case 12:
+//          maskCUpdate = maskAll;
+        break;
+
+        case 13:
+//          maskCUpdate = maskAll;
+        break;
+
+        case 14: // Switch to previous mode - cancel the metronome/tabata mode
+          _uistate = _uistate_prev;
+          if( _uistate == UI_metronome )   { metronome.stop(); }
+          else if( _uistate == UI_tabata ) { tabata_m.stop();  }
+//          maskCUpdate = maskAll;
+        break;
+
+        case 15:
+          if( _uistate == UI_metronome ) { metronome.decBPM(20); }
+          else if( _uistate == UI_tabata )
+          {
+            if( tabata_m.with_metronome ) { tabata_m.metronome.decBPM(20); }
+            else                          { tabata_m.decRestTime(10); } // Note: Rest time
+          }
+//          maskCUpdate = maskAll;
+        break;
+
+        case 16:
+          if( _uistate == UI_metronome ) { metronome.decBPM(1); }
+          else if( _uistate == UI_tabata )
+          {
+            if( tabata_m.with_metronome ) { tabata_m.metronome.decBPM(1); }
+            else                          { tabata_m.decRestTime(5); }
+          }
+//          maskCUpdate = maskAll;
+        break;
+
+        case 17:
+          if( _uistate == UI_metronome )   { metronome.stop(); _uistate = UI_tabata; }
+          else if( _uistate == UI_tabata ) { tabata_m.stop(); _uistate = UI_metronome; }
+          Serial.println("Toggle Metronome/Tabata");
+//          maskCUpdate = maskAll;
+        break;
+
+        case 18:
+          if( _uistate == UI_metronome ) { metronome.incBPM(1); }
+          else if( _uistate == UI_tabata )
+          {
+            if( tabata_m.with_metronome ) { tabata_m.metronome.incBPM(1); }
+            else                          { tabata_m.incRestTime(5); }
+          }
+//          maskCUpdate = maskAll;
+        break;
+
+        case 19:
+          if( _uistate == UI_metronome ) { metronome.incBPM(20); }
+          else if( _uistate == UI_tabata )
+          {
+            if( tabata_m.with_metronome ) { tabata_m.metronome.incBPM(20); }
+            else                          { tabata_m.incRestTime(10); }
+          }
+//          maskCUpdate = maskAll;
         break;
 
         default:
