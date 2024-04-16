@@ -79,7 +79,7 @@ TFT_eSprite spr = TFT_eSprite(&tft); // Declare Sprite object "spr" with pointer
 //#include "fonts/Free_Fonts.h" // Needs to be anabled in my_custom_setup.h as well
 
 // TFT backlight brightness
-int brightness = 128; // 0 - 255
+int brightness = 160; // 0 - 255
 int pin_backlight = 24;
 
 // Normal TRACE/DEBUG
@@ -139,9 +139,10 @@ void fsm_9b_1(UIStates &_uistate, uint8_t &button_state); // Forward declaration
 /////////////////////////////////////////////////////////////////////////////////////////
 // Metronome and Tabata
 /////////////////////////////////////////////////////////////////////////////////////////
-#include "tabata_metronome.h"
+#include "tabata_ui.h"
 #define TICK_PIN 25
 Tabata_Metronome tm = Tabata_Metronome(TICK_PIN);
+TabataUI tmui = TabataUI(tm, 70, 30, TFT_THRGREY, TFT_BLACK);
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
@@ -298,18 +299,17 @@ void gui_timing()
   {
     if( maskCUpdate )
     {
-      if( _uistate == UI_edit )
-      {
-        tftUpdateEdit(THR_Values, maskCUpdate);
-      }
-      else
-      {
-        updateStatusMask(THR_Values, maskCUpdate);
-      }
-
-      tick1 = millis(); // Start new waiting period
-      return;
+      if( _uistate == UI_edit ) { tftUpdateEdit(THR_Values, maskCUpdate);    }
+      else                      { updateStatusMask(THR_Values, maskCUpdate); }
     }
+
+    if( _uistate == UI_tabata || _uistate == UI_metronome )
+    {
+      tmui.update(); // Has to be called regularly
+    }
+
+    tick1 = millis(); // Start new waiting period
+    return;
 	}
 /*
 	if( millis() - tick2 > 1500 ) // Switch back to mask or selected patchname after showing something else for a while

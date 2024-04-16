@@ -83,8 +83,9 @@ extern uint16_t npatches_user;    // Counts the user patches stored on SD-card
 extern uint16_t npatches_factory; // Counts the factory patches stored on SD-card
 extern uint16_t *npatches;        // Reference to npathces_user or npatches_factory
 
-#include "tabata_metronome.h"
+#include "tabata_ui.h"
 extern Tabata_Metronome tm;
+extern TabataUI tmui;
 
 UIStates _uistate_prev = UI_home_patch; // To remember amp vs custom patches state
 /////////////////////////////////////////////////////////////////
@@ -359,7 +360,8 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
           Serial.println("Activating Metronome mode");
           _uistate = UI_metronome;
           _uistate_prev = UI_home_amp;
-          maskCUpdate = maskAll; 
+          maskCUpdate = maskAll;
+          tmui.draw_metronome();
         break;
 
         case 15:
@@ -483,7 +485,8 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
           Serial.println("Activating Metronome mode");
           _uistate = UI_metronome;
           _uistate_prev = UI_home_patch;
-          maskCUpdate = maskAll; 
+          maskCUpdate = maskAll;
+          tmui.draw_metronome();
         break;
 
         case 15:
@@ -616,7 +619,8 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           // _uistate_prev not set here. Will return to the previous-previuos state, issues when returning to manual mode
           Serial.println("Activating Metronome mode");
           _uistate = UI_metronome;
-          maskCUpdate = maskAll; 
+          maskCUpdate = maskAll;
+          tmui.draw_metronome();
         break;
 
         case 15:
@@ -838,7 +842,8 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           Serial.println("Activating Metronome mode");
           _uistate = UI_metronome;
           _uistate_prev = UI_edit;
-//          maskCUpdate = maskAll;
+          maskCUpdate = maskAll;
+          tmui.draw_metronome();
         break;
 
         case 15:
@@ -961,8 +966,7 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 7: // Start / Stop
-          if( _uistate == UI_metronome )   { tm.metronome.toggle(); }
-          else if( _uistate == UI_tabata ) { tm.tabata.toggle();    }
+          tm.toggle();
 //          maskCUpdate = maskAll;
         break;
 
@@ -1002,7 +1006,7 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
         case 14: // Switch to previous mode - cancel the metronome/tabata mode
           _uistate = _uistate_prev;
           tm.stop();
-//          maskCUpdate = maskAll;
+          maskCUpdate = maskAll;
         break;
 
         case 15:
@@ -1027,8 +1031,8 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
 
         case 17: // Switch between Tabata and Metronome
           tm.toggleTabataMetronomeMode();
-          if( _uistate == UI_metronome )   { _uistate = UI_tabata;    }
-          else if( _uistate == UI_tabata ) { _uistate = UI_metronome; }
+          if( _uistate == UI_metronome )   { _uistate = UI_tabata;    tmui.draw_tabata();    }
+          else if( _uistate == UI_tabata ) { _uistate = UI_metronome; tmui.draw_metronome(); }
           Serial.println("Toggle Metronome/Tabata");
 //          maskCUpdate = maskAll;
         break;

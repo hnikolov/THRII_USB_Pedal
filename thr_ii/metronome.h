@@ -15,13 +15,13 @@ private:
   uint16_t normal_click = accent_click / 2; // Hz
   uint8_t time_signature = 4; // = 4/4; 3 = 3/4
   uint8_t max_ts = 9; // = 9/4
-  uint16_t sig[4] = {accent_click, normal_click, normal_click, normal_click};
+  //uint16_t sig[4] = {accent_click, normal_click, normal_click, normal_click};
   uint8_t idx = 0;
 
   uint32_t tempotaptime0 = 0;
   uint32_t tempotaptime1 = 0;
   uint32_t tempotapint = 1000;
-  uint32_t tempotaptimeout = 1500; // Check what whould be this value
+  uint32_t tempotaptimeout = 1500;
 
 public:
   Metronome(uint8_t tick_pin):
@@ -34,10 +34,15 @@ public:
     return per_second;
   }
 
-  void setTimeSignature( uint8_t ts)
+  void setTimeSignature( uint8_t ts )
   {
     time_signature = ts;
     Serial.println("Metronome time signature set to: " + String(time_signature) + "/4");
+  }
+
+  uint8_t getTimeSignature()
+  {
+    return time_signature;
   }
 
   void prevTimeSignature()
@@ -143,7 +148,7 @@ public:
         if( idx == 0 ) { tone(cTICK_PIN, accent_click, 5); }
         else           { tone(cTICK_PIN, normal_click, 5); }
         idx++;
-        if( idx == time_signature ) { idx = 0; }
+        if( idx >= time_signature ) { idx = 0; }
         //*/
       }
     }

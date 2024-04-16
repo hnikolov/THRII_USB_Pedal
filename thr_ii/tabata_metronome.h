@@ -20,18 +20,18 @@ public:
 
   void selectMetronomeMode( bool sel )
   {
+    stop();
     isMetronome = sel;
     if( isMetronome == true ) { Serial.println("Selected Metronome"); }
     else                      { Serial.println("Selected Tabata");    }
-    stop();
   }
 
   void toggleTabataMetronomeMode()
   {
+    stop();
     isMetronome = !isMetronome;
     if( isMetronome == true ) { Serial.println("Switched to Metronome"); }
     else                      { Serial.println("Switched to Tabata");    }
-    stop();
   }
 
   void enableMetronomeInTabata( bool en )
@@ -43,16 +43,17 @@ public:
 
   void toggleMetronomeInTabata()
   {
+    // TODO: If metronome is enabled during the ready counting state, the effect is "pause"
     with_metronome = !with_metronome;
     if( with_metronome == true ) { metronome.start(); }
     else                         { metronome.stop();  }
-    Serial.println("Toggled tabata with metronome");
+    Serial.println("Toggled tabata with metronome: " + String(with_metronome));
   }
 
   bool isRunning()
   {
-    if( isMetronome == true )         { return metronome.isRunning(); }
-    else                              { return tabata.isRunning();    }
+    if( isMetronome == true ) { return metronome.isRunning(); }
+    else                      { return tabata.isRunning();    }
   }
 
   void start()
@@ -62,10 +63,10 @@ public:
     else                              { tabata.start();    }
   }
 
-  void _start()
+  inline void _start()
   {
-    tabata._tbstate = tabata.Tb_practice;
-    tabata.practice_cnt = 0;
+    tabata._tbstate = tabata.Tb_practice; // Skip the Ready state
+    tabata.practice_cnt = 1;
     tabata.second = millis();
     tabata.running = true;
     metronome.start();
@@ -75,8 +76,28 @@ public:
   void stop()
   {
     if( isMetronome == true )         { metronome.stop(); }
+    else if( with_metronome == true ) { _stop();          }
     else                              { tabata.stop();    }
+  }
+
+  inline void _stop()
+  {
+    metronome.stop();
+    tabata.stop();
     Serial.println("Tabata metronome stopped");
+  }
+
+  void toggle()
+  {
+    if( isMetronome == true )         { metronome.toggle(); }
+    else if( with_metronome == true ) { _toggle();          }
+    else                              { tabata.toggle();    }
+  }
+
+  inline void _toggle()
+  {
+    if( isRunning() ) { _stop();  }
+    else              { _start(); }
   }
 
   void update()
@@ -86,7 +107,7 @@ public:
     else                              { tabata.update();    }
   }
 
-  void _update()
+  inline void _update()
   // Not using interrupts, so this function must be called very regularly in the Arduino loop() function
   {
     if( tabata.running == true )
@@ -98,14 +119,14 @@ public:
           metronome.update();
           if( now - tabata.second >= 1000 ) // 1 second
           {
+            Serial.println("Tabata metronome Practice: " + String(tabata.practice_cnt));
             tabata.practice_cnt++;
             tabata.second = now;
-            Serial.println("Tabata metronome Practice: " + String(tabata.practice_cnt));
 
-            if( tabata.practice_cnt >= tabata.practice_time )
+            if( tabata.practice_cnt > tabata.practice_time )
             {
               tabata._tbstate = tabata.Tb_rest;
-              tabata.rest_cnt = tabata.rest_time; // seconds
+              tabata.rest_cnt = 1; // seconds
               Serial.println("Tabata metronome: Rest");
               metronome.stop();
             }
@@ -116,13 +137,13 @@ public:
           if( now - tabata.second >= 1000 ) // 1 second
           {
             Serial.println("Tabata metronome Rest: " + String(tabata.rest_cnt));
-            tabata.rest_cnt--;
+            tabata.rest_cnt++;
             tabata.second = now;
           
-            if( tabata.rest_cnt == 0 )
+            if( tabata.rest_cnt > tabata.rest_time )
             {
               tabata._tbstate = tabata.Tb_practice;
-              tabata.practice_cnt = 0;
+              tabata.practice_cnt = 1;
               Serial.println("Tabata metronome: Practice");
               metronome.start();
             }

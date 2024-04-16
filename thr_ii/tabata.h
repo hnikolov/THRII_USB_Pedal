@@ -11,18 +11,25 @@ public:
 
   uint16_t practice_time;
   uint16_t rest_time;
-  uint16_t practice_cnt = 0;
-  uint16_t rest_cnt = 0;
+  uint16_t practice_cnt = 1;
+  uint16_t rest_cnt = 1;
+  uint16_t ready_cnt = 0;
+  uint16_t ready_time = 3;
   uint32_t second = 0;
   bool running = false;
-  enum TbStates {Tb_practice, Tb_rest};
-  TbStates _tbstate = Tb_rest;
+  enum TbStates {Tb_practice, Tb_rest, Tb_ready};
+  TbStates _tbstate = Tb_ready;
 
 public:
   Tabata(uint16_t practice_time=45, uint16_t rest_time=15, uint8_t tick_pin=7):
     cTICK_PIN(tick_pin),
     practice_time(practice_time), // seconds
     rest_time(rest_time) {} // seconds
+
+  TbStates getState()
+  {
+    return _tbstate;
+  }
 
   bool isPractice()
   {
@@ -79,8 +86,8 @@ public:
 
   void start()
   {
-    _tbstate = Tb_rest;
-    rest_cnt = 4; // Ready: 3-2-1 count before start practicing
+    _tbstate = Tb_ready;
+    ready_cnt = 0;
     second = millis();
     running = true;
     Serial.println("Tabata start");
@@ -91,6 +98,8 @@ public:
     if( running == true )
     {
       Serial.println("Tabata stopped");
+      _tbstate = Tb_ready;
+      ready_cnt = 0;
       running = false;
     }
   }
@@ -112,18 +121,18 @@ public:
         case Tb_practice:
           if( now - second >= 1000 ) // 1 second 
           {
+            Serial.println("Practice: " + String(practice_cnt));
             practice_cnt++;
             second = now;
-            Serial.println("Practice: " + String(practice_cnt));
 
-            if( practice_cnt >= practice_time )
+            if( practice_cnt > practice_time )
             {
               _tbstate = Tb_rest;
-              rest_cnt = rest_time; // seconds
+              rest_cnt = 1; // seconds
               Serial.println("Tabata: Rest");
               tone(cTICK_PIN, normal_click, 5);
             }
-            else if( practice_cnt >= practice_time - 3 )
+            else if( practice_cnt > practice_time - 3 )
             {
               tone(cTICK_PIN, accent_click, 5);
             }
@@ -131,20 +140,41 @@ public:
         break;
       
         case Tb_rest:
-          if( now - second >= 1000 ) // 1 second 
+          if( now - second >= 1000 ) // 1 second
           {
             Serial.println("Rest: " + String(rest_cnt));
-            rest_cnt--;
+            rest_cnt++;
             second = now;
-          
-            if( rest_cnt == 0 )
+
+            if( rest_cnt > rest_time )
             {
               _tbstate = Tb_practice;
-              practice_cnt = 0;
+              practice_cnt = 1;
               Serial.println("Tabata: Practice");
               tone(cTICK_PIN, accent_click, 5);
             }
-            else if( rest_cnt <= 3 ) 
+            else if( rest_cnt > rest_time - 3 )
+            {
+              tone(cTICK_PIN, normal_click, 5);
+            }
+          }
+        break;
+
+        case Tb_ready:
+          if( now - second >= 1000 ) // 1 second
+          {
+            Serial.println("Ready: " + String(ready_cnt));
+            ready_cnt++;
+            second = now;
+          
+            if( ready_cnt > ready_time )
+            {
+              _tbstate = Tb_practice;
+              practice_cnt = 1;
+              Serial.println("Tabata: Practice");
+              tone(cTICK_PIN, accent_click, 5);
+            }
+            else if( ready_cnt > ready_time - 3 )
             {
               tone(cTICK_PIN, normal_click, 5);
             }
