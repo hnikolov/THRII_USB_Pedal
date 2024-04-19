@@ -169,6 +169,15 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
 	
 	switch( _uistate ) 
   {
+    // TODO: avoid code duplication
+    case UI_manual:
+      if( _uistate_prev == UI_home_amp )
+      {
+        for(int i = 1; i <= 5; i++) { drawPatchIcon(60 + 20*i, 0, 20, 20, TFT_THRBROWN, i, false); }
+        drawPatchIcon(60 + 20*active_user_setting + 1, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
+      }
+		break;
+
 		case UI_home_amp:
       for(int i = 1; i <= 5; i++)
       {
@@ -559,8 +568,17 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 	// Patch number
   if( maskCUpdate & maskPatchID )
   {
-    if( _uistate == UI_home_amp )        { drawPatchID(TFT_THRCREAM, nUserPreset + 1);  }
-    else if( _uistate == UI_home_patch ) { drawPatchID(TFT_THRCREAM, *active_patch_id); }
+//    if( _uistate == UI_home_amp )        { drawPatchID(TFT_THRCREAM, nUserPreset + 1);  }
+////    else if( _uistate == UI_home_patch ) { drawPatchID(TFT_THRCREAM, *active_patch_id); }
+//    else                                 { drawPatchID(TFT_THRCREAM, *active_patch_id); }
+    if((_uistate == UI_home_amp) || (_uistate == UI_manual  && _uistate_prev == UI_home_amp))
+    {
+      drawPatchID(TFT_THRCREAM, nUserPreset + 1);
+    }
+    else
+    {
+      drawPatchID(TFT_THRCREAM, *active_patch_id);
+    }
   }
 
 	// Patch icon bank

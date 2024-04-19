@@ -31,7 +31,7 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 
 **OPERATION MODES**
 
-*THRII Presets (1-5)*
+***THRII Presets (1-5)***
 <br> This is the default mode which is selected after connecting to THRII
 - At start-up and after connecting to THR, the GUI shows "INITIALIZING" and then "*THR* PANEL".
   It checks and shows the actual THR name, e.g., in my case *THR* = **THR10II-W**.   
@@ -64,7 +64,7 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 |        | Hold   |                                     |
 
 
-*User Presets / Factory Presets*
+***User Presets / Factory Presets***
 - User presets are loaded from SD card at start-up
 - The THRII Factory presets provided with the remote App are copied in this repo. if present on the SD card, they are loaded as well
 - User presets use the same format and file type as the THRII factory presets (.thrl6p)
@@ -96,18 +96,19 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 
 
   
-*Manual mode*
+***Manual mode***
 
 - In manual mode, individual units can be selected and switched on/off by using the pedal board
 - Amp model/collection and speakers can be changed as well
+- In manual mode, bank up/down buttons are used to select next/previous preset
 
 ![THRII USB Pedal](images/manual.png)
 
 | Button | Action | Function                                       |
 |--------|--------|------------------------------------------------|
-|   1    | Press  | Next preset (+1) (TODO)                        |
+|   1    | Press  | Next preset (+1)                       |
 |        | Hold   | Toggle Collection/Amp/Cabinet                  |
-|   2    | Press  | Previous preset (-1) (TODO)                    |
+|   2    | Press  | Previous preset (-1)                   |
 |        | Hold   | Next from selected Collection, Amp, or Cabinet |
 |   3    | Press  | Toggle “Manual” mode                           |
 |        | Hold   | Toggle “Edit” mode                             |
@@ -125,7 +126,7 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 |        | Hold   | Select Reverb (Spring/Plate/Room/Hall)         |
 
 
-*Edit mode*
+***Edit mode***
 
 - THRII knobs can be used to directly change parameter settings. New values are reflected in the GUI
 - The THRII Audio knob can be used to change a parameter value. Press buttons 1 and 2 to select a parameter, then use the audio knob to set value
@@ -154,7 +155,7 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 |        | Hold   | Select Reverb (Spring/Plate/Room/Hall)                         |
 
 
-*Tabata/Metronome Mode*
+***Tabata/Metronome Mode***
 
 <br> There are 3 variants available: 
 -	Metronome: this is the default mode

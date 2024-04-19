@@ -518,10 +518,44 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
     switch (button_state)
     {
         case 1:
+          if( _uistate_prev != UI_home_amp )
+          {
+            *presel_patch_id = *presel_patch_id - 1;
+            if( *presel_patch_id < 1 ) // Detect if went  below first patch
+            {
+              *presel_patch_id = *npatches;	// Wrap back round to the last patch in library
+            }
+            *bank_first_patch = ((*presel_patch_id-1)/5) * 5 + 1;
+            *active_patch_id = *presel_patch_id;
+            patch_activate(*presel_patch_id);
+          }
+          else
+          {
+            nUserPreset = nUserPreset - 1;
+            if( nUserPreset < 0 ) { nUserPreset = 4; }
+            select_thrii_preset( nUserPreset );
+          }
           maskCUpdate = maskAll;
         break;
 
-        case 2: 
+        case 2:
+          if( _uistate_prev != UI_home_amp )
+          {
+            *presel_patch_id = *presel_patch_id + 1;
+            if( *presel_patch_id > *npatches ) // Detect if went beyond last patch
+            {
+              *presel_patch_id = 1;	// Wrap back round to first patch in library
+            }
+            *bank_first_patch = ((*presel_patch_id-1)/5) * 5 + 1;
+            *active_patch_id = *presel_patch_id;
+            patch_activate(*presel_patch_id);
+          }
+          else
+          {
+            nUserPreset = nUserPreset + 1;
+            if( nUserPreset > 4 ) { nUserPreset = 0; }
+            select_thrii_preset( nUserPreset );
+          }
           maskCUpdate = maskAll;
         break;
 
