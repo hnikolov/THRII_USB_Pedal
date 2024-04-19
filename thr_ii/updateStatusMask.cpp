@@ -510,20 +510,14 @@ void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour
 	spr.drawString(label, w/2, 13);	// Write label
 	spr.fillRect(grx, gry, grw, grh, fgcolour);	// Draw graph area
 
+	if( nbars == 4 ) { barw = grw / nbars + 1; }
+
 	for(int i = 0; i < nbars; i++)
 	{
 		barh = (grh-1) * FXparams[i] / 100;	// Calculate bar height
-		if( nbars == 2 || nbars == 4 ) 
-    {
-			barw = grw / nbars + 1;
-		}
-		if( i == nbars - 1 ) { // Widen last bar by 1px
-			spr.fillRect(grx + i * barw, gry + grh - barh, barw+1, barh, bgcolour);
-		}
-    else 
-    {
-			spr.fillRect(grx + i * barw, gry + grh - barh, barw, barh, bgcolour);
-		}
+    // Widen last bar by 1px
+		if( i == nbars - 1 ) { spr.fillRect(grx + i * barw, gry + grh - barh, barw+1, barh, bgcolour); }
+    else                 { spr.fillRect(grx + i * barw, gry + grh - barh, barw,   barh, bgcolour); }
 	}
 
 	spr.pushSprite(x, y);
@@ -628,7 +622,9 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 	uint16_t FXfgcolour  =  0;
 	double FXparams[5]   = {0};
 	double utilparams[2] = {0};
-	uint8_t FXw  =  60;
+	//uint8_t FXw  =  60;
+	uint8_t FXw  =  56;
+	uint8_t FXw2 =  48;
 	uint8_t FXh  =  65;
   uint16_t FXx = 0;
 	uint8_t FXy  = 240 - FXh;
@@ -640,10 +636,10 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     FXparams[0] = thrs.compressor_setting[CO_SUSTAIN];
     FXparams[1] = thrs.compressor_setting[CO_LEVEL];
     nFXbars = 2;
-    if(thrs.unit[COMPRESSOR]) { drawFXUnit(FXx, FXy, 40, FXh, TFT_THRWHITE, TFT_THRDARKGREY, "Cmp", nFXbars, FXparams); }
-    else                      { drawFXUnit(FXx, FXy, 40, FXh, TFT_THRGREY, TFT_THRVDARKGREY, "Cmp", nFXbars, FXparams); }
+    if(thrs.unit[COMPRESSOR]) { drawFXUnit(FXx, FXy, FXw2, FXh, TFT_THRWHITE, TFT_THRDARKGREY, "Cmp", nFXbars, FXparams); }
+    else                      { drawFXUnit(FXx, FXy, FXw2, FXh, TFT_THRGREY, TFT_THRVDARKGREY, "Cmp", nFXbars, FXparams); }
   }
-  FXx += 40;
+  FXx += FXw2;
 
   // Amp unit -------------------------------------------------------------------
   if( maskCUpdate & (maskGainMaster | maskEQChart) )
@@ -664,10 +660,10 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     FXparams[0] = thrs.gate_setting[GA_THRESHOLD];
     FXparams[1] = thrs.gate_setting[GA_DECAY];
     nFXbars = 2;
-    if(thrs.unit[GATE]) {	drawFXUnit(FXx, FXy, 40, FXh, TFT_THRYELLOW,    TFT_THRDIMYELLOW, "Gate", nFXbars, FXparams); }
-    else                { drawFXUnit(FXx, FXy, 40, FXh, TFT_THRDIMYELLOW, TFT_THRVDARKGREY, "Gate", nFXbars, FXparams); }
+    if(thrs.unit[GATE]) {	drawFXUnit(FXx, FXy, FXw2, FXh, TFT_THRYELLOW,    TFT_THRDIMYELLOW, "Gate", nFXbars, FXparams); }
+    else                { drawFXUnit(FXx, FXy, FXw2, FXh, TFT_THRDIMYELLOW, TFT_THRVDARKGREY, "Gate", nFXbars, FXparams); }
   }
-  FXx += 40;
+  FXx += FXw2;
   
 	// FX2 Effect (Chorus/Flanger/Phaser/Tremolo) ----------------------------------
   if( maskCUpdate & maskFxUnit )
