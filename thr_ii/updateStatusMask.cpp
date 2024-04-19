@@ -500,7 +500,7 @@ void drawUtilUnit(int x, int y, int w, int h, int bpad, uint16_t bgcolour, uint1
 	spr.deleteSprite();
 }
 
-void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int nbars, double FXparams[5], int selectedFXparam)
+void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int nbars, double FXparams[5])
 {
 	int tpad = 26; int pad = 2;
 	int grx = pad; int gry = tpad; int grw = w-1-2*pad; int grh = h-1-tpad-pad;
@@ -636,46 +636,45 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 	uint16_t FXfgcolour  =  0;
 	double FXparams[5]   = {0};
 	double utilparams[2] = {0};
-	uint8_t FXx = 0;
-  uint8_t FXx_offset = -7;
+	uint16_t FXx = 0;
+  uint8_t FXx_offset = 0;
 	uint8_t FXy = 160;
 	uint8_t FXw =  60;
 	uint8_t FXh =  80;
 	uint8_t nFXbars = 5;
-	uint8_t selectedFXparam = 0;
-
-	// Gain, Master, and EQ (B/M/T) -----------------------------------------------
-  if( maskCUpdate & maskGainMaster )
-  {
-     drawPPChart( 0, FXy, 26, FXh, TFT_THRBROWN, TFT_THRCREAM, "GM", thrs.control[CTRL_GAIN], thrs.control[CTRL_MASTER]);
-  }
-
-  // EQ (B/M/T) -----------------------------------------------------------------
-  if( maskCUpdate & maskEQChart )
-  {
-    drawEQChart(26, FXy, 27, FXh, TFT_THRBROWN, TFT_THRCREAM, "EQ", thrs.control[CTRL_BASS], thrs.control[CTRL_MID], thrs.control[CTRL_TREBLE]);
-  }
-
-  FXx = FXw + FXx_offset; // Set FX unit position
 
 	// FX1 Compressor -------------------------------------------------------------
   if( maskCUpdate & maskCompressor )
   {
-    utilparams[0] = thrs.compressor_setting[CO_SUSTAIN];
-    utilparams[1] = thrs.compressor_setting[CO_LEVEL];
-    if(thrs.unit[COMPRESSOR]) { drawUtilUnit(FXx, FXy, 60, 40, 1, TFT_THRWHITE, TFT_THRDARKGREY,  "Comp", utilparams); }
-    else                      { drawUtilUnit(FXx, FXy, 60, 40, 1, TFT_THRGREY,  TFT_THRVDARKGREY, "Comp", utilparams); }
+    FXparams[0] = thrs.compressor_setting[CO_SUSTAIN];
+    FXparams[1] = thrs.compressor_setting[CO_LEVEL];
+    nFXbars = 2;
+    if(thrs.unit[COMPRESSOR]) { drawFXUnit(FXx, FXy, 40, FXh, TFT_THRWHITE, TFT_THRDARKGREY, "Cmp", nFXbars, FXparams); }
+    else                      { drawFXUnit(FXx, FXy, 40, FXh, TFT_THRGREY, TFT_THRVDARKGREY, "Cmp", nFXbars, FXparams); }
   }
+  FXx += 40;
+
+  // Amp unit -------------------------------------------------------------------
+  FXparams[0] = thrs.control[CTRL_GAIN];
+  FXparams[1] = thrs.control[CTRL_MASTER];
+  FXparams[2] = thrs.control[CTRL_BASS];
+  FXparams[3] = thrs.control[CTRL_MID];
+  FXparams[4] = thrs.control[CTRL_TREBLE];
+  nFXbars = 5;
+  drawFXUnit(FXx, FXy, FXw, FXh, TFT_THRBROWN, TFT_THRVDARKBROWN, "Amp", nFXbars, FXparams);
+  FXx += FXw;
 
  	// Gate -----------------------------------------------------------------------
   if( maskCUpdate & maskNoiseGate )
   {
-    utilparams[0] = thrs.gate_setting[GA_THRESHOLD];
-    utilparams[1] = thrs.gate_setting[GA_DECAY];
-    if(thrs.unit[GATE]) {	drawUtilUnit(FXx, FXy + 40, 60, 40, 0, TFT_THRYELLOW,    TFT_THRDIMYELLOW, "Gate", utilparams); }
-    else                { drawUtilUnit(FXx, FXy + 40, 60, 40, 0, TFT_THRDIMYELLOW, TFT_THRVDARKGREY, "Gate", utilparams); }
+    FXparams[0] = thrs.gate_setting[GA_THRESHOLD];
+    FXparams[1] = thrs.gate_setting[GA_DECAY];
+    nFXbars = 2;
+    if(thrs.unit[GATE]) {	drawFXUnit(FXx, FXy, 40, FXh, TFT_THRYELLOW,    TFT_THRDIMYELLOW, "Gate", nFXbars, FXparams); }
+    else                { drawFXUnit(FXx, FXy, 40, FXh, TFT_THRDIMYELLOW, TFT_THRVDARKGREY, "Gate", nFXbars, FXparams); }
   }
-
+  FXx += 40;
+  
 	// FX2 Effect (Chorus/Flanger/Phaser/Tremolo) ----------------------------------
   if( maskCUpdate & maskFxUnit )
   {
@@ -762,9 +761,9 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       break;
     } // of switch(effecttype)
 
-  	FXx = 2*FXw + FXx_offset; // Set FX unit position
-	  drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
+	  drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams);
   }
+  FXx += FXw;
 
   // FX3 Echo (Tape Echo/Digital Delay)
   if( maskCUpdate & maskEcho )
@@ -812,9 +811,9 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       break;
     }	// of switch(effecttype)
     
-    FXx = 3*FXw + FXx_offset;	// set FX unit position
-    drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
+    drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams);
   }
+  FXx += FXw;
 
  	// FX4 Reverb (Spring/Room/Plate/Hall)
   if( maskCUpdate & maskReverb )
@@ -902,17 +901,17 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       break;
     }	// of switch(reverbtype)
       
-    FXx = 4*FXw + FXx_offset; // Set FX unit position
-    drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams, selectedFXparam);
+    drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams);
   }
-
+  FXx += FXw;
+/*
   // Show THRII Guitar and Audio volume values
   if( maskCUpdate & maskVolumeAudio )
   {
     // FIXME: Does not work if FXx is, and if not uint8_t... FXx = 5*FXw + FXx_offset; // Set FX unit position
     drawPPChart(293, FXy, 27, FXh, TFT_THRBROWN, TFT_THRCREAM, "VA", thrs.guitar_volume, thrs.audio_volume);
   }
-
+*/
   if( maskCUpdate & maskPatchName )
   {
     String s2, s3;
