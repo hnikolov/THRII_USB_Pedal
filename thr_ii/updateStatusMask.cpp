@@ -655,8 +655,8 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     FXparams[4] = thrs.control[CTRL_TREBLE];
     nFXbars = 5;
     drawFXUnit(FXx, FXy, FXw, FXh, TFT_THRBROWN, TFT_THRVDARKBROWN, "Amp", nFXbars, FXparams);
-    FXx += FXw;
   }
+  FXx += FXw;
 
  	// Gate -----------------------------------------------------------------------
   if( maskCUpdate & maskNoiseGate )

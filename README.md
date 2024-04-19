@@ -106,17 +106,17 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 
 | Button | Action | Function                                       |
 |--------|--------|------------------------------------------------|
-|   1    | Press  | Next preset (+1)                       |
+|   1    | Press  | Next preset (+1)                               |
 |        | Hold   | Toggle Collection/Amp/Cabinet                  |
-|   2    | Press  | Previous preset (-1)                   |
+|   2    | Press  | Previous preset (-1)                           |
 |        | Hold   | Next from selected Collection, Amp, or Cabinet |
 |   3    | Press  | Toggle “Manual” mode                           |
 |        | Hold   | Toggle “Edit” mode                             |
 |   4    | Press  | TAP Echo/Delay time                            |
 |        | Hold   | Toggle Tabata/Metronome mode                   |
-|   5    | Press  | Toggle “Solo boost” (on/off)                   |
+|   5    | Press  | Toggle Compressor (on/off)                     |
 |        | Hold   |                                                |
-|   6    | Press  | Toggle Compressor (on/off)                     |
+|   6    | Press  | Toggle “Solo boost” (on/off)                   |
 |        | Hold   | Toggle Noise Gate (on/off)                     |
 |   7    | Press  | Toggle Effect (on/off)                         |
 |        | Hold   | Select Effect (Chorus/Flanger/Phaser/Tremolo)  |
