@@ -71,18 +71,12 @@ uint32_t maskEcho          = 1 << 14; // drawFxUnit
 uint32_t maskReverb        = 1 << 15; // drawFxUnit
 
 // Used in Edit mode
-uint32_t maskAmpUnitPar    = 1 << 16;
-uint32_t maskCompressorEn  = 1 << 17; // drawUtilUnit (Edit mode)
-uint32_t maskCompressorPar = 1 << 18; // drawUtilUnit (Edit mode)
-uint32_t maskNoiseGateEn   = 1 << 19; // drawUtilUnit (Edit mode)
-uint32_t maskNoiseGatePar  = 1 << 20; // drawUtilUnit (Edit mode)
-uint32_t maskFxUnitEn      = 1 << 21; // drawFxUnit   (Edit mode)
-uint32_t maskFxUnitPar     = 1 << 22; // drawFxUnit   (Edit mode)
-uint32_t maskEchoEn        = 1 << 23; // drawFxUnit   (Edit mode)
-uint32_t maskEchoPar       = 1 << 24; // drawFxUnit   (Edit mode)
-uint32_t maskReverbEn      = 1 << 25; // drawFxUnit   (Edit mode)
-uint32_t maskReverbPar     = 1 << 26; // drawFxUnit   (Edit mode)
-uint32_t maskClearTft      = 1 << 27; // Used when switching to Edit mode
+uint32_t maskCompressorEn  = 1 << 16; // drawUtilUnit (Edit mode)
+uint32_t maskNoiseGateEn   = 1 << 17; // drawUtilUnit (Edit mode)
+uint32_t maskFxUnitEn      = 1 << 18; // drawFxUnit   (Edit mode)
+uint32_t maskEchoEn        = 1 << 19; // drawFxUnit   (Edit mode)
+uint32_t maskReverbEn      = 1 << 20; // drawFxUnit   (Edit mode)
+uint32_t maskClearTft      = 1 << 21; // Used when switching to Edit mode
 
 uint32_t maskAll           = 0xffffffff;
 
@@ -90,7 +84,7 @@ ampSelectModes amp_select_mode = COL; // Currently used in updateStatusMask()
 
 bool bgfill = true;
 
-// Can be: THRII (5 presets), User, and Factory (TODO) set
+// Can be: THRII (5 presets), User, and Factory presets
 void drawPatchSet(uint16_t colour, String ps_name)
 {
   int x = 0, y = 0, w = 80, h = 20;
@@ -311,6 +305,7 @@ void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
   // FIXME: free for local variables:-23904: Error program exceeds memory space
   //if( spr.textWidth(patchname) > w ) {spr.loadFont(Latin_Hiragana_24);}
   //else                               {spr.loadFont(NotoSansBold36);}
+  // TEST: spr.setTextWrap(true);
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(fg_colour, bg_colour, bgfill);
 
@@ -1021,8 +1016,7 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     drawAmpUnit(40, 35, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab);    
   }
 
-//  if( maskCUpdate & maskAmpUnitPar ) //
-  if( maskCUpdate & maskGainMaster )    // ONE OF THE IFs TO BE REMOVED
+  if( maskCUpdate & maskGainMaster )
   {
     // TODO: Draw selected knob only???
     sboxes[0]->draw_knob(0, thrs.control[CTRL_GAIN]);
@@ -1037,7 +1031,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 // NOTE: Alignment is a must: updateStatusMask, FSM9b_1, enums definitions (THR30II.h)
 
   // FX1 Compressor -------------------------------------------------------------
-//  if( maskCUpdate & maskCompressor || (maskCUpdate & maskCompressorEn) || (maskCUpdate & maskCompressorPar) )
   if( maskCUpdate & maskCompressor || (maskCUpdate & maskCompressorEn) )
   {
     if( last_updated_sbox != 1 )
@@ -1047,10 +1040,10 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       sboxes[1]->draw();
     }
   }
-  if( maskCUpdate & maskCompressorEn  ) { sboxes[1]->setEnabled(thrs.unit[COMPRESSOR]); }
-//  if( maskCUpdate & maskCompressorPar )
+
+  if( maskCUpdate & maskCompressorEn ) { sboxes[1]->setEnabled(thrs.unit[COMPRESSOR]); }
+
   if( maskCUpdate & maskCompressor )
-//  else if( maskCUpdate & maskCompressor )
   {
     // TODO: Draw selected knob only???
     sboxes[1]->draw_knob(0, thrs.compressor_setting[CO_SUSTAIN]);
@@ -1058,7 +1051,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   }
 
  	// Gate -----------------------------------------------------------------------
-//  if( maskCUpdate & maskNoiseGate || (maskCUpdate & maskNoiseGateEn) || (maskCUpdate & maskNoiseGatePar) )
   if( maskCUpdate & maskNoiseGate || (maskCUpdate & maskNoiseGateEn) )
   {
     if( last_updated_sbox != 2 )
@@ -1068,10 +1060,10 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       sboxes[2]->draw();
     }
   }
-  if( maskCUpdate & maskNoiseGateEn  ) { sboxes[2]->setEnabled(thrs.unit[GATE]); }
-//  if( maskCUpdate & maskNoiseGatePar )
+
+  if( maskCUpdate & maskNoiseGateEn ) { sboxes[2]->setEnabled(thrs.unit[GATE]); }
+
   if( maskCUpdate & maskNoiseGate )
-//  else if( maskCUpdate & maskNoiseGate )
   {
     // TODO: Draw selected knob only???
     sboxes[2]->draw_knob(0, thrs.gate_setting[GA_THRESHOLD]);
@@ -1079,7 +1071,7 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   }
 
 	// FX2 Effect (Chorus/Flanger/Phaser/Tremolo) ----------------------------------
-  if( (maskCUpdate & maskFxUnit) || (maskCUpdate & maskFxUnitEn) || (maskCUpdate & maskFxUnitPar) )
+  if( (maskCUpdate & maskFxUnit) || (maskCUpdate & maskFxUnitEn) )
   {
     switch( thrs.effecttype )
     {
@@ -1090,10 +1082,10 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
           last_updated_sbox = 3;
           sboxes[3]->draw();
         }
-        if( maskCUpdate & maskFxUnitEn  ) { sboxes[3]->setEnabled(thrs.unit[EFFECT]); }
-        //if( maskCUpdate & maskFxUnitPar )
+
+        if( maskCUpdate & maskFxUnitEn ) { sboxes[3]->setEnabled(thrs.unit[EFFECT]); }
+
         if( maskCUpdate & maskFxUnit )
-        //else if( maskCUpdate & maskFxUnit )
         {
           // TODO: Draw selected knob only???
           sboxes[3]->draw_knob(0, thrs.effect_setting[CHORUS][CH_SPEED]);
@@ -1111,10 +1103,10 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
           last_updated_sbox = 4;
           sboxes[4]->draw();
         }
-        if( maskCUpdate & maskFxUnitEn  ) { sboxes[4]->setEnabled(thrs.unit[EFFECT]); }
-        //if( maskCUpdate & maskFxUnitPar )
+
+        if( maskCUpdate & maskFxUnitEn ) { sboxes[4]->setEnabled(thrs.unit[EFFECT]); }
+
         if( maskCUpdate & maskFxUnit )
-        //else if( maskCUpdate & maskFxUnit )
         {
           // TODO: Draw selected knob only???
           sboxes[4]->draw_knob(0, thrs.effect_setting[FLANGER][FL_SPEED]);
@@ -1130,10 +1122,10 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
           last_updated_sbox = 5;
           sboxes[5]->draw();
         }
-        if( maskCUpdate & maskFxUnitEn  ) { sboxes[5]->setEnabled(thrs.unit[EFFECT]); }
-        //if( maskCUpdate & maskFxUnitPar )
+
+        if( maskCUpdate & maskFxUnitEn ) { sboxes[5]->setEnabled(thrs.unit[EFFECT]); }
+
         if( maskCUpdate & maskFxUnit )
-        //else if( maskCUpdate & maskFxUnit )
         {
           // TODO: Draw selected knob only???
           sboxes[5]->draw_knob(0, thrs.effect_setting[PHASER][PH_SPEED]);
@@ -1149,10 +1141,10 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
           last_updated_sbox = 6;
           sboxes[6]->draw();
         }
-        if( maskCUpdate & maskFxUnitEn  ) { sboxes[6]->setEnabled(thrs.unit[EFFECT]); }
-        //if( maskCUpdate & maskFxUnitPar )
+
+        if( maskCUpdate & maskFxUnitEn ) { sboxes[6]->setEnabled(thrs.unit[EFFECT]); }
+
         if( maskCUpdate & maskFxUnit )
-        //else if( maskCUpdate & maskFxUnit )
         {
           // TODO: Draw selected knob only???
           sboxes[6]->draw_knob(0, thrs.effect_setting[TREMOLO][TR_SPEED]);
@@ -1164,7 +1156,7 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   }
 
   // FX3 Echo (Tape Echo/Digital Delay)
-  if( (maskCUpdate & maskEcho) || (maskCUpdate & maskEchoEn) || (maskCUpdate & maskEchoPar) )
+  if( (maskCUpdate & maskEcho) || (maskCUpdate & maskEchoEn) )
   {
     switch( thrs.echotype )
     {
@@ -1175,10 +1167,10 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
           last_updated_sbox = 7;
           sboxes[7]->draw();
         }
-        if( maskCUpdate & maskEchoEn  ) { sboxes[7]->setEnabled(thrs.unit[ECHO]); }
-        //if( maskCUpdate & maskEchoPar )
+
+        if( maskCUpdate & maskEchoEn ) { sboxes[7]->setEnabled(thrs.unit[ECHO]); }
+
         if( maskCUpdate & maskEcho )
-        //else if( maskCUpdate & maskEcho )
         {
           // TODO: Draw selected knob only???
           sboxes[7]->draw_knob(0, thrs.echo_setting[TAPE_ECHO][TA_TIME]);
@@ -1196,10 +1188,10 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
           last_updated_sbox = 8;
           sboxes[8]->draw();
         }
-        if( maskCUpdate & maskEchoEn  ) { sboxes[8]->setEnabled(thrs.unit[ECHO]); }
-        //if( maskCUpdate & maskEchoPar )
+
+        if( maskCUpdate & maskEchoEn ) { sboxes[8]->setEnabled(thrs.unit[ECHO]); }
+
         if( maskCUpdate & maskEcho )
-        //else if( maskCUpdate & maskEcho )
         {
           // TODO: Draw selected knob only???
           sboxes[8]->draw_knob(0, thrs.echo_setting[DIGITAL_DELAY][DD_TIME]);
@@ -1213,7 +1205,7 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   }
 
  	// FX4 Reverb (Spring/Room/Plate/Hall)
-  if( (maskCUpdate & maskReverb) || (maskCUpdate & maskReverbEn) || (maskCUpdate & maskReverbPar) )
+  if( (maskCUpdate & maskReverb) || (maskCUpdate & maskReverbEn) )
   {
     switch( thrs.reverbtype )
     {
@@ -1224,10 +1216,9 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
           last_updated_sbox = 9;
           sboxes[9]->draw();
         }
-        if( maskCUpdate & maskReverbEn  ) { sboxes[9]->setEnabled(thrs.unit[REVERB]); }
-        //if( maskCUpdate & maskReverbPar )
+        if( maskCUpdate & maskReverbEn ) { sboxes[9]->setEnabled(thrs.unit[REVERB]); }
+
         if( maskCUpdate & maskReverb )
-        //else if( maskCUpdate & maskReverb )
         {
           // TODO: Draw selected knob only???
           sboxes[9]->draw_knob(0, thrs.reverb_setting[SPRING][SP_REVERB]);
@@ -1243,10 +1234,10 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
           last_updated_sbox = 12;
           sboxes[12]->draw();
         }
-        if( maskCUpdate & maskReverbEn  ) { sboxes[12]->setEnabled(thrs.unit[REVERB]); }
-        //if( maskCUpdate & maskReverbPar )
+
+        if( maskCUpdate & maskReverbEn ) { sboxes[12]->setEnabled(thrs.unit[REVERB]); }
+
         if( maskCUpdate & maskReverb )
-        //else if( maskCUpdate & maskReverb )
         {
           // TODO: Draw selected knob only???
           sboxes[12]->draw_knob(0, thrs.reverb_setting[ROOM][RO_DECAY]);
@@ -1263,10 +1254,10 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
           last_updated_sbox = 10;
           sboxes[10]->draw();
         }
-        if( maskCUpdate & maskReverbEn  ) { sboxes[10]->setEnabled(thrs.unit[REVERB]); }
-        //if( maskCUpdate & maskReverbPar )
+
+        if( maskCUpdate & maskReverbEn ) { sboxes[10]->setEnabled(thrs.unit[REVERB]); }
+
         if( maskCUpdate & maskReverb )
-        //else if( maskCUpdate & maskReverb )
         {
           // TODO: Draw selected knob only???
           sboxes[10]->draw_knob(0, thrs.reverb_setting[PLATE][PL_DECAY]);
@@ -1283,10 +1274,10 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
           last_updated_sbox = 11;
           sboxes[11]->draw();
         }
-        if( maskCUpdate & maskReverbEn  ) { sboxes[11]->setEnabled(thrs.unit[REVERB]); }
-        //if( maskCUpdate & maskReverbPar )
+
+        if( maskCUpdate & maskReverbEn ) { sboxes[11]->setEnabled(thrs.unit[REVERB]); }
+
         if( maskCUpdate & maskReverb )
-        //else if( maskCUpdate & maskReverb )
         {
           // TODO: Draw selected knob only???
           sboxes[11]->draw_knob(0, thrs.reverb_setting[HALL][HA_DECAY]);

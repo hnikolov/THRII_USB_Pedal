@@ -51,17 +51,11 @@ extern uint32_t maskEcho;
 extern uint32_t maskReverb;
 
 // Used in Edit mode
-extern uint32_t maskAmpUnitPar;
 extern uint32_t maskCompressorEn;
-extern uint32_t maskCompressorPar;
 extern uint32_t maskNoiseGateEn;
-extern uint32_t maskNoiseGatePar;
 extern uint32_t maskFxUnitEn;
-extern uint32_t maskFxUnitPar;
 extern uint32_t maskEchoEn;
-extern uint32_t maskEchoPar;
 extern uint32_t maskReverbEn;
-extern uint32_t maskReverbPar;
 extern uint32_t maskClearTft;
 
 extern uint32_t maskAll;
@@ -599,9 +593,9 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
         case 12: // Rotate amp select mode ( COL -> AMP -> CAB -> )
           switch(amp_select_mode)
           {
-              case COL:	amp_select_mode = AMP;	break;
-              case AMP:	amp_select_mode = CAB; 	break;
-              case CAB:	amp_select_mode = COL; 	break;
+              case COL:	amp_select_mode = AMP; break;
+              case AMP:	amp_select_mode = CAB; break;
+              case CAB:	amp_select_mode = COL; break;
           }
           Serial.println("Amp Select Mode: " + String(amp_select_mode));
           maskCUpdate |= maskAmpSelMode;
@@ -612,7 +606,7 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           // _uistate_prev not set here. Will return to the previous-previuos state, issues when returning to manual mode
 //          _uistate_prev = UI_manual; 
           selected_sbox = 0; // Amp unit
-          maskCUpdate = (maskClearTft | maskAmpUnit | maskAmpUnitPar);
+          maskCUpdate = (maskClearTft | maskAmpUnit);
         break;
 
         case 14:
@@ -703,14 +697,13 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         case 4: // Tap tempo
           THR_Values.EchoTempoTap(); // Get tempo tap input and apply to echo unit
           selected_sbox = 7;
-          maskCUpdate |= maskEchoPar;
+          maskCUpdate |= maskEcho;
         break;
 
         case 5: // Edit the Amp
           if( selected_sbox != 0 )
           {
             selected_sbox = 0;
-//            maskCUpdate |= (maskAmpUnit | maskAmpUnitPar);
             maskCUpdate |= (maskAmpUnit | maskGainMaster);
           }
         break;
@@ -720,7 +713,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           {
             Serial.println("Compressor selected");
             selected_sbox = 1;
-            maskCUpdate |= (maskCompressor | maskCompressorPar | maskCompressorEn);
+            maskCUpdate |= (maskCompressor | maskCompressorEn);
           }
           else
           {
@@ -742,7 +735,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               case PHASER:  selected_sbox = 5; break;
               case TREMOLO: selected_sbox = 6; break;
             }
-            maskCUpdate |= (maskFxUnit | maskFxUnitPar | maskFxUnitEn);
+            maskCUpdate |= (maskFxUnit | maskFxUnitEn);
           }
           else
           {
@@ -762,7 +755,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               case TAPE_ECHO:     selected_sbox = 7; break;
               case DIGITAL_DELAY: selected_sbox = 8; break;
             }
-            maskCUpdate |= (maskEcho | maskEchoPar | maskEchoEn);
+            maskCUpdate |= (maskEcho | maskEchoEn);
           }
           else
           {
@@ -784,7 +777,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               case HALL:   selected_sbox = 11; break;
               case ROOM:   selected_sbox = 12; break;
             }
-            maskCUpdate |= (maskReverb | maskReverbPar | maskReverbEn);
+            maskCUpdate |= (maskReverb | maskReverbEn);
           }
           else
           {
@@ -855,7 +848,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           {
             Serial.println("Gate unit selected");
             selected_sbox = 2;
-            maskCUpdate |= (maskNoiseGate | maskNoiseGatePar | maskNoiseGateEn);
+            maskCUpdate |= (maskNoiseGate | maskNoiseGateEn);
           }
           else
           {
@@ -878,7 +871,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             }
             THR_Values.createPatch();
             Serial.println("Effect unit switched to: " + String(THR_Values.effecttype));
-            maskCUpdate |= (maskFxUnit | maskFxUnitPar);
+            maskCUpdate |= maskFxUnit;
           }
         break;
 
@@ -892,7 +885,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             }
             THR_Values.createPatch();
             Serial.println("Echo unit switched to: " + String(THR_Values.echotype));
-            maskCUpdate |= (maskEcho | maskEchoPar);
+            maskCUpdate |= maskEcho;
           }
         break;
 
@@ -908,7 +901,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             }
             THR_Values.createPatch();
             Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));
-            maskCUpdate |= (maskReverb | maskReverbPar);
+            maskCUpdate |= maskReverb;
           }
         break;
 

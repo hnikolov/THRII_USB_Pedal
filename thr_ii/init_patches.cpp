@@ -89,7 +89,6 @@ void initializePresets(File dir, std::vector <JsonDocument> &json_patchesII, std
 void initializeSortedPresets(const String &path, std::vector <JsonDocument> &json_patchesII, std::vector <String> &patchNames, uint16_t &npatches)
 {
   JsonDocument doc;
-//  std::vector <File> directory; // Uses more memory
   std::vector <String> file_paths;
 
   File dir = SD.open(path.c_str());
@@ -102,20 +101,16 @@ void initializeSortedPresets(const String &path, std::vector <JsonDocument> &jso
     {
       String fpath = path + "/" + String(entry.name());
       Serial.println( fpath );
-//      directory.push_back(entry);
       file_paths.push_back(fpath);
     }
-    entry.close(); // DO NOT CLOSE IF PUSH File objects!!!
+    entry.close();
   }
 
-//  if( directory.size() > 0 )
   if( file_paths.size() > 0 )
   {
-//    std::sort(directory.begin(), directory.end(), [](File a, File b) { return strcasecmp(a.name(), b.name()) < 0; });
     std::sort(file_paths.begin(), file_paths.end(), [](String a, String b) { return strcasecmp(a.c_str(), b.c_str()) < 0; });
 
     for(auto fpath : file_paths)
-//    for(auto entry : directory)
     {
       //Serial.println(fpath);
       File entry = SD.open(fpath.c_str(), FILE_READ);
@@ -126,9 +121,9 @@ void initializeSortedPresets(const String &path, std::vector <JsonDocument> &jso
       DeserializationError dse = deserializeJson(doc, data);
       if( dse )
       {
-          Serial.print("deserializeJson() failed: ");
-          Serial.println( dse.c_str() );
-          continue;
+        Serial.print("deserializeJson() failed: ");
+        Serial.println( dse.c_str() );
+        continue;
       }
       
       json_patchesII.push_back( doc );

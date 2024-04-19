@@ -11,13 +11,12 @@ extern TFT_eSprite spr;
 
 // FIXME: Memory not enough if fonts included from here
 // Locally supplied fonts
-#include "fonts/Free_Fonts.h" // Needs to be anabled in my_custom_setup.h as well
+#include "fonts/Free_Fonts.h" // Needs to be enabled in my_custom_setup.h as well
 #include "fonts/NotoSansBold15.h"
 #include "fonts/NotoSansBold36.h"
 #include "fonts/NotoSansMonoSCB20.h"
 //#include "fonts/Latin_Hiragana_24.h"
 //#include "fonts/Final_Frontier_28.h"
-
 
 // The font names are arrays references, thus must NOT be in quotes ""
 #define AA_FONT_SMALL NotoSansBold15
@@ -135,14 +134,14 @@ public:
 
   virtual void erase()
   {
-    // FIXME: Issues with large sprites
-    //spr.createSprite(w+26, 240-y); // Height is 240 pixels
-    spr.createSprite(w/2+20, 240-y); // Height is 240 pixels
+    // NOTE: Issues with large sprites, therefore, reduce color depth
+    spr.setColorDepth(1);
+    spr.createSprite(w+26, 240-y); // Height is 240 pixels
     spr.fillScreen(TFT_BLACK);
-//    spr.pushSprite(x-13, y);
     spr.pushSprite(x-13, y);
-    spr.pushSprite(x+w/2, y);
-    spr.deleteSprite();      
+    spr.setColorDepth(16);
+    spr.deleteSprite();
+
   }
 
   void init_knobs()
@@ -205,8 +204,9 @@ public:
   virtual void draw()
   {
 //    Serial.println("X, Y, W, H = " + String(x) + ", " + String(y) + ", " + String(w) + ", " + String(240-y));
+    // NOTE: Issues with large sprites, therefore, reduce color depth
+    spr.setColorDepth(8);
     spr.createSprite(w, 240-y); // Height is 240 pixels
-//    spr.createSprite(w+26, 240-y); // FIXME: Cannot create sprite larger than w=288px
     
     // Stompbox
     spr.fillSmoothRoundRect(0, 0, w, 135, 10, fg, bg);
@@ -228,12 +228,13 @@ public:
     //spr.drawString(name, w/2, 145);
 
     spr.setTextColor(TFT_BLACK);
-    spr.setFreeFont(FSB9);       // Select Free Serif font
+    spr.setFreeFont(FSB9);      // Select Free Serif font
     spr.setTextDatum(TC_DATUM); // Middle center
     spr.drawString(name, w/2, 145, GFXFF);
 
     spr.pushSprite(x, y);
     spr.unloadFont();
+    spr.setColorDepth(16);
     spr.deleteSprite();
 
     // Jacks
@@ -254,7 +255,6 @@ public:
     for(auto & knob: knobs)
     {
       knob.setFocus(false);
-//      knob.draw(0);
     }
     knobs[f_idx].setFocus(true);
   }
@@ -288,10 +288,13 @@ public:
 
   virtual void erase()
   {
+    // NOTE: Issues with large sprites, therefore, reduce color depth
+    spr.setColorDepth(1);
     spr.createSprite(w, 240-y); // Height is 240 pixels
     spr.fillScreen(TFT_BLACK);
     spr.pushSprite(x, y);
     spr.pushSprite(x, 35); // Note to erase the amp unit info (amp,col,cab)
+    spr.setColorDepth(16);
     spr.deleteSprite();      
   }
 
@@ -299,6 +302,8 @@ public:
 
   virtual void draw()
   {
+    // NOTE: Issues with large sprites, therefore, reduce color depth
+    spr.setColorDepth(8);
     spr.createSprite(w, 240-y); // Height is 240 pixels
 
     // Amp box
@@ -312,13 +317,13 @@ public:
     spr.fillSmoothRoundRect(w-50, 130, 20, 10, 10, bg, bg);
 
     spr.pushSprite(x, y);
+    spr.setColorDepth(16);
     spr.deleteSprite();
 
     // The Knobs
     for(auto & knob: knobs)
     {
       knob.setFocus(false);
-//      knob.draw(0);
     }
     knobs[f_idx].setFocus(true);
   }

@@ -79,7 +79,7 @@ TFT_eSprite spr = TFT_eSprite(&tft); // Declare Sprite object "spr" with pointer
 //#include "fonts/Free_Fonts.h" // Needs to be anabled in my_custom_setup.h as well
 
 // TFT backlight brightness
-int brightness = 160; // 0 - 255
+int brightness = 192; // 0 - 255
 int pin_backlight = 24;
 
 // Normal TRACE/DEBUG
@@ -232,7 +232,7 @@ void setup()
   // Initialise the TFT backlight
   // ----------------------------
   pinMode(pin_backlight, OUTPUT); 
-  analogWrite(pin_backlight, brightness);  
+  analogWrite(pin_backlight, brightness);
 
   // -----------------------------------
   // Initialise Components for Edit mode
@@ -295,7 +295,7 @@ extern uint32_t maskEditAmpUnit, maskEditReverb;
 ////////////////////////
 void gui_timing()
 {
-  if( millis() - tick1 > 40 ) // Mask update if it was required because of changed values
+  if( millis() - tick1 > 100 ) // Mask update if it was required because of changed values
   {
     if( maskCUpdate )
     {
