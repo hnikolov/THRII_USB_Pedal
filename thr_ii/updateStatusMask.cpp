@@ -299,7 +299,7 @@ uint8_t getSplitPos( String patchname )
 
 void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
 {
-  int x = 00, y = 80, w = 320, h = 80; // Place in manual mode layout
+  int x = 00, y = 80, w = 320, h = 95; // Place in manual mode layout
   uint16_t fg_colour = fgcolour;
   uint16_t bg_colour = TFT_THRVDARKGREY;
   if( inverted )
@@ -310,24 +310,17 @@ void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w, h-1, 3, bg_colour, TFT_BLACK);
   spr.loadFont(AA_FONT_XLARGE);
-  //spr.setTextFont(4);
-  // FIXME: free for local variables:-23904: Error program exceeds memory space
-  //if( spr.textWidth(patchname) > w ) {spr.loadFont(Latin_Hiragana_24);}
-  //else                               {spr.loadFont(NotoSansBold36);}
-  // TEST: spr.setTextWrap(true);
+
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(fg_colour, bg_colour, bgfill);
-
+  
   if( spr.textWidth(patchname) > w )
   {
     uint8_t pos = getSplitPos( patchname );
     String line1 = patchname.substring(0, pos); // TODO: Split at space char
     String line2 = patchname.substring(pos, patchname.length());
-    // TODO -19/+20 works OK with the xlarge font
-//    spr.drawString(line1, w/2, h/2-11);
-//    spr.drawString(line2, w/2, h/2+12);
-    spr.drawString(line1, w/2, h/2-19);
-    spr.drawString(line2, w/2, h/2+20);
+    spr.drawString(line1, w/2, h/2-18);
+    spr.drawString(line2, w/2, h/2+24);
   }
   else
   {
@@ -502,10 +495,11 @@ void drawUtilUnit(int x, int y, int w, int h, int bpad, uint16_t bgcolour, uint1
 
 void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int nbars, double FXparams[5])
 {
-	int tpad = 26; int pad = 2;
+	int tpad = 24; int pad = 2;
 	int grx = pad; int gry = tpad; int grw = w-1-2*pad; int grh = h-1-tpad-pad;
 	int barw = grw / nbars;	// Calculate bar width
 	int barh = 0;
+
 	spr.createSprite(w, h);
 	spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);	// Draw FX unit
 	spr.loadFont(AA_FONT_SMALL);
@@ -515,10 +509,11 @@ void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour
 	spr.setTextColor(TFT_BLACK, bgcolour, bgfill);
 	spr.drawString(label, w/2, 13);	// Write label
 	spr.fillRect(grx, gry, grw, grh, fgcolour);	// Draw graph area
+
 	for(int i = 0; i < nbars; i++)
 	{
-		barh = grh * FXparams[i] / 100;	// calculate bar height
-		if( nbars == 4 ) 
+		barh = (grh-1) * FXparams[i] / 100;	// Calculate bar height
+		if( nbars == 2 || nbars == 4 ) 
     {
 			barw = grw / nbars + 1;
 		}
@@ -530,13 +525,10 @@ void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour
 			spr.fillRect(grx + i * barw, gry + grh - barh, barw, barh, bgcolour);
 		}
 	}
+
 	spr.pushSprite(x, y);
 	spr.unloadFont();
 	spr.deleteSprite();
-}
-
-void drawFXUnitEditMode()
-{
 }
 
 void THR30II_Settings::updateConnectedBanner() // Show the connected Model 
@@ -630,17 +622,16 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     }
     drawAmpUnit(80, 20, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab); // Place in manual mode layout
   }
-  
+
 	String FXtitle;
 	uint16_t FXbgcolour  =  0;
 	uint16_t FXfgcolour  =  0;
 	double FXparams[5]   = {0};
 	double utilparams[2] = {0};
-	uint16_t FXx = 0;
-  uint8_t FXx_offset = 0;
-	uint8_t FXy = 160;
-	uint8_t FXw =  60;
-	uint8_t FXh =  80;
+	uint8_t FXw  =  60;
+	uint8_t FXh  =  65;
+  uint16_t FXx = 0;
+	uint8_t FXy  = 240 - FXh;
 	uint8_t nFXbars = 5;
 
 	// FX1 Compressor -------------------------------------------------------------
