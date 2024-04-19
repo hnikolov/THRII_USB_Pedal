@@ -232,7 +232,7 @@ void setup()
   // Initialise the TFT backlight
   // ----------------------------
   pinMode(pin_backlight, OUTPUT); 
-  analogWrite(pin_backlight, brightness);
+  //analogWrite(pin_backlight, brightness); // Temporally disabled
 
   // -----------------------------------
   // Initialise Components for Edit mode

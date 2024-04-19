@@ -997,6 +997,8 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 14: // Switch to previous mode - cancel the metronome/tabata mode
+          // FIXME: Some issue when returning to edit mode
+          if( _uistate_prev == UI_edit ) { _uistate_prev = UI_home_patch; }
           _uistate = _uistate_prev;
           tm.stop();
           maskCUpdate = maskAll;

@@ -6,9 +6,10 @@
 
 extern uint32_t maskCUpdate;
 
-////////////////////////////////////////////////////////////////////////
-//
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// FIXME: When moving away from this mode, some minor font issues are observed,
+//        E.g., see stompbox names at the bottom of the screen
+///////////////////////////////////////////////////////////////////////////////
 class TabataUI
 {
 private:
@@ -75,6 +76,7 @@ public:
     draw_text_line_1(String(tm.metronome.getBPM()));
     draw_text_line_2(String(tm.metronome.getTimeSignature())+"/4"); // TODO" /8
     spr.pushSprite(x, y);
+    spr.unloadFont();
     spr.deleteSprite(); 
   }
 
@@ -88,6 +90,7 @@ public:
     draw_text_line_1(String(tm.tabata.practice_time) + "/" + String(tm.tabata.rest_time));
     draw_text_line_2("Ready");
     spr.pushSprite(x, y);
+    spr.unloadFont();
     spr.deleteSprite(); 
   }
 
@@ -215,6 +218,7 @@ public:
       }
     }
     if( push_sprite ) { spr.pushSprite(x, y); }
+    spr.unloadFont();
     spr.deleteSprite();
   }
 
