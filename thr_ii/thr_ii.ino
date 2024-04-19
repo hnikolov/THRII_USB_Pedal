@@ -527,7 +527,6 @@ void patch_activate(uint16_t pnr) // Check patchnumber and send patch as a SysEx
 		TRACE_THR30IIPEDAL(Serial.printf("Patch_activate(): Activating patch #%d \n\r", pnr);)
 		send_patch( pnr ); // Now send this patch as a SysEx message to THR30II 
 		THR_Values.boost_activated = false;
-		_uistate = UI_home_patch;
 	} 
 	else
 	{

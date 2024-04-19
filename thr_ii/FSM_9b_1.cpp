@@ -337,6 +337,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 12: // Toggle between Factory and User presets
+          _uistate = UI_home_patch;
           toggle_factory_user_presets();
           *active_patch_id = *presel_patch_id;
           patch_activate(*presel_patch_id);
