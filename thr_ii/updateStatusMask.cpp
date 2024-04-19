@@ -646,14 +646,17 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   FXx += 40;
 
   // Amp unit -------------------------------------------------------------------
-  FXparams[0] = thrs.control[CTRL_GAIN];
-  FXparams[1] = thrs.control[CTRL_MASTER];
-  FXparams[2] = thrs.control[CTRL_BASS];
-  FXparams[3] = thrs.control[CTRL_MID];
-  FXparams[4] = thrs.control[CTRL_TREBLE];
-  nFXbars = 5;
-  drawFXUnit(FXx, FXy, FXw, FXh, TFT_THRBROWN, TFT_THRVDARKBROWN, "Amp", nFXbars, FXparams);
-  FXx += FXw;
+  if( maskCUpdate & (maskGainMaster | maskEQChart) )
+  {
+    FXparams[0] = thrs.control[CTRL_GAIN];
+    FXparams[1] = thrs.control[CTRL_MASTER];
+    FXparams[2] = thrs.control[CTRL_BASS];
+    FXparams[3] = thrs.control[CTRL_MID];
+    FXparams[4] = thrs.control[CTRL_TREBLE];
+    nFXbars = 5;
+    drawFXUnit(FXx, FXy, FXw, FXh, TFT_THRBROWN, TFT_THRVDARKBROWN, "Amp", nFXbars, FXparams);
+    FXx += FXw;
+  }
 
  	// Gate -----------------------------------------------------------------------
   if( maskCUpdate & maskNoiseGate )

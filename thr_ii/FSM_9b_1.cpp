@@ -569,16 +569,16 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           maskCUpdate |= maskEcho;    
         break;
             
-        case 5:
-          toggle_boost();
-          maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);
-        break;
-
-        case 6: // Toggle the Compressor Unit
+        case 5: // Toggle the Compressor Unit
           if(THR_Values.unit[COMPRESSOR])	{ Serial.println("Compressor unit switched off"); }
           else                            { Serial.println("Compressor unit switched on");  }
           THR_Values.Switch_On_Off_Compressor_Unit( !THR_Values.unit[COMPRESSOR] );
           maskCUpdate |= maskCompressor;
+        break;
+
+        case 6:
+          toggle_boost();
+          maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);        
         break;
 
         case 7: // Toggle Effect
