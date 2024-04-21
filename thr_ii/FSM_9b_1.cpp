@@ -347,7 +347,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         case 13: // Select the Edit mode
           _uistate = UI_edit;
           _uistate_prev = UI_home_amp;
-          selected_sbox = 0; // Amp unit
+          selected_sbox = 1; // Amp unit
           maskCUpdate = (maskClearTft | maskAmpUnit | maskGainMaster);
         break;
 
@@ -472,7 +472,7 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
         case 13: // Switch to Edit mode
           _uistate = UI_edit;
           _uistate_prev = UI_home_patch;
-          selected_sbox = 0; // Amp unit
+          selected_sbox = 1; // Amp unit
           maskCUpdate = (maskClearTft | maskAmpUnit | maskGainMaster);
         break;
 
@@ -640,7 +640,7 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           _uistate = UI_edit;
           // _uistate_prev not set here. Will return to the previous-previuos state, issues when returning to manual mode
 //          _uistate_prev = UI_manual; 
-          selected_sbox = 0; // Amp unit
+          selected_sbox = 1; // Amp unit
           maskCUpdate = (maskClearTft | maskAmpUnit);
         break;
 
@@ -738,16 +738,8 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         case 5: // Edit the Amp
           if( selected_sbox != 0 )
           {
-            selected_sbox = 0;
-            maskCUpdate |= (maskAmpUnit | maskGainMaster);
-          }
-        break;
-
-        case 6: // Edit the Compressor Unit
-          if( selected_sbox != 1 )
-          {
             Serial.println("Compressor selected");
-            selected_sbox = 1;
+            selected_sbox = 0;
             maskCUpdate |= (maskCompressor | maskCompressorEn);
           }
           else
@@ -756,6 +748,14 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             else                            { Serial.println("Compressor unit switched on");  }
             THR_Values.Switch_On_Off_Compressor_Unit( !THR_Values.unit[COMPRESSOR] );
             maskCUpdate |= maskCompressorEn;
+          }
+          break;
+
+        case 6: // Edit the Compressor Unit
+          if( selected_sbox != 1 )
+          {
+            selected_sbox = 1;
+            maskCUpdate |= (maskAmpUnit | maskGainMaster);
           }
         break;
 

@@ -1004,14 +1004,37 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   }
 // =================================================================================
 
-	// Amp/Cabinet ---------------------------------------------------------------
-  if( maskCUpdate & maskAmpUnit )
+// FIXME: Get rid of hard-coded indexes.
+// NOTE: Alignment is a must: updateStatusMask, FSM9b_1, enums definitions (THR30II.h)
+
+  // FX1 Compressor -------------------------------------------------------------
+  if( maskCUpdate & maskCompressor || (maskCUpdate & maskCompressorEn) )
   {
     if( last_updated_sbox != 0 )
     {
       sboxes[last_updated_sbox]->erase();
       last_updated_sbox = 0;
       sboxes[0]->draw();
+    }
+  }
+
+  if( maskCUpdate & maskCompressorEn ) { sboxes[0]->setEnabled(thrs.unit[COMPRESSOR]); }
+
+  if( maskCUpdate & maskCompressor )
+  {
+    // TODO: Draw selected knob only???
+    sboxes[0]->draw_knob(0, thrs.compressor_setting[CO_SUSTAIN]);
+    sboxes[0]->draw_knob(1, thrs.compressor_setting[CO_LEVEL]);
+  }
+
+	// Amp/Cabinet ---------------------------------------------------------------
+  if( maskCUpdate & maskAmpUnit )
+  {
+    if( last_updated_sbox != 1 )
+    {
+      sboxes[last_updated_sbox]->erase();
+      last_updated_sbox = 1;
+      sboxes[1]->draw();
     }
 
     switch( thrs.col )
@@ -1026,35 +1049,11 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   if( maskCUpdate & maskGainMaster )
   {
     // TODO: Draw selected knob only???
-    sboxes[0]->draw_knob(0, thrs.control[CTRL_GAIN]);
-    sboxes[0]->draw_knob(1, thrs.control[CTRL_MASTER]);
-    sboxes[0]->draw_knob(2, thrs.control[CTRL_BASS]);
-    sboxes[0]->draw_knob(3, thrs.control[CTRL_MID]);
-    sboxes[0]->draw_knob(4, thrs.control[CTRL_TREBLE]);
-
-  }
-
-// FIXME: Get rid of hard-coded indexes.
-// NOTE: Alignment is a must: updateStatusMask, FSM9b_1, enums definitions (THR30II.h)
-
-  // FX1 Compressor -------------------------------------------------------------
-  if( maskCUpdate & maskCompressor || (maskCUpdate & maskCompressorEn) )
-  {
-    if( last_updated_sbox != 1 )
-    {
-      sboxes[last_updated_sbox]->erase();
-      last_updated_sbox = 1;
-      sboxes[1]->draw();
-    }
-  }
-
-  if( maskCUpdate & maskCompressorEn ) { sboxes[1]->setEnabled(thrs.unit[COMPRESSOR]); }
-
-  if( maskCUpdate & maskCompressor )
-  {
-    // TODO: Draw selected knob only???
-    sboxes[1]->draw_knob(0, thrs.compressor_setting[CO_SUSTAIN]);
-    sboxes[1]->draw_knob(1, thrs.compressor_setting[CO_LEVEL]);
+    sboxes[1]->draw_knob(0, thrs.control[CTRL_GAIN]);
+    sboxes[1]->draw_knob(1, thrs.control[CTRL_MASTER]);
+    sboxes[1]->draw_knob(2, thrs.control[CTRL_BASS]);
+    sboxes[1]->draw_knob(3, thrs.control[CTRL_MID]);
+    sboxes[1]->draw_knob(4, thrs.control[CTRL_TREBLE]);
   }
 
  	// Gate -----------------------------------------------------------------------

@@ -48,9 +48,9 @@ std::vector <String> param_hall   = {" Decay ", " Tone ", " Pre-Dly ", " Mix "};
 //enum THR30II_REV_SET_HALL { HA_DECAY, HA_TONE, HA_PREDELAY, HA_MIX };
 //*/
 
-AmpBox abox("AMP", param_amp, TFT_THRAMP, TFT_THRDIMAMP);
-
 StompBox sbox1("COMPRESSOR", param_comprs, TFT_THRWHITE, TFT_THRDARKGREY);
+
+AmpBox abox("AMP", param_amp, TFT_THRAMP, TFT_THRDIMAMP);
 StompBox sbox2("NOISE GATE", param_nsgate, TFT_THRYELLOW, TFT_THRDIMYELLOW);
 
 // enum THR30II_EFF_TYPES { PHASER, TREMOLO, FLANGER, CHORUS }
@@ -69,4 +69,4 @@ StompBox sbox10("PLATE REVERB", param_plate, TFT_THRPURPLE, TFT_THRDIMPURPLE);
 StompBox sbox11("HALL REVERB", param_hall, TFT_THRVIOLET, TFT_THRDIMVIOLET);
 StompBox sbox12("ROOM REVERB", param_room, TFT_THRMAGENTA, TFT_THRDIMMAGENTA);
 
-std::vector <StompBox*> sboxes = {&abox, &sbox1, &sbox2, &sbox3, &sbox4, &sbox5, &sbox6, &sbox7, &sbox8, &sbox9, &sbox10, &sbox11, &sbox12};
+std::vector <StompBox*> sboxes = {&sbox1, &abox, &sbox2, &sbox3, &sbox4, &sbox5, &sbox6, &sbox7, &sbox8, &sbox9, &sbox10, &sbox11, &sbox12};
