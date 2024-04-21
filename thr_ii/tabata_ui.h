@@ -43,12 +43,27 @@ private:
   //void draw_text_line_1(String txt) { spr.drawString(txt, radius+2, radius-20, 6); }
   void draw_text_line_1(String txt)
   {
+    spr.setTextColor(TFT_THRGREY, bg, true);
+    spr.setTextDatum(MC_DATUM); // Middle centre datum
+    spr.setTextPadding(radius);
     spr.loadFont(AA_FONT_XLARGE);
-    spr.drawString(txt, radius+2, radius-20, 6);
+    spr.drawString(txt, radius+2, radius-20);
+    spr.setTextPadding(0);
     spr.unloadFont();
   }
 
-  void draw_text_line_2(String txt) { spr.drawString(txt, radius+2, radius+30, 4); }
+  //void draw_text_line_2(String txt) { spr.drawString(txt, radius+2, radius+30, 4); }
+  void draw_text_line_2(String txt)
+  {
+    spr.setTextColor(TFT_THRGREY, bg, true);
+    spr.setTextDatum(MC_DATUM); // Middle centre datum
+    spr.setTextPadding(radius);
+    //spr.loadFont(AA_FONT_MONO);
+    //spr.drawString(txt, radius+2, radius+30);
+    spr.drawString(txt, radius+2, radius+30, 4);
+    spr.setTextPadding(0);
+    spr.unloadFont();
+  }
 
 public:
   TabataUI(Tabata_Metronome &_tm, uint16_t xCoord, uint16_t yCoord, uint16_t fgColor, uint16_t bgColor):
@@ -66,42 +81,30 @@ public:
     if( maskCUpdate )
     {
        tft.fillScreen(TFT_BLACK);
-      maskCUpdate = 0;;
+      maskCUpdate = 0;
     }
     spr.createSprite(radius*2+4, radius*2+4);
-    spr.setTextColor(TFT_THRGREY, bg, true);
-    spr.setTextDatum(MC_DATUM); // Middle centre datum
-    spr.setTextPadding(radius);
     draw_progress_arc(0); // Filled if in rest/ready state
     draw_text_line_1(String(tm.metronome.getBPM()));
     draw_text_line_2(String(tm.metronome.getTimeSignature())+"/4"); // TODO" /8
     spr.pushSprite(x, y);
-    spr.unloadFont();
-    spr.deleteSprite(); 
+    spr.deleteSprite();
   }
 
   void draw_tabata()
   {
     spr.createSprite(radius*2+4, radius*2+4);
-    spr.setTextColor(TFT_THRGREY, bg, true);
-    spr.setTextDatum(MC_DATUM); // Middle centre datum
-    spr.setTextPadding(radius);
     draw_progress_arc(0); // Filled if in rest/ready state
     draw_text_line_1(String(tm.tabata.practice_time) + "/" + String(tm.tabata.rest_time));
     draw_text_line_2("Ready");
     spr.pushSprite(x, y);
-    spr.unloadFont();
     spr.deleteSprite(); 
   }
 
   void update()
   {
-    // TODO: isRunning() ???
     bool push_sprite = false;
     spr.createSprite(radius*2+4, radius*2+4);
-    spr.setTextColor(TFT_THRGREY, bg, true);
-    spr.setTextDatum(MC_DATUM); // Middle centre datum
-    spr.setTextPadding(radius); 
     // ---------------------------------------------------------------
     // Metronome
     // ---------------------------------------------------------------
@@ -218,7 +221,6 @@ public:
       }
     }
     if( push_sprite ) { spr.pushSprite(x, y); }
-    spr.unloadFont();
     spr.deleteSprite();
   }
 
