@@ -133,26 +133,26 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 
 ![THRII USB Pedal](images/edit.png)
 
-| Button | Action | Function                                                       |
-|--------|--------|----------------------------------------------------------------|
-|   1    | Press  | Select Next parameter                                          |
-|   	 | Hold	  | Toggle Collection/Amp/Cabinet                                  |
-|   2    | Press  | Select Previous                                                |
-|   	 | Hold	  | Next from selected Collection, Amp, or Cabinet                 |
-|   3    | Press  | Exit/Cancel “Edit” mode                                        |
-|   	 | Hold	  | Store the changes (TODO) and exit “Edit” mode                  |
-|   4    | Press  | TAP Echo/Delay time                                            |
-|   	 | Hold	  | Toggle Tabata/Metronome mode (changes not stored)              |
-|   5    | Press  | Select Amp Unit                                                |
-|   	 | Hold   |                                                                |
-|   6    | Press  | Select Compressor Settings. Press again to toggle (on/off)     |
-|   	 | Hold   | Select Noise Gate Settings. Press again to toggle (on/off)     |
-|   7    | Press  | Select Effect Settings. Press again to toggle (on/off)         |
-|        | Hold   | Select Effect (Chorus/Flanger/Phaser/Tremolo)                  |
-|   8    | Press  | Select Delay Settings. Press again to toggle (on/off)          |
-|        | Hold   | Select Delay (Tape/Digital)                                    |
-|   9    | Press  | Select Reverb Settings. Press again to toggle (on/off)         |
-|        | Hold   | Select Reverb (Spring/Plate/Room/Hall)                         |
+| Button | Action | Function                                                            |
+|--------|--------|---------------------------------------------------------------------|
+|   1    | Press  | Select Next parameter                                               |
+|   	 | Hold	  | Toggle Collection/Amp/Cabinet                                       |
+|   2    | Press  | Select Previous                                                     |
+|   	 | Hold	  | Next from selected Collection, Amp, or Cabinet                      |
+|   3    | Press  | Exit/Cancel “Edit” mode                                             |
+|   	 | Hold	  | Store the changes (TODO) and exit “Edit” mode                       |
+|   4    | Press  | TAP Echo/Delay time                                                 |
+|   	 | Hold	  | Toggle Tabata/Metronome mode (changes not stored)                   |
+|   5    | Press  | Select Compressor Settings. Press again to toggle (on/off)          |
+|   	 | Hold   |                                                                     |
+|   6    | Press  | Select Amp Unit                                                     |
+|   	 | Hold   | Select Noise Gate Settings. Press and hold again to toggle (on/off) |
+|   7    | Press  | Select Effect Settings. Press again to toggle (on/off)              |
+|        | Hold   | Select Effect (Chorus/Flanger/Phaser/Tremolo)                       |
+|   8    | Press  | Select Delay Settings. Press again to toggle (on/off)               |
+|        | Hold   | Select Delay (Tape/Digital)                                         |
+|   9    | Press  | Select Reverb Settings. Press again to toggle (on/off)              |
+|        | Hold   | Select Reverb (Spring/Plate/Room/Hall)                              |
 
 
 ***Tabata/Metronome Mode***
