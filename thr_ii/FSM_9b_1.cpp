@@ -81,6 +81,11 @@ extern uint16_t *npatches;        // Reference to npathces_user or npatches_fact
 extern Tabata_Metronome tm;
 extern TabataUI tmui;
 
+extern String serializePreset( THR30II_Settings &thrs, String presetName, JsonDocument *current_doc );
+extern void writeToFile( String fileName, String data );
+extern std::vector <String> file_paths_user; // Full path, including file name ad extension of patches
+String presetData;
+
 UIStates _uistate_prev = UI_home_patch; // To remember amp vs custom patches state
 /////////////////////////////////////////////////////////////////
 
@@ -639,7 +644,7 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
         case 13:
           _uistate = UI_edit;
           // _uistate_prev not set here. Will return to the previous-previuos state, issues when returning to manual mode
-//          _uistate_prev = UI_manual; 
+          // ALso, in edit mode, we need to detect that we came there from user presets, so we can write changes
           selected_sbox = 1; // Amp unit
           maskCUpdate = (maskClearTft | maskAmpUnit);
         break;
@@ -859,10 +864,23 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           maskCUpdate |= (maskAmpUnit | maskGainMaster);
         break;
 
-        case 13: // TODO: Save the changes and Switch to previous mode (amp/presets)
-          // TODO
+        case 13: // Save the changes and Switch to previous mode
+          // Note: Support writing changes to user presets only
+          //       1) THRII presets can be written by folding the respective button on the amp
+          //       2) Factory presets should not change on SD Card
+          if( _uistate_prev == UI_home_patch )
+          {
+            // Store changes in memory (as json) for both, user and factory presets
+            presetData = serializePreset( THR_Values, (*active_patch_names)[*active_patch_id - 1], &(*active_json_patchesII)[*active_patch_id - 1] );
+            //Serial.println( presetData );
+
+            // Writing changes to user presets only
+            if( factory_presets_active == false )
+            {
+              writeToFile( file_paths_user[*active_patch_id - 1], presetData );
+            }
+          }
           _uistate = _uistate_prev;
-//          _uistate = UI_home_amp; // FIXME: Issues if UI_manual
           maskCUpdate = maskAll;
         break;
 

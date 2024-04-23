@@ -1207,7 +1207,7 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
           sboxes[8]->draw_knob(4, thrs.echo_setting[DIGITAL_DELAY][DD_MIX]);       
         } 
       break;
-    }	// of switch(effecttype)
+    }	// of switch(echotype)
   }
 
  	// FX4 Reverb (Spring/Room/Plate/Hall)

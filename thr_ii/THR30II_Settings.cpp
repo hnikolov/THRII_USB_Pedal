@@ -709,6 +709,21 @@ String THR30II_Settings::THRII_MODEL_NAME()
 	}
 }
 
+String THR30II_Settings::getAmpName()
+{
+  String name = "Not found";
+  uint16_t ca = THR30IIAmpKeys[(col_amp){col, amp}];
+
+  for( auto &i : Constants::glo )
+  {
+    if( i.second == ca )
+    {
+      name = i.first;
+      break; // Stop searching
+    }
+  }
+  return name;
+}
 //////////////////
 byte THR30II_Settings::UseSysExSendCounter() // Returns the actual counter value and increments it afterwards
 {

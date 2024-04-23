@@ -332,6 +332,8 @@ class THR30II_Settings
   void prev_amp();
   void next_cab();
   void prev_cab();
+
+  String getAmpName();
   
 	String ParseSysEx(const byte cur[], int cur_len);
 	
