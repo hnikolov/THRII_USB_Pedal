@@ -1742,13 +1742,13 @@ void THR30II_Settings::setParbyAudioVolKnob(double val)
 
   if( selected_sbox == 0 )
   {
-    SetControl(idx_par, val);
-    maskCUpdate |= maskGainMaster;
+    CompressorSetting((THR30II_COMP)idx_par, val);
+    maskCUpdate |= maskCompressor;
   }
   else if( selected_sbox == 1 )
   {
-    CompressorSetting((THR30II_COMP)idx_par, val);
-    maskCUpdate |= maskCompressor;
+    SetControl(idx_par, val);
+    maskCUpdate |= maskGainMaster;
   }
   else if( selected_sbox == 2 )
   {
