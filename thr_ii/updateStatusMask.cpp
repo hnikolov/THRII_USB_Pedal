@@ -299,7 +299,7 @@ uint8_t getSplitPos( String patchname )
 
 void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
 {
-  int x = 00, y = 80, w = 320, h = 95; // Place in manual mode layout
+  int x = 00, y = 80, w = 320, h = 95;
   uint16_t fg_colour = fgcolour;
   uint16_t bg_colour = TFT_THRVDARKGREY;
   if( inverted )
@@ -307,7 +307,7 @@ void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
     fg_colour = TFT_THRVDARKGREY;
     bg_colour = fgcolour;
   }
-  spr.createSprite(w, h);
+  spr.createSprite(w, h); // 16-bit colour needed to show antialiased fonts, do not use palette
   spr.fillSmoothRoundRect(0, 0, w, h-1, 3, bg_colour, TFT_BLACK);
   spr.loadFont(AA_FONT_XLARGE);
 

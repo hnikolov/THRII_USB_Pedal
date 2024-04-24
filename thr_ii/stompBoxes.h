@@ -316,7 +316,7 @@ public:
     // NOTE: Issues with large sprites, therefore, reduce color depth and use palette
     spr.setColorDepth(4);
     spr.createSprite(w, 240-y); // Height is 240 pixels
-    spr.createPalette(cmap); // or 9?
+    spr.createPalette(cmap);
     spr.setPaletteColor(2, fg); // To set foreground color of a stompbox
     spr.setPaletteColor(3, bg); // To set background color of a stompbox
     //spr.fillSprite(0); // Black
