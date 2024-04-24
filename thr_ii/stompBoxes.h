@@ -9,7 +9,6 @@
 extern TFT_eSPI tft;
 extern TFT_eSprite spr;
 
-// FIXME: Memory not enough if fonts included from here
 // Locally supplied fonts
 #include "fonts/Free_Fonts.h" // Needs to be enabled in my_custom_setup.h as well
 #include "fonts/NotoSansBold15.h"
@@ -91,6 +90,15 @@ public:
   }
 };
 
+static uint16_t cmap[] =
+{
+  TFT_BLACK, TFT_LIGHTGREY,
+  TFT_THRLIME,    // Foreground color, to be set
+  TFT_THRDIMLIME, // Background color, to be set
+  TFT_THRGREY, TFT_THRDARKGREY, // Jacks
+//  TFT_THRRED,  TFT_THRDRED, TFT_THRLIGHTRED // On/Off led
+};
+
 ////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////
@@ -137,11 +145,10 @@ public:
     // NOTE: Issues with large sprites, therefore, reduce color depth
     spr.setColorDepth(1);
     spr.createSprite(w+26, 240-y); // Height is 240 pixels
-    spr.fillScreen(TFT_BLACK);
+    //spr.fillScreen(TFT_BLACK);   // No need, default color is black
     spr.pushSprite(x-13, y);
-    spr.setColorDepth(16);
     spr.deleteSprite();
-
+    spr.setColorDepth(16);
   }
 
   void init_knobs()
@@ -204,19 +211,23 @@ public:
   virtual void draw()
   {
 //    Serial.println("X, Y, W, H = " + String(x) + ", " + String(y) + ", " + String(w) + ", " + String(240-y));
-    // NOTE: Issues with large sprites, therefore, reduce color depth
-    spr.setColorDepth(8);
+    // NOTE: Issues with large sprites, therefore, reduce color depth and use palette
+    spr.setColorDepth(4);
     spr.createSprite(w, 240-y); // Height is 240 pixels
-    
+    spr.createPalette(cmap);
+    spr.setPaletteColor(2, fg); //to set FG and BG of a stompbox
+    spr.setPaletteColor(3, bg); //to set FG and BG of a stompbox
+    // 0-black, 2-fg, 3-bg
+
     // Stompbox
-    spr.fillSmoothRoundRect(0, 0, w, 135, 10, fg, bg);
-    spr.fillRect(0, 125, w, 10, bg);
-    spr.fillSmoothRoundRect(5, 5, w-10, 110, 10, TFT_BLACK, TFT_BLACK);
-    spr.fillSmoothRoundRect(5, 5, w-10,  14, 10, TFT_BLACK, TFT_BLACK); // Better top round
-    spr.fillRect(5, 105, w-10, 15, TFT_BLACK);
-    spr.fillRect(0, 132, w, 3, TFT_THRGREY);
-    spr.fillRect(0, 135, w, 50, fg);
-    spr.fillSmoothRoundRect(5, 175, w-10, 15, 10, TFT_BLACK, TFT_BLACK);      
+    spr.fillSmoothRoundRect(0, 0, w, 135, 10, 2, 3);
+    spr.fillRect(0, 125, w, 10, 3);
+    spr.fillSmoothRoundRect(5, 5, w-10, 110, 10, 0, 0);
+    spr.fillSmoothRoundRect(5, 5, w-10,  14, 10, 0, 0); // Better top round
+    spr.fillRect(5, 105, w-10, 15, 0);
+    spr.fillRect(0, 132, w, 3, 4);
+    spr.fillRect(0, 135, w, 50, 2);
+    spr.fillSmoothRoundRect(5, 175, w-10, 15, 10, 0, 0);
 
     // Name
     //spr.setTextColor(TFT_BLACK, fg, true);
@@ -227,26 +238,26 @@ public:
     //spr.setTextDatum(TC_DATUM); // Middle center
     //spr.drawString(name, w/2, 145);
 
-    spr.setTextColor(TFT_BLACK);
+    spr.setTextColor(0);
     spr.setFreeFont(FSB9);      // Select Free Serif font
     spr.setTextDatum(TC_DATUM); // Middle center
     spr.drawString(name, w/2, 145, GFXFF);
 
     spr.pushSprite(x, y);
     spr.unloadFont();
-    spr.setColorDepth(16);
     spr.deleteSprite();
+    spr.setColorDepth(16);
 
     // Jacks
     spr.createSprite(13, 45);
     spr.fillRect(5, 0, 8, 45, TFT_THRGREY);
     spr.fillRect(0, 5, 5, 35, TFT_THRDARKGREY);
     spr.pushSprite(x-13, y+135);
-    spr.fillScreen(TFT_BLACK);
+    spr.fillScreen(0);
     spr.fillRect(0, 0, 8, 45, TFT_THRGREY);
     spr.fillRect(8, 5, 5, 35, TFT_THRDARKGREY);
     spr.pushSprite(x+w, y+135);
-    spr.deleteSprite(); 
+    spr.deleteSprite();
  
     // On/off LED
     draw_led();
@@ -290,35 +301,39 @@ public:
   {
     // NOTE: Issues with large sprites, therefore, reduce color depth
     spr.setColorDepth(1);
-    spr.createSprite(w, 240-y); // Height is 240 pixels
-    spr.fillScreen(TFT_BLACK);
+    spr.createSprite(w, 240-y);  // Height is 240 pixels
+    //spr.fillScreen(TFT_BLACK); // No need, default color is black
     spr.pushSprite(x, y);
     spr.pushSprite(x, 35); // Note to erase the amp unit info (amp,col,cab)
-    spr.setColorDepth(16);
     spr.deleteSprite();      
+    spr.setColorDepth(16);
   }
 
   virtual void setEnabled( bool status ) {} // Not needed for Amp
 
   virtual void draw()
   {
-    // NOTE: Issues with large sprites, therefore, reduce color depth
-    spr.setColorDepth(8);
+    // NOTE: Issues with large sprites, therefore, reduce color depth and use palette
+    spr.setColorDepth(4);
     spr.createSprite(w, 240-y); // Height is 240 pixels
+    spr.createPalette(cmap); // or 9?
+    spr.setPaletteColor(2, fg); // To set foreground color of a stompbox
+    spr.setPaletteColor(3, bg); // To set background color of a stompbox
+    //spr.fillSprite(0); // Black
+    // 0-black, 2-fg, 3-bg
 
     // Amp box
-    spr.fillSmoothRoundRect(0, 22, w, 107, 10, fg, bg);
-    spr.fillSmoothRoundRect(5, 5+22, w-10, 89, 10, TFT_BLACK, TFT_BLACK);
-    spr.fillSmoothRoundRect(5, 5+22, w-10, 14, 10, TFT_BLACK, TFT_BLACK);       // Better top round
-    spr.fillSmoothRoundRect(5, 5+22+89-14, w-10, 14, 10, TFT_BLACK, TFT_BLACK); // Better bottom round
+    spr.fillSmoothRoundRect(0, 22, w, 107, 10, 2, 3);
+    spr.fillSmoothRoundRect(5, 5+22, w-10, 89, 10, 0, 0);
+    spr.fillSmoothRoundRect(5, 5+22, w-10, 14, 10, 0, 0);       // Better top round
+    spr.fillSmoothRoundRect(5, 5+22+89-14, w-10, 14, 10, 0, 0); // Better bottom round
 
     // The Legs
-    spr.fillSmoothRoundRect(  30, 130, 20, 10, 10, bg, bg);
-    spr.fillSmoothRoundRect(w-50, 130, 20, 10, 10, bg, bg);
-
+    spr.fillSmoothRoundRect(  30, 130, 20, 10, 10, 3, 3);
+    spr.fillSmoothRoundRect(w-50, 130, 20, 10, 10, 3, 3);
     spr.pushSprite(x, y);
-    spr.setColorDepth(16);
     spr.deleteSprite();
+    spr.setColorDepth(16);
 
     // The Knobs
     for(auto & knob: knobs)
