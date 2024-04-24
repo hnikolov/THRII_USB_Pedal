@@ -31,24 +31,7 @@
 #include "THR30II_Pedal.h"
 #include "Globals.h"		 	// For the global keys	
 
-/////////////////////////////////////////////////////////////////////////////////////////
-// BUTTONS
-/////////////////////////////////////////////////////////////////////////////////////////
-#include <AceButton.h>
-using namespace ace_button;
-
-const int NUM_BUTTONS = 9;
-
-// Use an array
-AceButton buttons[NUM_BUTTONS];
-uint8_t pins[NUM_BUTTONS] = {14, 15, 16, 17, 18, 19, 20, 21, 22}; // Buttons range from 1 to 9, therefore, we subtract 13 in the handler
-
-// Forward reference to prevent Arduino compiler becoming confused.
-void handleEvent(AceButton*, uint8_t, uint8_t);
-void handleButtons(uint8_t);
-
-// Contains 1-10 for pressed, 11-20 for hold buttons 
-uint8_t button_state = 0;
+#include "buttons.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // TFT DISPLAY
@@ -75,8 +58,6 @@ uint8_t button_state = 0;
 
 TFT_eSPI tft = TFT_eSPI(); // Declare object "tft"
 TFT_eSprite spr = TFT_eSprite(&tft); // Declare Sprite object "spr" with pointer to "tft" object
-
-//#include "fonts/Free_Fonts.h" // Needs to be anabled in my_custom_setup.h as well
 
 // TFT backlight brightness
 int brightness = 192; // 0 - 255
@@ -195,21 +176,7 @@ void setup()
   // ----------------------
   // Initialise the buttons
   // ----------------------
-  for( uint8_t i = 0; i < NUM_BUTTONS; i++ )
-  {  
-    pinMode(pins[i], INPUT_PULLUP);    // Button uses the built-in pull up register
-    buttons[i].init(pins[i], HIGH, i); // Initialize the corresponding AceButton
-  }
-
-  // Configure the ButtonConfig with the event handler, and enable Click and LongPress events.
-  // NOTE: Only one event handler can be specified! Event handler should run fast
-  ButtonConfig* buttonConfig = ButtonConfig::getSystemButtonConfig();
-  buttonConfig->setEventHandler(handleEvent);
-  buttonConfig->setFeature(ButtonConfig::kFeatureClick);
-  //buttonConfig->setFeature(ButtonConfig::kFeatureDoubleClick);
-  buttonConfig->setFeature(ButtonConfig::kFeatureLongPress);
-  buttonConfig->setClickDelay(500);	  	// short presses < 500ms (def 200ms)
-  buttonConfig->setLongPressDelay(500);	// long  presses > 500ms (def 1000ms)
+  initialize_buttons();
 
   // ----------------------------
   // Initialise the TFT registers
@@ -253,31 +220,6 @@ void setup()
   midi1.begin();
   midi1.setHandleSysEx(OnSysEx);
 } // End of Setup()
-
-/////////////////////////////////////////////////////////////////////////////////////////
-// BUTTONS EVENT HANDLER 
-/////////////////////////////////////////////////////////////////////////////////////////
-void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
-  uint8_t button_pressed =  button->getPin() - 13; // Buttons logical numbers starts from 1
-  switch (eventType) {
-    case AceButton::kEventPressed:
-      // Only the tap-echo time button reacts on key pressed event
-      if( button_pressed == 4 ) { button_state = button_pressed; }
-      break;
-
-    // case AceButton::kEventReleased:    
-    case AceButton::kEventClicked:
-      if( button_pressed != 4 ) { button_state = button_pressed; } // Skip button #4
-      break;
-
-    case AceButton::kEventLongPressed:
-      button_state = button_pressed + 10; // Buttons logical numbers starts from 1, add 10 for long press
-      break;
-//    case AceButton::kEventDoubleClicked:
-//      button_state = (button->getPin() - 13) + 20; // Buttons logical numbers starts from 1, add 20 for double click
-//      break;
-  }
-}
 
 //////////////////////////////////////////////////////////////////////////////////////
 // Global variables, because values must be stored in between two calls of "parse_thr"
