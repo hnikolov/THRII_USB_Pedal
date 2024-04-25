@@ -101,7 +101,8 @@ uint32_t msgcount = 0;
 uint16_t cur = 0;     // Current index in actual SysEx
 uint16_t cur_len = 0; // Length of actual SysEx if completed
 
-volatile static byte midi_connected = false; // TODO: Why 'volatile static'?
+//volatile static byte midi_connected = false; // TODO: Why 'volatile static'?
+bool midi_connected = false;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // PATCHES
@@ -225,7 +226,6 @@ void setup()
 // Global variables, because values must be stored in between two calls of "parse_thr"
 //////////////////////////////////////////////////////////////////////////////////////
 UIStates _uistate = UI_home_amp; // TODO: idle state not needed?
-//UIStates _uistate = UI_edit; // TODO: idle state not needed?
 
 uint32_t tick1 = millis(); // Timer for regular mask update
 //uint32_t tick2 = millis(); // Timer for switching back to display layout after showing something else for a while
@@ -239,16 +239,20 @@ void gui_timing()
 {
   if( millis() - tick1 > 100 ) // Mask update if it was required because of changed values
   {
-    if( maskCUpdate )
+    if( _uistate == UI_tabata || _uistate == UI_metronome ) // to avoid GUI issue of changing pars from thrii
+    {
+      tmui.update(); // Has to be called regularly
+    }
+    else if( maskCUpdate )
     {
       if( _uistate == UI_edit ) { tftUpdateEdit(THR_Values, maskCUpdate);    }
       else                      { updateStatusMask(THR_Values, maskCUpdate); }
     }
 
-    if( _uistate == UI_tabata || _uistate == UI_metronome )
-    {
-      tmui.update(); // Has to be called regularly
-    }
+//    if( _uistate == UI_tabata || _uistate == UI_metronome )
+//    {
+//      tmui.update(); // Has to be called regularly
+//    }
 
     tick1 = millis(); // Start new waiting period
     return;

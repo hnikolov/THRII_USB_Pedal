@@ -1731,11 +1731,11 @@ uint32_t THR30II_Settings::ValToNumber_Threshold(double val) //convert a 0..100 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "stompBoxes.h"
 extern std::vector <StompBox*> sboxes;
-//extern uint8_t selected_sbox;
 
 // For the parameters, alignment is important between stompBoxes, updateStatusMask, FSM9b_1, enums definitions (THR30II.h)
 void THR30II_Settings::setParbyAudioVolKnob(double val)
 {
+  // TODO: Regularly hangs with timeout error. Try sending updates back to thrii just few times a second???
   sendChangestoTHR = true;
 
   uint8_t idx_par = sboxes[selected_sbox]->getFocus();

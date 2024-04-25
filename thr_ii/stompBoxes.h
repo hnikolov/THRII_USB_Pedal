@@ -4,7 +4,6 @@
 #include <vector>
 #include "THR30II_Pedal.h"
 
-/////////////////////////
 #include <TFT_eSPI.h>
 extern TFT_eSPI tft;
 extern TFT_eSprite spr;
@@ -92,11 +91,10 @@ public:
 
 static uint16_t cmap[] =
 {
-  TFT_BLACK, TFT_LIGHTGREY,
-  TFT_THRLIME,    // Foreground color, to be set
-  TFT_THRDIMLIME, // Background color, to be set
+  TFT_BLACK,   TFT_WHITE,
+  TFT_THRLIME, TFT_THRDIMLIME,  // Foreground and Background colors, to be set in each stompbox object
   TFT_THRGREY, TFT_THRDARKGREY, // Jacks
-//  TFT_THRRED,  TFT_THRDRED, TFT_THRLIGHTRED // On/Off led
+  TFT_THRRED,  TFT_THRDRED, TFT_THRLIGHTRED // On/Off led
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -147,6 +145,25 @@ public:
     spr.createSprite(w+26, 240-y); // Height is 240 pixels
     //spr.fillScreen(TFT_BLACK);   // No need, default color is black
     spr.pushSprite(x-13, y);
+    spr.deleteSprite();
+    spr.setColorDepth(16);
+  }
+
+  inline void createPalettedSprite(int16_t width, int16_t height)
+  {
+    // NOTE: Issues with large sprites, therefore, reduce color depth and use palette
+    spr.setColorDepth(4);
+    spr.createSprite(width, height);
+    spr.createPalette(cmap);
+    spr.setPaletteColor(2, fg); // To set FG of a stompbox
+    spr.setPaletteColor(3, bg); // To set FG of a stompbox
+    //spr.fillSprite(0); // Black, no need: sprite is default init with color index 0
+  }
+
+  inline void deinitPalettedSprite(int32_t x, int32_t y)
+  {
+    spr.pushSprite(x, y);
+    spr.unloadFont();
     spr.deleteSprite();
     spr.setColorDepth(16);
   }
@@ -210,14 +227,8 @@ public:
   
   virtual void draw()
   {
-//    Serial.println("X, Y, W, H = " + String(x) + ", " + String(y) + ", " + String(w) + ", " + String(240-y));
-    // NOTE: Issues with large sprites, therefore, reduce color depth and use palette
-    spr.setColorDepth(4);
-    spr.createSprite(w, 240-y); // Height is 240 pixels
-    spr.createPalette(cmap);
-    spr.setPaletteColor(2, fg); //to set FG and BG of a stompbox
-    spr.setPaletteColor(3, bg); //to set FG and BG of a stompbox
-    // 0-black, 2-fg, 3-bg
+    createPalettedSprite(w, 240-y); // Height is 240 pixels
+    // 0-black, 2-fg, 3-bg, 4-grey
 
     // Stompbox
     spr.fillSmoothRoundRect(0, 0, w, 135, 10, 2, 3);
@@ -230,23 +241,12 @@ public:
     spr.fillSmoothRoundRect(5, 175, w-10, 15, 10, 0, 0);
 
     // Name
-    //spr.setTextColor(TFT_BLACK, fg, true);
-    //spr.drawCentreString(name, w/2, 145, 4);
-
-    //spr.setTextColor(TFT_BLACK, fg, true);
-    //spr.loadFont(NotoSansMonoSCB20);
-    //spr.setTextDatum(TC_DATUM); // Middle center
-    //spr.drawString(name, w/2, 145);
-
-    spr.setTextColor(0);
+    spr.setTextColor(0);        // cmap[0] = black
     spr.setFreeFont(FSB9);      // Select Free Serif font
     spr.setTextDatum(TC_DATUM); // Middle center
     spr.drawString(name, w/2, 145, GFXFF);
 
-    spr.pushSprite(x, y);
-    spr.unloadFont();
-    spr.deleteSprite();
-    spr.setColorDepth(16);
+    deinitPalettedSprite(x, y);
 
     // Jacks
     spr.createSprite(13, 45);
@@ -258,7 +258,7 @@ public:
     spr.fillRect(8, 5, 5, 35, TFT_THRDARKGREY);
     spr.pushSprite(x+w, y+135);
     spr.deleteSprite();
- 
+
     // On/off LED
     draw_led();
 
@@ -303,23 +303,15 @@ public:
     spr.setColorDepth(1);
     spr.createSprite(w, 240-y);  // Height is 240 pixels
     //spr.fillScreen(TFT_BLACK); // No need, default color is black
-    spr.pushSprite(x, y);
-    spr.pushSprite(x, 35); // Note to erase the amp unit info (amp,col,cab)
-    spr.deleteSprite();      
-    spr.setColorDepth(16);
+    spr.pushSprite(x, 35);       // Note: to erase the amp unit info (amp,col,cab)
+    deinitPalettedSprite(x, y);
   }
 
   virtual void setEnabled( bool status ) {} // Not needed for Amp
 
   virtual void draw()
   {
-    // NOTE: Issues with large sprites, therefore, reduce color depth and use palette
-    spr.setColorDepth(4);
-    spr.createSprite(w, 240-y); // Height is 240 pixels
-    spr.createPalette(cmap);
-    spr.setPaletteColor(2, fg); // To set foreground color of a stompbox
-    spr.setPaletteColor(3, bg); // To set background color of a stompbox
-    //spr.fillSprite(0); // Black
+    createPalettedSprite(w, 240-y); // Height is 240 pixels
     // 0-black, 2-fg, 3-bg
 
     // Amp box
@@ -331,9 +323,7 @@ public:
     // The Legs
     spr.fillSmoothRoundRect(  30, 130, 20, 10, 10, 3, 3);
     spr.fillSmoothRoundRect(w-50, 130, 20, 10, 10, 3, 3);
-    spr.pushSprite(x, y);
-    spr.deleteSprite();
-    spr.setColorDepth(16);
+    deinitPalettedSprite(x, y);
 
     // The Knobs
     for(auto & knob: knobs)

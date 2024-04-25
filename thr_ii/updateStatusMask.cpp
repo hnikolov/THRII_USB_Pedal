@@ -22,7 +22,6 @@ extern TFT_eSprite spr;
 extern std::vector <StompBox*> sboxes;
 
 /*
-// FIXME: Memory not enough if fonts included from stompboxes.h
 // Moved to stompboxes.h
 // Locally supplied fonts
 // #fonts/include "Free_Fonts.h"
@@ -39,16 +38,16 @@ extern std::vector <StompBox*> sboxes;
 #define AA_FONT_MONO  NotoSansMonoSCB20 // NotoSansMono-SemiCondensedBold 20pt
 */
 
-
 extern std::vector <String> *active_patch_names;
 
-//extern uint16_t &npatches;      // Reference to npathces_user or npatches_factory
-extern uint16_t *npatches;      // Reference to npathces_user or npatches_factory
+extern uint16_t *npatches;       // Reference to npathces_user or npatches_factory
 extern int16_t *presel_patch_id; // ID of actually pre-selected patch (absolute number)
 extern int16_t *active_patch_id; // ID of actually selected patch     (absolute number)
-extern int8_t nUserPreset;      // Used to cycle the THRII User presets
-extern bool show_patch_num;     // Used to show match numbers only when switching banks
+extern int8_t nUserPreset;       // Used to cycle the THRII User presets
+extern bool show_patch_num;      // Used to show match numbers only when switching banks
 extern bool factory_presets_active;
+
+extern bool midi_connected;
 
 /////////////////////////
 uint32_t maskCUpdate = 0;
@@ -185,7 +184,6 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
       }
       // Note: if user preset is selected and parameter is changed via THRII, then getActiveUserSetting() returns -1
       drawPatchIcon(60 + 20*active_user_setting + 1, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
-      //drawPatchIcon(60 + 20*active_user_setting + 1, 0, 20, 20, TFT_SKYBLUE, active_user_setting + 1, false); // No need to be blue
 		break;
 		
 		case UI_home_patch:
@@ -198,7 +196,7 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
 				}
 				else if( i == presel_patch_id )
 				{
-					iconcolour = ST7789_ORANGE; // Highlight pre-selected patch icon
+					iconcolour = TFT_THRORANGE; // Highlight pre-selected patch icon
 				}
 				else
 				{
@@ -548,15 +546,13 @@ void THR30II_Settings::updateConnectedBanner() // Show the connected Model
 // x-position (0) where to place top left corner of status mask
 // y-position     where to place top left corner of status mask
 /////////////////////////////////////////////////////////////////
-//void updateStatusMask(THR30II_Settings &thrs)
 void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 {
+  if( maskCUpdate ) { drawConnIcon( midi_connected ); } // Just for completeness
+
 	// Patch number
   if( maskCUpdate & maskPatchID )
   {
-//    if( _uistate == UI_home_amp )        { drawPatchID(TFT_THRCREAM, nUserPreset + 1);  }
-////    else if( _uistate == UI_home_patch ) { drawPatchID(TFT_THRCREAM, *active_patch_id); }
-//    else                                 { drawPatchID(TFT_THRCREAM, *active_patch_id); }
     if((_uistate == UI_home_amp) || (_uistate == UI_manual  && _uistate_prev == UI_home_amp))
     {
       drawPatchID(TFT_THRCREAM, nUserPreset + 1);
@@ -614,7 +610,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       case MODERN:   tft.setTextColor(TFT_GREEN, TFT_BLACK, bgfill); 	break;
       case CLASSIC:  tft.setTextColor(TFT_RED,   TFT_BLACK, bgfill); 	break;
     }
-    drawAmpUnit(80, 20, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab); // Place in manual mode layout
+    drawAmpUnit(80, 20, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab);
   }
 
 	String FXtitle;
@@ -623,9 +619,9 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 	double FXparams[5]   = {0};
 	double utilparams[2] = {0};
 	//uint8_t FXw  =  60;
-	uint8_t FXw  =  56;
-	uint8_t FXw2 =  48;
-	uint8_t FXh  =  65;
+	uint8_t FXw  = 56;
+	uint8_t FXw2 = 48;
+	uint8_t FXh  = 65;
   uint16_t FXx = 0;
 	uint8_t FXy  = 240 - FXh;
 	uint8_t nFXbars = 5;
@@ -650,7 +646,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     FXparams[3] = thrs.control[CTRL_MID];
     FXparams[4] = thrs.control[CTRL_TREBLE];
     nFXbars = 5;
-    drawFXUnit(FXx, FXy, FXw, FXh, TFT_THRBROWN, TFT_THRVDARKBROWN, "Amp", nFXbars, FXparams);
+    drawFXUnit(FXx, FXy, FXw, FXh, TFT_THRAMP, TFT_THRDIMAMP, "Amp", nFXbars, FXparams);
   }
   FXx += FXw;
 
@@ -898,8 +894,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   // Show THRII Guitar and Audio volume values
   if( maskCUpdate & maskVolumeAudio )
   {
-    // FIXME: Does not work if FXx is, and if not uint8_t... FXx = 5*FXw + FXx_offset; // Set FX unit position
-    drawPPChart(293, FXy, 27, FXh, TFT_THRBROWN, TFT_THRCREAM, "VA", thrs.guitar_volume, thrs.audio_volume);
+    drawPPChart(FXx, FXy, 27, FXh, TFT_THRBROWN, TFT_THRCREAM, "VA", thrs.guitar_volume, thrs.audio_volume);
   }
 */
   if( maskCUpdate & maskPatchName )
@@ -918,7 +913,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       else if( thrs.getUserSettingsHaveChanged() )
       {
         s2 = thrs.getPatchName();
-        drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
+        drawPatchName(TFT_THRORANGE, s2, thrs.boost_activated);
       }
       else
       {
@@ -934,7 +929,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
         if( *presel_patch_id != *active_patch_id )
         {
           s2 = (*active_patch_names)[*presel_patch_id - 1]; // Patch names are 0-indexed
-          drawPatchName(ST7789_ORANGE, s2, thrs.boost_activated);
+          drawPatchName(TFT_THRORANGE, s2, thrs.boost_activated);
         }
         else
         {
@@ -945,7 +940,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       else
       {
         s2 = (*active_patch_names)[*active_patch_id - 1]; // Patch names are 0-indexed
-        drawPatchName(ST7789_ORANGERED, s2, thrs.boost_activated);
+        drawPatchName(TFT_THRORANGE, s2, thrs.boost_activated);
       }
     }
   }
@@ -965,31 +960,14 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     tft.fillRect(0, 20, 320, 220, TFT_BLACK);
   }
 // =================================================================================
-/*
-	// Patch icon bank
-  if( maskCUpdate )
-  {
-	  drawPatchIconBank(*presel_patch_id, *active_patch_id, nUserPreset + 1, true);
-  }
-*/
+
 	// Use Patch select mode to indicate manual mode
   if( maskCUpdate )
   {
-    drawPatchSelMode(TFT_THRCREAM, "EDIT"); // TODO: "EDIT"
+    drawPatchSelMode(TFT_THRCREAM, "EDIT");
+    drawConnIcon( midi_connected ); // Just for completeness
   }
-/*
-  // Show which set of patches is used
-  if( maskCUpdate )
-  {
-    // FIXME: Edit mode
-    if( _uistate == UI_home_amp || _uistate == UI_edit ) { drawPatchSet(TFT_THRCREAM, "THRII"); }
-    else if( _uistate == UI_home_patch  || _uistate == UI_edit ) 
-    {
-      if( factory_presets_active == true ) { drawPatchSet(TFT_THRCREAM, "FACTORY"); }
-      else                                 { drawPatchSet(TFT_THRCREAM, "USER");    }
-    }
-  }
-*/
+
 	// Amp select mode (COL/AMP/CAB); Highlighted only in Manual mode
   if( maskCUpdate )
   {
@@ -1022,7 +1000,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
   if( maskCUpdate & maskCompressor )
   {
-    // TODO: Draw selected knob only???
     sboxes[0]->draw_knob(0, thrs.compressor_setting[CO_SUSTAIN]);
     sboxes[0]->draw_knob(1, thrs.compressor_setting[CO_LEVEL]);
   }
@@ -1048,7 +1025,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
   if( maskCUpdate & maskGainMaster )
   {
-    // TODO: Draw selected knob only???
     sboxes[1]->draw_knob(0, thrs.control[CTRL_GAIN]);
     sboxes[1]->draw_knob(1, thrs.control[CTRL_MASTER]);
     sboxes[1]->draw_knob(2, thrs.control[CTRL_BASS]);
@@ -1093,7 +1069,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
         if( maskCUpdate & maskFxUnit )
         {
-          // TODO: Draw selected knob only???
           sboxes[3]->draw_knob(0, thrs.effect_setting[CHORUS][CH_SPEED]);
           sboxes[3]->draw_knob(1, thrs.effect_setting[CHORUS][CH_DEPTH]);
           sboxes[3]->draw_knob(2, thrs.effect_setting[CHORUS][CH_PREDELAY]);
@@ -1114,7 +1089,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
         if( maskCUpdate & maskFxUnit )
         {
-          // TODO: Draw selected knob only???
           sboxes[4]->draw_knob(0, thrs.effect_setting[FLANGER][FL_SPEED]);
           sboxes[4]->draw_knob(1, thrs.effect_setting[FLANGER][FL_DEPTH]);    
           sboxes[4]->draw_knob(2, thrs.effect_setting[FLANGER][FL_MIX]);       
@@ -1133,7 +1107,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
         if( maskCUpdate & maskFxUnit )
         {
-          // TODO: Draw selected knob only???
           sboxes[5]->draw_knob(0, thrs.effect_setting[PHASER][PH_SPEED]);
           sboxes[5]->draw_knob(1, thrs.effect_setting[PHASER][PH_FEEDBACK]);    
           sboxes[5]->draw_knob(2, thrs.effect_setting[PHASER][PH_MIX]);       
@@ -1152,7 +1125,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
         if( maskCUpdate & maskFxUnit )
         {
-          // TODO: Draw selected knob only???
           sboxes[6]->draw_knob(0, thrs.effect_setting[TREMOLO][TR_SPEED]);
           sboxes[6]->draw_knob(1, thrs.effect_setting[TREMOLO][TR_DEPTH]);    
           sboxes[6]->draw_knob(2, thrs.effect_setting[TREMOLO][TR_MIX]);       
@@ -1178,7 +1150,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
         if( maskCUpdate & maskEcho )
         {
-          // TODO: Draw selected knob only???
           sboxes[7]->draw_knob(0, thrs.echo_setting[TAPE_ECHO][TA_TIME]);
           sboxes[7]->draw_knob(1, thrs.echo_setting[TAPE_ECHO][TA_FEEDBACK]);    
           sboxes[7]->draw_knob(2, thrs.echo_setting[TAPE_ECHO][TA_BASS]);       
@@ -1199,7 +1170,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
         if( maskCUpdate & maskEcho )
         {
-          // TODO: Draw selected knob only???
           sboxes[8]->draw_knob(0, thrs.echo_setting[DIGITAL_DELAY][DD_TIME]);
           sboxes[8]->draw_knob(1, thrs.echo_setting[DIGITAL_DELAY][DD_FEEDBACK]);    
           sboxes[8]->draw_knob(2, thrs.echo_setting[DIGITAL_DELAY][DD_BASS]);       
@@ -1226,7 +1196,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
         if( maskCUpdate & maskReverb )
         {
-          // TODO: Draw selected knob only???
           sboxes[9]->draw_knob(0, thrs.reverb_setting[SPRING][SP_REVERB]);
           sboxes[9]->draw_knob(1, thrs.reverb_setting[SPRING][SP_TONE]);    
           sboxes[9]->draw_knob(2, thrs.reverb_setting[SPRING][SP_MIX]);           
@@ -1245,7 +1214,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
         if( maskCUpdate & maskReverb )
         {
-          // TODO: Draw selected knob only???
           sboxes[12]->draw_knob(0, thrs.reverb_setting[ROOM][RO_DECAY]);
           sboxes[12]->draw_knob(1, thrs.reverb_setting[ROOM][RO_PREDELAY]);    
           sboxes[12]->draw_knob(2, thrs.reverb_setting[ROOM][RO_TONE]);           
@@ -1265,7 +1233,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
         if( maskCUpdate & maskReverb )
         {
-          // TODO: Draw selected knob only???
           sboxes[10]->draw_knob(0, thrs.reverb_setting[PLATE][PL_DECAY]);
           sboxes[10]->draw_knob(1, thrs.reverb_setting[PLATE][PL_PREDELAY]);    
           sboxes[10]->draw_knob(2, thrs.reverb_setting[PLATE][PL_TONE]);           
@@ -1285,7 +1252,6 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
         if( maskCUpdate & maskReverb )
         {
-          // TODO: Draw selected knob only???
           sboxes[11]->draw_knob(0, thrs.reverb_setting[HALL][HA_DECAY]);
           sboxes[11]->draw_knob(1, thrs.reverb_setting[HALL][HA_PREDELAY]);    
           sboxes[11]->draw_knob(2, thrs.reverb_setting[HALL][HA_TONE]);           

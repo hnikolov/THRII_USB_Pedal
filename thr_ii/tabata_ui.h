@@ -7,8 +7,7 @@
 extern uint32_t maskCUpdate;
 
 ///////////////////////////////////////////////////////////////////////////////
-// FIXME: When moving away from this mode, some minor font issues are observed,
-//        E.g., see stompbox names at the bottom of the screen
+// NOTE: Smooth arcs need 16-bit color
 ///////////////////////////////////////////////////////////////////////////////
 class TabataUI
 {
@@ -40,27 +39,27 @@ private:
   bool isRunning = false;
   bool update_metronome, update_tabata;
 
-  //void draw_text_line_1(String txt) { spr.drawString(txt, radius+2, radius-20, 6); }
   void draw_text_line_1(String txt)
   {
     spr.setTextColor(TFT_THRGREY, bg, true);
     spr.setTextDatum(MC_DATUM); // Middle centre datum
     spr.setTextPadding(radius);
     spr.loadFont(AA_FONT_XLARGE);
-    spr.drawString(txt, radius+2, radius-20);
+    spr.drawString(txt, radius, radius-20);
+    //spr.setFreeFont(FSB24);      // Select Free Serif font
+    //spr.drawString(txt, radius, radius-20, GFXFF);
     spr.setTextPadding(0);
     spr.unloadFont();
   }
 
-  //void draw_text_line_2(String txt) { spr.drawString(txt, radius+2, radius+30, 4); }
   void draw_text_line_2(String txt)
   {
     spr.setTextColor(TFT_THRGREY, bg, true);
     spr.setTextDatum(MC_DATUM); // Middle centre datum
     spr.setTextPadding(radius);
-    //spr.loadFont(AA_FONT_MONO);
-    //spr.drawString(txt, radius+2, radius+30);
     spr.drawString(txt, radius+2, radius+30, 4);
+    //spr.setFreeFont(FSS18);      // Select Free Serif font
+    //spr.drawString(txt, radius, radius+30, GFXFF);
     spr.setTextPadding(0);
     spr.unloadFont();
   }
