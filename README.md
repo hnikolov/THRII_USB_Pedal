@@ -196,7 +196,6 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
   - Care to be taken when switching presets and the solo switch was on!
 - Define useable settings for all parameters/effects and initialize them at startup. I
   - In this case even if nothing is loaded from the amp or preset, effects can be selected and used. Currently, they can be switched but not very usable
-- Introduce button mapping (it has been removed from the original code)
 
 **DISCLAIMER**
 <br> In addition to the MIT license disclaimer about the software, consider the same disclaimer for hardware suggestions and all information in this project. Similarly to martinzw and BuhJuhWuh, I can not ensure, that sending messages in the suggested way will not damage the THRII. As well I can not guarantee, that the hardware, I describe will not damage your THRII device or it's power supply or your computer.
