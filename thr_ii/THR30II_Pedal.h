@@ -241,7 +241,58 @@ const byte TFT_DIR_RIGHT_LEFT = 3;
 #define TFT_THRVIOLET           tft.color565(191,   0, 255)
 #define TFT_THRDIMVIOLET        tft.color565( 95,   0, 127)
 
-#define TFT_THRDIMAMP           tft.color565(155, 135,   5)
-#define TFT_THRAMP              tft.color565(222, 197,  67)
+// New color scheme =======================================
+
+#define TFT_THRGreen2           tft.color565(115, 170,  37)
+#define TFT_THRDIMGreen2        tft.color565( 35, 100,   2)
+#define TFT_THRGreen3           tft.color565( 70, 160,  50)
+#define TFT_THRDIMGreen3        tft.color565( 20, 100,  22)
+#define TFT_THRPINK5            tft.color565(160,  39, 166)
+
+#define TFT_THRFORESTGREEN1     tft.color565( 49, 209,  47)
+#define TFT_THRDIMFORESTGREEN1  tft.color565( 25,  89,  07)
+
+#define TFT_THRLIME1            tft.color565( 75, 235,   0)
+
+#define TFT_THRDIMMAGENTA1      tft.color565(105,   0,  89)
+#define TFT_THRDIMVIOLET1       tft.color565(105,   0, 117)
+
+#define TFT_THRDIMPURPLE1       tft.color565(117,   0, 117)
+
+#define TFT_THRROYALBLUE1       tft.color565(111, 151, 255)
+#define TFT_THRDIMROYALBLUE1    tft.color565( 55,  65, 127)
+
+////////////////
+
+#define TFT_THRAMP      tft.color565(222, 197,  67)
+#define TFT_THRDIMAMP   tft.color565(155, 135,   5)
+
+#define TFT_THRCOMP     TFT_THRWHITE
+#define TFT_THRDIMCOMP  TFT_THRDARKGREY
+#define TFT_THRGATE     TFT_THRMANGO
+#define TFT_THRDIMGATE  TFT_THRDIMMANGO
+
+#define TFT_THRCHOR     TFT_THRFORESTGREEN1
+#define TFT_THRDIMCHOR  TFT_THRDIMFORESTGREEN1
+#define TFT_THRFLAN     TFT_THRLIME1
+#define TFT_THRDIMFLAN  TFT_THRDIMLIME
+#define TFT_THRPHAS     TFT_THRGreen3
+#define TFT_THRDIMPHAS  TFT_THRDIMGreen3
+#define TFT_THRTREM     TFT_THRGreen2
+#define TFT_THRDIMTREM  TFT_THRDIMGreen2
+
+#define TFT_THRTAPE     TFT_THRROYALBLUE1
+#define TFT_THRDIMTAPE  TFT_THRDIMROYALBLUE1
+#define TFT_THRDDLY     TFT_THRSKYBLUE
+#define TFT_THRDIMDDLY  TFT_THRDIMSKYBLUE
+
+#define TFT_THRSPR      TFT_THRPINK5
+#define TFT_THRDIMSPR   TFT_THRDIMMAGENTA1
+#define TFT_THRPLATE    TFT_THRVIOLET
+#define TFT_THRDIMPLATE TFT_THRDIMVIOLET1
+#define TFT_THRROOM     TFT_THRMAGENTA
+#define TFT_THRDIMROOM  TFT_THRDIMMAGENTA
+#define TFT_THRHALL     TFT_THRPURPLE
+#define TFT_THRDIMHALL  TFT_THRDIMPURPLE1
 
 #endif // _THR30II_PEDAL_H_

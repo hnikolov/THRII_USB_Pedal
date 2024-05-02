@@ -491,7 +491,7 @@ void drawUtilUnit(int x, int y, int w, int h, int bpad, uint16_t bgcolour, uint1
 	spr.deleteSprite();
 }
 
-void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int nbars, double FXparams[5])
+void drawFXUnit(int x, int y, int w, int h, uint16_t fgcolour, uint16_t bgcolour, String label, int nbars, double FXparams[5])
 {
 	int tpad = 24; int pad = 2;
 	int grx = pad; int gry = tpad; int grw = w-1-2*pad; int grh = h-1-tpad-pad;
@@ -499,14 +499,16 @@ void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour
 	int barh = 0;
 
 	spr.createSprite(w, h);
-	spr.fillSmoothRoundRect(0, 0, w-1, h, 3, bgcolour, TFT_BLACK);	// Draw FX unit
+
+	spr.fillSmoothRoundRect(0, 0, w-1, h, 3, fgcolour, TFT_BLACK); // Draw FX unit
+  spr.fillRect(grx, gry, grw, grh, bgcolour); // Draw graph area
+
 	spr.loadFont(AA_FONT_SMALL);
 	//spr.setTextFont(2);
   spr.setTextDatum(MC_DATUM);
-//	spr.setTextColor(fgcolour, bgcolour, bgfill);
-	spr.setTextColor(TFT_BLACK, bgcolour, bgfill);
+//	spr.setTextColor(bgcolour, fgcolour, bgfill);
+	spr.setTextColor(TFT_BLACK, fgcolour, bgfill);
 	spr.drawString(label, w/2, 13);	// Write label
-	spr.fillRect(grx, gry, grw, grh, fgcolour);	// Draw graph area
 
 	if( nbars == 4 ) { barw = grw / nbars + 1; }
 
@@ -514,8 +516,8 @@ void drawFXUnit(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour
 	{
 		barh = (grh-1) * FXparams[i] / 100;	// Calculate bar height
     // Widen last bar by 1px
-		if( i == nbars - 1 ) { spr.fillRect(grx + i * barw, gry + grh - barh, barw+1, barh, bgcolour); }
-    else                 { spr.fillRect(grx + i * barw, gry + grh - barh, barw,   barh, bgcolour); }
+		if( i == nbars - 1 ) { spr.fillRect(grx + i * barw, gry + grh - barh, barw+1, barh, fgcolour); }
+    else                 { spr.fillRect(grx + i * barw, gry + grh - barh, barw,   barh, fgcolour); }
 	}
 
 	spr.pushSprite(x, y);
@@ -632,7 +634,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     FXparams[0] = thrs.compressor_setting[CO_SUSTAIN];
     FXparams[1] = thrs.compressor_setting[CO_LEVEL];
     nFXbars = 2;
-    if(thrs.unit[COMPRESSOR]) { drawFXUnit(FXx, FXy, FXw2, FXh, TFT_THRWHITE, TFT_THRDARKGREY, "Cmp", nFXbars, FXparams); }
+    if(thrs.unit[COMPRESSOR]) { drawFXUnit(FXx, FXy, FXw2, FXh, TFT_THRCOMP, TFT_THRDIMCOMP,   "Cmp", nFXbars, FXparams); }
     else                      { drawFXUnit(FXx, FXy, FXw2, FXh, TFT_THRGREY, TFT_THRVDARKGREY, "Cmp", nFXbars, FXparams); }
   }
   FXx += FXw2;
@@ -656,8 +658,8 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     FXparams[0] = thrs.gate_setting[GA_THRESHOLD];
     FXparams[1] = thrs.gate_setting[GA_DECAY];
     nFXbars = 2;
-    if(thrs.unit[GATE]) {	drawFXUnit(FXx, FXy, FXw2, FXh, TFT_THRYELLOW,    TFT_THRDIMYELLOW, "Gate", nFXbars, FXparams); }
-    else                { drawFXUnit(FXx, FXy, FXw2, FXh, TFT_THRDIMYELLOW, TFT_THRVDARKGREY, "Gate", nFXbars, FXparams); }
+    if(thrs.unit[GATE]) {	drawFXUnit(FXx, FXy, FXw2, FXh, TFT_THRGATE,    TFT_THRDIMGATE,   "Gate", nFXbars, FXparams); }
+    else                { drawFXUnit(FXx, FXy, FXw2, FXh, TFT_THRDIMGATE, TFT_THRVDARKGREY, "Gate", nFXbars, FXparams); }
   }
   FXx += FXw2;
   
@@ -670,12 +672,12 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
         FXtitle = "Chor";	 // Set FX unit title
         if( thrs.unit[EFFECT] ) // FX2 activated
         {
-          FXbgcolour = TFT_THRFORESTGREEN;
-          FXfgcolour = TFT_THRDIMFORESTGREEN;
+          FXbgcolour = TFT_THRCHOR;
+          FXfgcolour = TFT_THRDIMCHOR;
         }
         else // FX2 deactivated
         {
-          FXbgcolour = TFT_THRDIMFORESTGREEN;
+          FXbgcolour = TFT_THRDIMCHOR;
           FXfgcolour = TFT_THRVDARKGREY;
         }
         FXparams[0] = thrs.effect_setting[CHORUS][CH_SPEED];
@@ -690,12 +692,12 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
         FXtitle = "Flan";	 // Set FX unit title
         if( thrs.unit[EFFECT] ) // FX2 activated
         {
-          FXbgcolour = TFT_THRLIME;
-          FXfgcolour = TFT_THRDIMLIME;
+          FXbgcolour = TFT_THRFLAN;
+          FXfgcolour = TFT_THRDIMFLAN;
         }
         else // FX2 deactivated
         {
-          FXbgcolour = TFT_THRDIMLIME;
+          FXbgcolour = TFT_THRDIMFLAN;
           FXfgcolour = TFT_THRVDARKGREY;
         }
         FXparams[0] = thrs.effect_setting[FLANGER][FL_SPEED];
@@ -710,12 +712,12 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
         FXtitle = "Phas";	 // Set FX unit title
         if( thrs.unit[EFFECT] ) // FX2 activated
         {
-          FXbgcolour = TFT_THRLEMON;
-          FXfgcolour = TFT_THRDIMLEMON;
+          FXbgcolour = TFT_THRPHAS;
+          FXfgcolour = TFT_THRDIMPHAS;
         }
         else // FX2 deactivated
         {
-          FXbgcolour = TFT_THRDIMLEMON;
+          FXbgcolour = TFT_THRDIMPHAS;
           FXfgcolour = TFT_THRVDARKGREY;
         }
         FXparams[0] = thrs.effect_setting[PHASER][PH_SPEED];
@@ -730,12 +732,12 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
         FXtitle = "Trem";	 // Set FX unit title
         if( thrs.unit[EFFECT] ) // FX2 activated
         {
-          FXbgcolour = TFT_THRMANGO;
-          FXfgcolour = TFT_THRDIMMANGO;
+          FXbgcolour = TFT_THRTREM;
+          FXfgcolour = TFT_THRDIMTREM;
         }
         else // FX2 deactivated
         {
-          FXbgcolour = TFT_THRDIMMANGO;
+          FXbgcolour = TFT_THRDIMTREM;
           FXfgcolour = TFT_THRVDARKGREY;
         }
         FXparams[0] = thrs.effect_setting[TREMOLO][TR_SPEED];
@@ -760,12 +762,12 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
         FXtitle = "Tape";	// Set FX unit title
         if( thrs.unit[ECHO] )  // FX3 activated
         {
-          FXbgcolour = TFT_THRROYALBLUE;
-          FXfgcolour = TFT_THRDIMROYALBLUE;
+          FXbgcolour = TFT_THRTAPE;
+          FXfgcolour = TFT_THRDIMTAPE;
         }
         else // FX2 deactivated
         {
-          FXbgcolour = TFT_THRDIMROYALBLUE;
+          FXbgcolour = TFT_THRDIMTAPE;
           FXfgcolour = TFT_THRVDARKGREY;
         }
         FXparams[0] = thrs.echo_setting[TAPE_ECHO][TA_TIME];
@@ -780,12 +782,12 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
         FXtitle = "D.D.";	// Set FX unit title
         if( thrs.unit[ECHO] )  // FX3 activated
         {
-          FXbgcolour = TFT_THRSKYBLUE;
-          FXfgcolour = TFT_THRDIMSKYBLUE;
+          FXbgcolour = TFT_THRDDLY;
+          FXfgcolour = TFT_THRDIMDDLY;
         }
         else // FX3 deactivated
         {
-          FXbgcolour = TFT_THRDIMSKYBLUE;
+          FXbgcolour = TFT_THRDIMDDLY;
           FXfgcolour = TFT_THRVDARKGREY;
         }
         FXparams[0] = thrs.echo_setting[DIGITAL_DELAY][DD_TIME];
@@ -810,12 +812,12 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
         FXtitle = "Spr";   // Set FX unit title
         if( thrs.unit[REVERB] ) // FX4 activated
         {
-          FXbgcolour = TFT_THRRED;
-          FXfgcolour = TFT_THRDIMRED;
+          FXbgcolour = TFT_THRSPR;
+          FXfgcolour = TFT_THRDIMSPR;
         }
         else // FX4 deactivated
         {
-          FXbgcolour = TFT_THRDIMRED;
+          FXbgcolour = TFT_THRDIMSPR;
           FXfgcolour = TFT_THRVDARKGREY;
         }
         FXparams[0] = thrs.reverb_setting[SPRING][SP_REVERB];
@@ -830,12 +832,12 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
         FXtitle = "Room";  // Set FX unit title
         if( thrs.unit[REVERB] ) // FX4 activated
         {
-          FXbgcolour = TFT_THRMAGENTA;
-          FXfgcolour = TFT_THRDIMMAGENTA;
+          FXbgcolour = TFT_THRROOM;
+          FXfgcolour = TFT_THRDIMROOM;
         }
         else // FX4 deactivated
         {
-          FXbgcolour = TFT_THRDIMMAGENTA;
+          FXbgcolour = TFT_THRDIMROOM;
           FXfgcolour = TFT_THRVDARKGREY;
         }
         FXparams[0] = thrs.reverb_setting[ROOM][RO_DECAY];
@@ -850,12 +852,12 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
         FXtitle = "Plate"; // Set FX unit title
         if( thrs.unit[REVERB] ) // FX4 activated
         {
-          FXbgcolour = TFT_THRPURPLE;
-          FXfgcolour = TFT_THRDIMPURPLE;
+          FXbgcolour = TFT_THRPLATE;
+          FXfgcolour = TFT_THRDIMPLATE;
         }
         else // FX4 deactivated
         {
-          FXbgcolour = TFT_THRDIMPURPLE;
+          FXbgcolour = TFT_THRDIMPLATE;
           FXfgcolour = TFT_THRVDARKGREY;
         }
         FXparams[0] = thrs.reverb_setting[PLATE][PL_DECAY];
@@ -870,12 +872,12 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
         FXtitle = "Hall";	 // Set FX unit title
         if( thrs.unit[REVERB] ) // FX4 activated
         {
-          FXbgcolour = TFT_THRVIOLET;
-          FXfgcolour = TFT_THRDIMVIOLET;
+          FXbgcolour = TFT_THRHALL;
+          FXfgcolour = TFT_THRDIMHALL;
         }
         else // FX4 deactivated
         {
-          FXbgcolour = TFT_THRDIMVIOLET;
+          FXbgcolour = TFT_THRDIMHALL;
           FXfgcolour = TFT_THRVDARKGREY;
         }
         FXparams[0] = thrs.reverb_setting[HALL][HA_DECAY];
