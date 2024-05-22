@@ -1564,7 +1564,19 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
 
                                 // CRC32 calculation over the symbol table, used to calculate the 'Magic Key' =================================================
                                 uint32_t checksum = CRC32::calculate(dump, dumplen);
+
+                                std::array<byte, 4>  raw_crc32 = {}; // 4 bytes CRC2
+		                            std::array<byte, 5>  magic_key = {}; // 5 bytes Yamaha 'Bitbucketed' CRC32
+                                
+                                raw_crc32[0] = (byte) (checksum & 0xFF);
+                                raw_crc32[1] = (byte)((checksum & 0xFF00)     >>  8);
+                                raw_crc32[2] = (byte)((checksum & 0xFF0000)   >> 16);
+                                raw_crc32[3] = (byte)((checksum & 0xFF000000) >> 24);
+
+                                Enbucket(magic_key, raw_crc32, raw_crc32.end());
+
                                 Serial.println("Symbol table CRC32 = 0x" + String(checksum, HEX) + " *******************************************************");
+                                Serial.println("0x" + String(magic_key[0], HEX) + " 0x" + String(magic_key[1], HEX) + " 0x" + String(magic_key[2], HEX) + " 0x" + String(magic_key[3], HEX) + " 0x" + String(magic_key[4], HEX));
                                 // ============================================================================================================================
 
                                 int id = 0;
