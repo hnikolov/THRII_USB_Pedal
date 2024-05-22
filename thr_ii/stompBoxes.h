@@ -277,7 +277,7 @@ private:
     if( enabled )
     {
       spr.drawSpot(7, 7, 6, TFT_THRRED, TFT_THRDRED);
-      spr.drawSpot(10, 10, 1.5, TFT_THRLIGHTRED, TFT_THRDRED);
+      spr.drawSpot(10, 4, 1.5, TFT_THRLIGHTRED, TFT_THRDRED);
     }
     else
     {
