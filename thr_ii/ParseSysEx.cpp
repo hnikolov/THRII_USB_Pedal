@@ -10,6 +10,7 @@
 //#include <stdexcept>   //exceptions are problematic on Arduino / Teensy we avoid them
 #include "THR30II_Pedal.h"
 #include "Globals.h"
+#include <CRC32.h> // https://github.com/bakercp/CRC32
 
 extern uint32_t maskCUpdate;
 
@@ -447,8 +448,9 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 outqueue.enqueue(Outmessage(SysExMessage((const byte[29]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x00, 0x01, 0x00, 0x00, 0x07, 0x00, 0x04, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7 },29), 3, false, false));
                                 //outqueue.enqueue(Outmessage(SysExMessage((const byte[29]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x00, 0x01, 0x00, 0x00, 0x07, 0x00, 0x04, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7 },29), 3, false, false));
                                 
-                                //Sure there will be a formula to calculate the magic keys from the received firmware version - but I don't know it :-(
-                                //#S4  (at least continue to this frame, to activate THR30II MIDI-Interface )
+                                // Sure there will be a formula to calculate the magic keys from the received firmware version - but I don't know it :-(
+                                // UPDATE: The magic key is the CRC32 value of the symbol table, considering the byte endianess and Yamaha 'Bitbucketing'
+                                // #S4  (at least continue to this frame, to activate THR30II MIDI-Interface )
                                 if (Firmware == 0x01300063)  //old firmware 1.30.0c
                                 {
                                     //Firmware 1.30.0c 60 6b 3e 6f 68
@@ -470,7 +472,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                     outqueue.enqueue(Outmessage(SysExMessage( (const byte[21]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x00, 0x02, 0x00, 0x00, 0x03, 0x10, 0x5c, 0x61, 0x06, 0x79, 0x00, 0x00, 0x00, 0xf7 },21), 4, true, false));
                                     //outqueue.enqueue(Outmessage(SysExMessage( (const byte[21]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x00, 0x02, 0x00, 0x00, 0x03, 0x10, 0x5c, 0x61, 0x06, 0x79, 0x00, 0x00, 0x00, 0xf7 },21), 4, true, false));
                                 }
-                                else if (Firmware == 0x01420067) //firmware 1.42.0g  
+                                else if (Firmware == 0x01420067) //firmware 1.42.0g
                                 {
                                     
                                     //Firmware 1.42.0g  28 72 4d 54 5d
@@ -478,7 +480,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                     outqueue.enqueue(Outmessage(SysExMessage( (const byte[21]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x00, 0x02, 0x00, 0x00, 0x03, 0x28, 0x72, 0x4d, 0x54, 0x5d, 0x00, 0x00, 0x00, 0xf7 },21), 4, true, false)); 
                                     //outqueue.enqueue(Outmessage(SysExMessage( (const byte[21]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x00, 0x02, 0x00, 0x00, 0x03, 0x28, 0x72, 0x4d, 0x54, 0x5d, 0x00, 0x00, 0x00, 0xf7 },21), 4, true, false)); 
                                 }
-                                else if (Firmware == 0x01430062) //latest firmware 1.43.0b  
+                                else if (Firmware == 0x01430062) //latest firmware 1.43.0b
                                 {
                                     
                                     //Firmware 1.43.0b (same magic key as 1.42.0.g)  28 72 4d 54 5d
@@ -486,11 +488,12 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                     outqueue.enqueue(Outmessage(SysExMessage( (const byte[21]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x00, 0x02, 0x00, 0x00, 0x03, 0x28, 0x72, 0x4d, 0x54, 0x5d, 0x00, 0x00, 0x00, 0xf7 },21), 4, true, false)); 
                                     //outqueue.enqueue(Outmessage(SysExMessage( (const byte[21]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x00, 0x02, 0x00, 0x00, 0x03, 0x28, 0x72, 0x4d, 0x54, 0x5d, 0x00, 0x00, 0x00, 0xf7 },21), 4, true, false)); 
                                 }
-                                else if (Firmware == 0x01440061) //latest firmware 1.44.0a  
+                                else if (Firmware == 0x01440061) // Latest firmware 1.44.0a
                                 {
                                     
-                                    //Firmware 1.44.0a (same magic key as 1.42.0.g and 1.43.0b)  28 72 4d 54 5d
-                                    //send Midi activation and await ack
+                                    // Firmware 1.44.0a (same magic key as 1.42.0.g and 1.43.0b)  28 72 4d 54 5d
+                                    // Note: the 5 bytes are derived from the Symbol table CRC32 = 0x_DD_54_CD_72, considering the byte endianess and Yamaha 'Bitbucketing'
+                                    // send Midi activation and await ack
                                     outqueue.enqueue(Outmessage(SysExMessage( (const byte[21]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x00, 0x02, 0x00, 0x00, 0x03, 0x28, 0x72, 0x4d, 0x54, 0x5d, 0x00, 0x00, 0x00, 0xf7 },21), 4, true, false)); 
                                     //outqueue.enqueue(Outmessage(SysExMessage( (const byte[21]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x00, 0x02, 0x00, 0x00, 0x03, 0x28, 0x72, 0x4d, 0x54, 0x5d, 0x00, 0x00, 0x00, 0xf7 },21), 4, true, false)); 
                                 }
@@ -1558,6 +1561,11 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 Init_Dictionaries();  //Now use constants in this App's dictionaries
                                 
                                 Serial.println("\n\rDictionaries initialized:");
+
+                                // CRC32 calculation over the symbol table, used to calculate the 'Magic Key' =================================================
+                                uint32_t checksum = CRC32::calculate(dump, dumplen);
+                                Serial.println("Symbol table CRC32 = 0x" + String(checksum, HEX) + " *******************************************************");
+                                // ============================================================================================================================
 
                                 int id = 0;
                                 if (outqueue.itemCount() > 0)

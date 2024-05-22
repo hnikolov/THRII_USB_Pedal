@@ -20,16 +20,41 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 - SysExMessage and OutMessage, when reused, caused run-time crashes
   - Code changed to instantiate new message every time it is used
   - See "SysExMessage m(sb.data(), sblast - sb.begin());" in CreatePatch()
-- setup_t conflict in TFT_eSPI library
+- setup_t conflict in TFT_eSPI library: renamed the setup_t type
 
 **HARDWARE USED**
 - Teensy 4.1
-- 3.2" TFT with ILI9341 controller is used. It is selected and SPI is configured in User_Setup.h of TFT_eSPI library source!
+- 3.2" TFT with ILI9341 controller is used. 
+  - The controller is selected and SPI is configured in *User_Setup.h* of TFT_eSPI library source!
 - 9 buttons for guitar stomp-boxes
-- Standard cheap buzzer (hat) for the metronome
-- TODO: more details
+- Standard cheap buzzer (hat) with PWM control for the metronome
+- Battery powerbank
+
+**LIBRARIES USED**
+<br>- USBHost_t36  (https://github.com/PaulStoffregen/USBHost_t36)
+<br>- ArduinoQueue (https://github.com/EinarArnason/ArduinoQueue)
+<br>- ArduinoJson  (https://arduinojson.org)
+<br>- AceButton    (https://github.com/bxparks/AceButton/tree/develop)
+<br>- CRC32        (https://github.com/bakercp/CRC32)
+<br>- Adafruit_gfx (https://github.com/adafruit/Adafruit-GFX-Library)
+<br>- TFT_eSPI     (https://github.com/Bodmer/TFT_eSPI). Below, the changes made in *User_Setup.h*:
+```
+// TFT Display DRiver
+#define ILI9341_DRIVER
+
+// SPI pins definition
+#define TFT_MISO 12
+#define TFT_MOSI 11
+#define TFT_SCK  13
+#define TFT_DC    9
+#define TFT_CS   10
+#define TFT_RST   8
+```
+
+<br />
 
 **OPERATION MODES**
+<br />
 
 ***THRII Presets (1-5)***
 <br> This is the default mode which is selected after connecting to THRII
@@ -63,6 +88,7 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 |   9    | Press  | Select THRII preset/memory 5. Press again for “Solo boost” (on/off) |
 |        | Hold   |                                     |
 
+<br />
 
 ***User Presets / Factory Presets***
 - User presets are loaded from SD card at start-up
@@ -94,7 +120,7 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 |   9    | Press  | Select preset 5 from the current bank. Press again for “Solo boost” (on/off) |
 |        | Hold   |                                     |
 
-
+<br />
   
 ***Manual mode***
 
@@ -125,6 +151,7 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 |   9    | Press  | Toggle Reverb (on/off)                         |
 |        | Hold   | Select Reverb (Spring/Plate/Room/Hall)         |
 
+<br />
 
 ***Edit mode***
 
@@ -154,9 +181,9 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 |   9    | Press  | Select Reverb Settings. Press again to toggle (on/off)              |
 |        | Hold   | Select Reverb (Spring/Plate/Room/Hall)                              |
 
+<br />
 
 ***Tabata/Metronome Mode***
-
 <br> There are 3 variants available: 
 -	Metronome: this is the default mode
 -	Tabata: a repeating sequence of 2 timed intervals: Practice (workout) and Rest (recovery). Default settings are 45s/15s
@@ -196,6 +223,11 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
   - Care to be taken when switching presets and the solo switch was on!
 - Define useable settings for all parameters/effects and initialize them at startup. I
   - In this case even if nothing is loaded from the amp or preset, effects can be selected and used. Currently, they can be switched but not very usable
+
+<br />
+
+**GALERY**
+<br />
 
 **DISCLAIMER**
 <br> In addition to the MIT license disclaimer about the software, consider the same disclaimer for hardware suggestions and all information in this project. Similarly to martinzw and BuhJuhWuh, I can not ensure, that sending messages in the suggested way will not damage the THRII. As well I can not guarantee, that the hardware, I describe will not damage your THRII device or it's power supply or your computer.

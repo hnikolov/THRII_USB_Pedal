@@ -19,6 +19,8 @@
 //#define TRACE_V_THR30IIPEDAL(x)	x
 #define TRACE_V_THR30IIPEDAL(x)
 
+#include <CRC32.h> // https://github.com/bakercp/CRC32
+
 void Constants::set_all(const byte* buf)
 {
   uint32_t vals = *((uint32_t*) buf);       //how many values are in the symbol table
@@ -31,6 +33,11 @@ void Constants::set_all(const byte* buf)
   
   TRACE_THR30IIPEDAL(Serial.printf("Start of symbols: %d\n\r"+symStart);)
   
+  // CRC32 calculation over the symbol table, used to calculate the 'Magic Key' ==========================================
+  // uint32_t checksum = CRC32::calculate(buf, len);
+  // Serial.println("Symbol table CRC32 = 0x" + String(checksum, HEX) + " *******************************************************");
+  // =====================================================================================================================
+
   // print out for analysis only
   // char tmp[60];
 
@@ -50,7 +57,7 @@ void Constants::set_all(const byte* buf)
 
   char *beg= (char*) (buf+symStart);
   char *p=beg;
-  
+
   for(uint16_t keynr=0; keynr< vals; keynr++ )
   {
       glo.emplace(String(p), keynr);
