@@ -173,7 +173,7 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
       if( _uistate_prev == UI_home_amp )
       {
         for(int i = 1; i <= 5; i++) { drawPatchIcon(60 + 20*i, 0, 20, 20, TFT_THRBROWN, i, false); }
-        drawPatchIcon(60 + 20*active_user_setting + 1, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
+        drawPatchIcon(60 + 20*active_user_setting, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
       }
 		break;
 
@@ -183,7 +183,7 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
         drawPatchIcon(60 + 20*i, 0, 20, 20, TFT_THRBROWN, i, false);
       }
       // Note: if user preset is selected and parameter is changed via THRII, then getActiveUserSetting() returns -1
-      drawPatchIcon(60 + 20*active_user_setting + 1, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
+      drawPatchIcon(60 + 20*active_user_setting, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
 		break;
 		
 		case UI_home_patch:
