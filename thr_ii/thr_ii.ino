@@ -187,7 +187,9 @@ void setup()
   //tft.setRotation(1);  // for the 2" tft (ST7789)
   tft.setRotation(3);    // for the 3.2" tft (ILI9341)
   spr.setColorDepth(16); // 16 bit colour needed to show antialiased fonts
-  tft.fillScreen(TFT_THRCREAM); // Show a splash screen instead? :)
+  //tft.fillScreen(TFT_THRCREAM); // Show a splash screen instead? :)
+  maskCUpdate = 0xffffffff;
+  updateStatusMask(THR_Values, maskCUpdate);
 
   //tft.setTextColor(TFT_BLACK);
   //tft.setFreeFont(FSB18);       // Select Free Serif 24 point font
