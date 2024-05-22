@@ -165,6 +165,7 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
 	uint16_t iconcolour = 0;
 	int banksize = 5;
 	int first = ((presel_patch_id-1)/banksize)*banksize+1; // Find number for 1st icon in row
+  int x = 110; // Note, coordinate of first patch icon becomes x + 20
 	
 	switch( _uistate ) 
   {
@@ -172,18 +173,16 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
     case UI_manual:
       if( _uistate_prev == UI_home_amp )
       {
-        for(int i = 1; i <= 5; i++) { drawPatchIcon(60 + 20*i, 0, 20, 20, TFT_THRBROWN, i, false); }
-        drawPatchIcon(60 + 20*active_user_setting, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
+        for(int i = 1; i <= 5; i++) { drawPatchIcon(x + 20*i, 0, 20, 20, TFT_THRBROWN, i, false); }
+        drawPatchIcon(x + 20*active_user_setting, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
       }
 		break;
 
 		case UI_home_amp:
-      for(int i = 1; i <= 5; i++)
-      {
-        drawPatchIcon(60 + 20*i, 0, 20, 20, TFT_THRBROWN, i, false);
-      }
+      for(int i = 1; i <= 5; i++) { drawPatchIcon(x + 20*i, 0, 20, 20, TFT_THRBROWN, i, false); }
+
       // Note: if user preset is selected and parameter is changed via THRII, then getActiveUserSetting() returns -1
-      drawPatchIcon(60 + 20*active_user_setting, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
+      drawPatchIcon(x + 20*active_user_setting, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
 		break;
 		
 		case UI_home_patch:
@@ -206,7 +205,7 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
 				{
 					iconcolour = TFT_BLACK;
 				}
-				drawPatchIcon(60 + 20*(i-first+1), 0, 20, 20, iconcolour, i, show_num);
+				drawPatchIcon(x + 20*(i-first+1), 0, 20, 20, iconcolour, i, show_num);
 			}
 		break;
 
@@ -218,7 +217,7 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
 // Used to indicate Manual mode
 void drawPatchSelMode(uint16_t colour, String string="MAN")
 {
-  int x = 180, y = 0, w = 50, h = 20;
+  int x = 230, y = 0, w = 50, h = 20;
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
@@ -234,7 +233,7 @@ void drawPatchSelMode(uint16_t colour, String string="MAN")
 
 void drawAmpSelMode(uint16_t colour, String string)
 {
-  int x = 230, y = 0, w = 50, h = 20;
+  int x = 80, y = 0, w = 50, h = 20;
   spr.createSprite(w, h);
   spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, colour, TFT_BLACK);
   spr.loadFont(AA_FONT_SMALL);
