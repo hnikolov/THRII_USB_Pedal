@@ -184,7 +184,7 @@ void THR30II_Settings::GateSetting(THR30II_GATE ctrl, double value) // Setter fo
 
 	if( sendChangestoTHR )
 	{
-		SendParameterSetting((un_cmd){THR30II_UNITS_VALS[GATE].key, THR30II_GATE_VALS[ctrl]},(type_val<double>) {0x04, value}); // Send reverb type change to THR
+		SendParameterSetting((un_cmd){THR30II_UNITS_VALS[GATE].key, THR30II_GATE_VALS[ctrl]}, (type_val<double>) {0x04, value}); // Send reverb type change to THR
 	}
 }
 
@@ -194,6 +194,8 @@ void THR30II_Settings::CompressorSetting(THR30II_COMP ctrl, double value) // Set
 
 	if( sendChangestoTHR )
 	{
+    SendParameterSetting((un_cmd){THR30II_UNITS_VALS[COMPRESSOR].key, THR30II_COMP_VALS[ctrl]}, (type_val<double>){0x04, value}); // Send settings change to THR
+    /*
 		if( ctrl == THR30II_COMP::CO_SUSTAIN )
 		{
 			SendParameterSetting((un_cmd){THR30II_UNITS_VALS[COMPRESSOR].key, THR30II_COMP_VALS[CO_SUSTAIN]}, (type_val<double>){0x04, value}); // Send settings change to THR
@@ -204,8 +206,9 @@ void THR30II_Settings::CompressorSetting(THR30II_COMP ctrl, double value) // Set
 		}
 		else if( ctrl == THR30II_COMP::CO_MIX )
 		{
-			SendParameterSetting((un_cmd){THR30II_UNITS_VALS[GATE].key, THR30II_COMP_VALS[CO_MIX]}, (type_val<double>){0x04, value}); // Send settings change to THR
+			SendParameterSetting((un_cmd){THR30II_UNITS_VALS[COMPRESSOR].key, THR30II_COMP_VALS[CO_MIX]}, (type_val<double>){0x04, value}); // Send settings change to THR
 		}
+    */
 	}
 }
 

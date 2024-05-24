@@ -1752,68 +1752,99 @@ uint32_t THR30II_Settings::ValToNumber_Threshold(double val) //convert a 0..100 
 #include "stompBoxes.h"
 extern std::vector <StompBox*> sboxes;
 
+// Call this function to actualy send changed parameters to the amp (a couple of times per second)
+// sendEditToTHR must be set to true
+void THR30II_Settings::send_to_thrii()
+{
+  if( selected_sbox_glob == 0 )
+  {
+    CompressorSetting((THR30II_COMP)idx_par_glob, val_glob); // Set (again) and send
+  }
+  else if( selected_sbox_glob == 1 )
+  {
+    SetControl(idx_par_glob, val_glob); // Set (again) and send
+  }
+  else if( selected_sbox_glob == 2 )
+  {
+    GateSetting((THR30II_GATE)idx_par_glob, val_glob); // Set (again) and send
+  }
+  else if( selected_sbox_glob >= 3 && selected_sbox_glob <= 6 )
+  {
+    uint8_t effect_type = selected_sbox_glob - 3; // Excluding Amp, Comp, NGate
+    //EffectSetting((THR30II_EFF_TYPES)effect_type, (uint16_t)idx_par_glob, val_glob); // FIXME: Does not work, therefore, the code below
+    if(effect_type == 0)      { SendParameterSetting((un_cmd) { THR30II_INFO_CHOR[(THR30II_EFF_SET_CHOR)idx_par_glob].uk, THR30II_INFO_CHOR[(THR30II_EFF_SET_CHOR)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); } // Send settings change to THR
+    else if(effect_type == 1) { SendParameterSetting((un_cmd) { THR30II_INFO_FLAN[(THR30II_EFF_SET_FLAN)idx_par_glob].uk, THR30II_INFO_FLAN[(THR30II_EFF_SET_FLAN)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+    else if(effect_type == 2) { SendParameterSetting((un_cmd) { THR30II_INFO_PHAS[(THR30II_EFF_SET_PHAS)idx_par_glob].uk, THR30II_INFO_PHAS[(THR30II_EFF_SET_PHAS)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+    else if(effect_type == 3) { SendParameterSetting((un_cmd) { THR30II_INFO_TREM[(THR30II_EFF_SET_TREM)idx_par_glob].uk, THR30II_INFO_TREM[(THR30II_EFF_SET_TREM)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+  }
+  else if( selected_sbox_glob >= 7 && selected_sbox_glob <= 8 ) // enum THR30II_ECHO_TYPES { TAPE_ECHO, DIGITAL_DELAY }
+  {
+    uint8_t echo_type = selected_sbox_glob - 7; // Excluding Amp, Comp, NGate, PHASER, TREMOLO, FLANGER, CHORUS
+    //EchoSetting((THR30II_ECHO_TYPES)echo_type, (uint16_t)idx_par_glob, val_glob); // FIXME: Does not work, therefore, the code below
+    if(echo_type == 0)      { SendParameterSetting((un_cmd) { THR30II_INFO_TAPE[(THR30II_ECHO_SET_TAPE)idx_par_glob].uk, THR30II_INFO_TAPE[(THR30II_ECHO_SET_TAPE)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); } // Send settings change to THR
+    else if(echo_type == 1) { SendParameterSetting((un_cmd) { THR30II_INFO_DIGI[(THR30II_ECHO_SET_DIGI)idx_par_glob].uk, THR30II_INFO_DIGI[(THR30II_ECHO_SET_DIGI)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+  }
+  else if( selected_sbox_glob >= 9 && selected_sbox_glob <= 12 ) // enum THR30II_REV_TYPES { SPRING, PLATE, HALL, ROOM }
+  {
+    uint8_t reverb_type = selected_sbox_glob - 9; // Excluding Amp, Comp, NGate, PHASER, TREMOLO, FLANGER, CHORUS, TAPE_ECHO, DIGITAL_DELAY
+    //ReverbSetting((THR30II_REV_TYPES)reverb_type, (uint16_t)idx_par_glob, val_glob); // FIXME: Does not work, therefore, the code below
+    if(reverb_type == 0)      { SendParameterSetting((un_cmd) { THR30II_INFO_SPRI[(THR30II_REV_SET_SPRI)idx_par_glob].uk, THR30II_INFO_SPRI[(THR30II_REV_SET_SPRI)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); } // Send settings change to THR
+    else if(reverb_type == 1) { SendParameterSetting((un_cmd) { THR30II_INFO_PLAT[(THR30II_REV_SET_PLAT)idx_par_glob].uk, THR30II_INFO_PLAT[(THR30II_REV_SET_PLAT)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+    else if(reverb_type == 2) { SendParameterSetting((un_cmd) { THR30II_INFO_HALL[(THR30II_REV_SET_HALL)idx_par_glob].uk, THR30II_INFO_HALL[(THR30II_REV_SET_HALL)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+    else if(reverb_type == 3) { SendParameterSetting((un_cmd) { THR30II_INFO_ROOM[(THR30II_REV_SET_ROOM)idx_par_glob].uk, THR30II_INFO_ROOM[(THR30II_REV_SET_ROOM)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+  }
+}
+
 // For the parameters, alignment is important between stompBoxes, updateStatusMask, FSM9b_1, enums definitions (THR30II.h)
 void THR30II_Settings::setParbyAudioVolKnob(double val)
 {
-  // TODO: Regularly hangs with timeout error. Try sending updates back to thrii just few times a second???
-  sendChangestoTHR = true;
+  // TODO: Regularly hangs with timeout error. Try sending updates back to thrii just few times a second, see gui_timing()
+  //       Just set the values in this function but do not send them to THRII
+  sendEditToTHR = false;
 
   uint8_t idx_par = sboxes[selected_sbox]->getFocus();
 
+  //--------------------------------------------------
+  selected_sbox_glob = selected_sbox;
+  idx_par_glob = idx_par;
+  val_glob = val;
+  //--------------------------------------------------
+
   if( selected_sbox == 0 )
   {
-    CompressorSetting((THR30II_COMP)idx_par, val);
+    compressor_setting[(THR30II_COMP)idx_par] = constrain(val, 0, 100);
     maskCUpdate |= maskCompressor;
   }
   else if( selected_sbox == 1 )
   {
-    SetControl(idx_par, val);
+    control[idx_par] = val;
     maskCUpdate |= maskGainMaster;
   }
   else if( selected_sbox == 2 )
   {
-    GateSetting((THR30II_GATE)idx_par, val);
+    gate_setting[(THR30II_GATE)idx_par] = constrain(val, 0, 100);
     maskCUpdate |= maskNoiseGate;
   }
   else if( selected_sbox >= 3 && selected_sbox <= 6 )
   {
     uint8_t effect_type = selected_sbox - 3; // Excluding Amp, Comp, NGate
-
     Serial.println("Volume knob: " + String(effect_type) + "(" + String(effecttype) + ")" + ", " + String(idx_par) + ", " + String(val));
     effect_setting[(THR30II_EFF_TYPES)effect_type][idx_par] = val;
-    //EffectSetting((THR30II_EFF_TYPES)effect_type, (uint16_t)idx_par, val); // FIXME: Does not work, therefore, the code below
-    if(effect_type == 0)      { SendParameterSetting((un_cmd) { THR30II_INFO_CHOR[(THR30II_EFF_SET_CHOR)idx_par].uk, THR30II_INFO_CHOR[(THR30II_EFF_SET_CHOR)idx_par].sk}, (type_val<double>) {0x04, val}); } // Send settings change to THR
-    else if(effect_type == 1) { SendParameterSetting((un_cmd) { THR30II_INFO_FLAN[(THR30II_EFF_SET_FLAN)idx_par].uk, THR30II_INFO_FLAN[(THR30II_EFF_SET_FLAN)idx_par].sk}, (type_val<double>) {0x04, val}); }
-    else if(effect_type == 2) { SendParameterSetting((un_cmd) { THR30II_INFO_PHAS[(THR30II_EFF_SET_PHAS)idx_par].uk, THR30II_INFO_PHAS[(THR30II_EFF_SET_PHAS)idx_par].sk}, (type_val<double>) {0x04, val}); }
-    else if(effect_type == 3) { SendParameterSetting((un_cmd) { THR30II_INFO_TREM[(THR30II_EFF_SET_TREM)idx_par].uk, THR30II_INFO_TREM[(THR30II_EFF_SET_TREM)idx_par].sk}, (type_val<double>) {0x04, val}); }
-
     maskCUpdate |= maskFxUnit;
   }
   else if( selected_sbox >= 7 && selected_sbox <= 8 ) // enum THR30II_ECHO_TYPES { TAPE_ECHO, DIGITAL_DELAY }
   {
     uint8_t echo_type = selected_sbox - 7; // Excluding Amp, Comp, NGate, PHASER, TREMOLO, FLANGER, CHORUS
-
     Serial.println("Volume knob: " + String(echo_type) + "(" + String(echotype) + ")" + ", " + String(idx_par) + ", " + String(val));
     echo_setting[(THR30II_ECHO_TYPES)echo_type][idx_par] = val;
-    //EchoSetting((THR30II_ECHO_TYPES)echo_type, (uint16_t)idx_par, val); // FIXME: Does not work, therefore, the code below
-    if(echo_type == 0)      { SendParameterSetting((un_cmd) { THR30II_INFO_TAPE[(THR30II_ECHO_SET_TAPE)idx_par].uk, THR30II_INFO_TAPE[(THR30II_ECHO_SET_TAPE)idx_par].sk}, (type_val<double>) {0x04, val}); } // Send settings change to THR
-    else if(echo_type == 1) { SendParameterSetting((un_cmd) { THR30II_INFO_DIGI[(THR30II_ECHO_SET_DIGI)idx_par].uk, THR30II_INFO_DIGI[(THR30II_ECHO_SET_DIGI)idx_par].sk}, (type_val<double>) {0x04, val}); }
-    
     maskCUpdate |= maskEcho;
   }  
   else if( selected_sbox >= 9 && selected_sbox <= 12 ) // enum THR30II_REV_TYPES { SPRING, PLATE, HALL, ROOM }
   {
     uint8_t reverb_type = selected_sbox - 9; // Excluding Amp, Comp, NGate, PHASER, TREMOLO, FLANGER, CHORUS, TAPE_ECHO, DIGITAL_DELAY
-
     Serial.println("Volume knob: " + String(reverb_type) + "(" + String(reverbtype) + ")" + ", " + String(idx_par) + ", " + String(val));
     reverb_setting[(THR30II_REV_TYPES)reverb_type][idx_par] = val;
-    //ReverbSetting((THR30II_REV_TYPES)reverb_type, (uint16_t)idx_par, val); // FIXME: Does not work, therefore, the code below
-    if(reverb_type == 0)      { SendParameterSetting((un_cmd) { THR30II_INFO_SPRI[(THR30II_REV_SET_SPRI)idx_par].uk, THR30II_INFO_SPRI[(THR30II_REV_SET_SPRI)idx_par].sk}, (type_val<double>) {0x04, val}); } // Send settings change to THR
-    else if(reverb_type == 1) { SendParameterSetting((un_cmd) { THR30II_INFO_PLAT[(THR30II_REV_SET_PLAT)idx_par].uk, THR30II_INFO_PLAT[(THR30II_REV_SET_PLAT)idx_par].sk}, (type_val<double>) {0x04, val}); }
-    else if(reverb_type == 2) { SendParameterSetting((un_cmd) { THR30II_INFO_HALL[(THR30II_REV_SET_HALL)idx_par].uk, THR30II_INFO_HALL[(THR30II_REV_SET_HALL)idx_par].sk}, (type_val<double>) {0x04, val}); }
-    else if(reverb_type == 3) { SendParameterSetting((un_cmd) { THR30II_INFO_ROOM[(THR30II_REV_SET_ROOM)idx_par].uk, THR30II_INFO_ROOM[(THR30II_REV_SET_ROOM)idx_par].sk}, (type_val<double>) {0x04, val}); }
-
     maskCUpdate |= maskReverb;
   }
-  sendChangestoTHR = false;
+  sendEditToTHR = true; // Notify the timing function that there is data to be sent to THRII
 }

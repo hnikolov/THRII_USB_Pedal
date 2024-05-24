@@ -10,7 +10,7 @@
 #define TRACE_V_THR30IIPEDAL(x) x	 // trace on
 // #define TRACE_V_THR30IIPEDAL(x) // trace off
 
-extern THR30II_Settings THR_Values, stored_THR_Values;
+extern THR30II_Settings THR_Values;
 
 extern ampSelectModes amp_select_mode;
 dynModes dyn_mode = Comp; // Used only in the FSM

@@ -508,7 +508,15 @@ class THR30II_Settings
 
   bool boost_activated;
 
+  // Used in Edit mode -----------------
+  void send_to_thrii();
   void setParbyAudioVolKnob(double val);
+
+  uint8_t selected_sbox_glob = 12;
+  uint8_t idx_par_glob;
+  double  val_glob;
+  bool sendEditToTHR = false;
+  // -----------------------------------
 
 //  private: // FIXME: Commented for debug purposes, review what needs to be public and what private!
 	bool MIDI_Activated = false; // Set true, if MIDI unlocked by magic key (success checked by receiving first regular THR-SysEx)
@@ -534,13 +542,11 @@ class THR30II_Settings
   // THR30II_COL col; // Field for the simulation collection (BOUTIQUE, CLASSIC, MODERN)
   // THR30II_CAB cab; // Field for the simulated cabinet
 
-  int8_t activeUserSetting = -1;     // Field for the selected user preset's index (0..4 , -1 for none / actual)
-  bool userSettingsHaveChanged; // Field for state of selected user preset
-  //bool thrSettings = true;  // When first connected, before any user preset is selected from the THR amp, the GUI shows: "THR Panel"
+  int8_t activeUserSetting = -1; // Field for the selected user preset's index (0..4 , -1 for none / actual)
+  bool userSettingsHaveChanged;  // Field for state of selected user preset
 
   std::array<double, CO_MIX - CO_SUSTAIN + 1> compressor_setting = { 36.0, 69.0 }; // Field for the Compressor settings with default values (Sustain, Level)
   std::array<double, GA_DECAY - GA_THRESHOLD + 1> gate_setting   = { 66.0, 21.0 }; // Field for the Gate settings with default values (Threshold, Decay)
-	// double echo_setting[EC_MIX-EC_BASS+1]; // Field for the Echo settings
 	
 	std::map<THR30II_ECHO_TYPES, std::map<int, double>> echo_setting = // Fields
 	{
@@ -560,11 +566,6 @@ class THR30II_Settings
 	 }	
 	}; 
 
-// Originally  
-//		{ PLATE , { {(int)PL_DECAY,  10.0}, {(int)PL_TONE, 25.0}, {(int)PL_PREDELAY, 77.0}, {(int)PL_MIX, 88.0} } },
-//		{ HALL  , { {(int)HA_DECAY , 10.0}, {(int)HA_TONE, 25.0}, {(int)HA_PREDELAY, 77.0}, {(int)HA_MIX, 88.0} } },
-//		{ ROOM  , { {(int)RO_DECAY,  10.0}, {(int)RO_TONE, 25.0}, {(int)RO_PREDELAY, 77.0}, {(int)RO_MIX, 88.0} } } 
-
 	std::map<THR30II_EFF_TYPES, std::map<int, double>> effect_setting = // Fields
 	{            
 		{
@@ -574,10 +575,6 @@ class THR30II_Settings
 			{CHORUS,  { {CH_SPEED, 12.0}, {CH_DEPTH, 23.0},    {CH_PREDELAY, 50.0}, {CH_FEEDBACK, 12.0},  {CH_MIX, 45.0} } }
 		}
 	};
-// Originally  
-//			{FLANGER, { {FL_DEPTH, 25.0},    {FL_SPEED, 10.0},    {FL_MIX, 50.0}  } },
-//			{CHORUS,  { {CH_FEEDBACK, 25.0}, {CH_DEPTH, 30.0},    {CH_SPEED, 10.0 }, {CH_PREDELAY, 0.0}, {CH_MIX, 50.0} } }
-
 
 	// Try making these public to solve error
 	// THR30II_REV_TYPES reverbtype = SPRING;

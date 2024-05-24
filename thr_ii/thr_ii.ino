@@ -130,7 +130,6 @@ TabataUI tmui = TabataUI(tm, 70, 30, TFT_THRGREY, TFT_BLACK);
 // GLOBAL VARIABLES
 /////////////////////////////////////////////////////////////////////////////////////////
 class THR30II_Settings THR_Values;			  // Actual settings of the connected THR30II
-class THR30II_Settings stored_THR_Values; // Stored settings, when applying a patch (to be able to restore them later on)
 
 // Initialize in the beginning with the stored presets in the THRII. Use them to switch between them from the pedal board
 // NOTE: We can just send command to activate a stored in the THRII preset. However, still we need to obtain the parameters settings in ordert to update the display
@@ -202,7 +201,7 @@ void setup()
   // Initialise the TFT backlight
   // ----------------------------
   pinMode(pin_backlight, OUTPUT); 
-  //analogWrite(pin_backlight, brightness); // Temporally disabled
+  analogWrite(pin_backlight, brightness);
 
   // -----------------------------------
   // Initialise Components for Edit mode
@@ -230,9 +229,8 @@ void setup()
 UIStates _uistate = UI_home_amp; // TODO: idle state not needed?
 
 uint32_t tick1 = millis(); // Timer for regular mask update
-//uint32_t tick2 = millis(); // Timer for switching back to display layout after showing something else for a while
-
-extern uint32_t maskEditAmpUnit, maskEditReverb;
+uint32_t tick2 = millis(); // Timer for sending data set by using the volume knob back to THRII
+//uint32_t tick3 = millis(); // Timer for switching back to display layout after showing something else for a while
 
 ////////////////////////
 // GUI TIMING
@@ -251,16 +249,21 @@ void gui_timing()
       else                      { updateStatusMask(THR_Values, maskCUpdate); }
     }
 
-//    if( _uistate == UI_tabata || _uistate == UI_metronome )
-//    {
-//      tmui.update(); // Has to be called regularly
-//    }
-
     tick1 = millis(); // Start new waiting period
-    return;
 	}
+
+  if( millis() - tick2 > 400 )
+  {
+    if( _uistate == UI_edit && THR_Values.sendEditToTHR == true )
+    {
+      THR_Values.send_to_thrii();
+      //Serial.println("****************************** Sent edit data to THRII");
+      THR_Values.sendEditToTHR = false; // Important to be here, after sending to thrii
+    }
+    tick2 = millis(); // Start new waiting period
+  }
 /*
-	if( millis() - tick2 > 1500 ) // Switch back to mask or selected patchname after showing something else for a while
+	if( millis() - tick3 > 1500 ) // Switch back to mask or selected patchname after showing something else for a while
 	{
     // TODO
 	}
