@@ -10,7 +10,7 @@
 #define TRACE_V_THR30IIPEDAL(x) x	 // trace on
 // #define TRACE_V_THR30IIPEDAL(x) // trace off
 
-THR30II_Settings::THR30II_Settings():patchNames( { "Actual", "UserSetting1", "UserSetting2", "UserSetting3", "UserSetting4", "UserSetting5" }) // Constructor
+THR30II_Settings::THR30II_Settings() // Constructor
 {
 	dumpFrameNumber = 0; 
 	dumpByteCount = 0; // Received bytes

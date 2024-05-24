@@ -524,7 +524,7 @@ class THR30II_Settings
 	bool dumpInProgress = false;
 	bool patchdump = false;
 	bool symboldump = false;
-	std::array< String, 6 > patchNames { { "Actual", "UserSetting1", "UserSetting2", "UserSetting3", "UserSetting4", "UserSetting5" } }; // Better than an array, because it can be deep copied
+	std::array< String, 5 > patchNames {{ "User Settings 1", "User Settings 2", "User Settings 3", "User Settings 4", "User Settings 5" }}; // Better than an array, because it can be deep copied
 
 	uint16_t dumpFrameNumber = 0; 
 	uint32_t dumpByteCount = 0; // Received bytes
