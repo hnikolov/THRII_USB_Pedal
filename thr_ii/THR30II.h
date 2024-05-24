@@ -545,18 +545,18 @@ class THR30II_Settings
 	std::map<THR30II_ECHO_TYPES, std::map<int, double>> echo_setting = // Fields
 	{
 	 {
-		{ TAPE_ECHO    , { {(int)TA_BASS ,50.0}, {(int)TA_TREBLE, 50.0}, {(int)TA_FEEDBACK, 50.0}, {(int)TA_TIME, 50.0}, {(int)TA_MIX, 50.0}, {(int)TA_SYNCSELECT, 50.0} } },
-		{ DIGITAL_DELAY, { {(int)TA_BASS ,50.0}, {(int)DD_TREBLE, 50.0}, {(int)DD_FEEDBACK, 50.0}, {(int)DD_TIME, 50.0}, {(int)DD_MIX, 50.0}, {(int)DD_SYNCSELECT, 50.0} } } 
+		{ TAPE_ECHO    , { {(int)TA_TIME, 41.0}, {(int)TA_FEEDBACK, 50.0}, {(int)TA_BASS, 43.0}, {(int)TA_TREBLE, 55.0}, {(int)TA_MIX, 26.0}, {(int)TA_SYNCSELECT, 50.0} } },
+		{ DIGITAL_DELAY, { {(int)DD_TIME, 39.0}, {(int)DD_FEEDBACK, 38.0}, {(int)TA_BASS, 26.0}, {(int)DD_TREBLE, 37.0}, {(int)DD_MIX, 36.0}, {(int)DD_SYNCSELECT, 50.0} } }
 	 }	
 	}; 
 
 	std::map<THR30II_REV_TYPES, std::map<int, double>> reverb_setting = // Fields
 	{
 	 {
-		{ SPRING, { {(int)SP_REVERB ,10.0}, {(int)SP_TONE, 25.0}, {(int)SP_MIX, 77.0} } } ,
-		{ PLATE , { {(int)PL_DECAY,  10.0}, {(int)PL_PREDELAY, 77.0}, {(int)PL_TONE, 25.0}, {(int)PL_MIX, 88.0} } },
-		{ HALL  , { {(int)HA_DECAY , 10.0}, {(int)HA_PREDELAY, 77.0}, {(int)HA_TONE, 25.0}, {(int)HA_MIX, 88.0} } },
-		{ ROOM  , { {(int)RO_DECAY,  10.0}, {(int)RO_PREDELAY, 77.0}, {(int)RO_TONE, 25.0}, {(int)RO_MIX, 88.0} } } 
+		{ SPRING, { {(int)SP_REVERB, 25.0}, {(int)SP_TONE, 50.0},     {(int)SP_MIX, 19.0} } },
+		{ PLATE , { {(int)PL_DECAY,  24.0}, {(int)PL_PREDELAY, 31.0}, {(int)PL_TONE, 54.0}, {(int)PL_MIX, 20.0} } },
+		{ HALL  , { {(int)HA_DECAY , 18.0}, {(int)HA_PREDELAY, 10.0}, {(int)HA_TONE, 62.0}, {(int)HA_MIX, 45.0} } },
+		{ ROOM  , { {(int)RO_DECAY,  13.0}, {(int)RO_PREDELAY,  6.0}, {(int)RO_TONE, 59.0}, {(int)RO_MIX, 10.0} } }
 	 }	
 	}; 
 
@@ -568,10 +568,10 @@ class THR30II_Settings
 	std::map<THR30II_EFF_TYPES, std::map<int, double>> effect_setting = // Fields
 	{            
 		{
-			{PHASER,  { {PH_SPEED, 25.0},    {PH_FEEDBACK, 20.0}, {PH_MIX, 50.0}  } },
-			{TREMOLO, { {TR_SPEED, 25.0},    {TR_DEPTH, 40.0},    {TR_MIX, 50.0}  } },
-			{FLANGER, { {FL_SPEED, 10.0},    {FL_DEPTH, 25.0},    {FL_MIX, 50.0}  } },
-			{CHORUS,  { {CH_SPEED, 10.0 }, {CH_DEPTH, 30.0},   {CH_PREDELAY, 0.0}, {CH_FEEDBACK, 25.0},  {CH_MIX, 50.0} } }
+			{PHASER,  { {PH_SPEED,  1.0}, {PH_FEEDBACK, 43.0}, {PH_MIX, 33.0}  } },
+			{TREMOLO, { {TR_SPEED, 34.0}, {TR_DEPTH, 71.0},    {TR_MIX, 41.0}  } },
+			{FLANGER, { {FL_SPEED,  4.0}, {FL_DEPTH, 44.0},    {FL_MIX, 26.0}  } },
+			{CHORUS,  { {CH_SPEED, 12.0}, {CH_DEPTH, 23.0},    {CH_PREDELAY, 50.0}, {CH_FEEDBACK, 12.0},  {CH_MIX, 45.0} } }
 		}
 	};
 // Originally  
