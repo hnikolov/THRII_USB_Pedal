@@ -538,8 +538,8 @@ class THR30II_Settings
   bool userSettingsHaveChanged; // Field for state of selected user preset
   //bool thrSettings = true;  // When first connected, before any user preset is selected from the THR amp, the GUI shows: "THR Panel"
 
-  std::array<double, CO_MIX - CO_SUSTAIN + 1> compressor_setting; // Field for the Compressor settings
-  std::array<double, GA_DECAY - GA_THRESHOLD + 1> gate_setting;   // Field for the Gate settings
+  std::array<double, CO_MIX - CO_SUSTAIN + 1> compressor_setting = { 36.0, 69.0 }; // Field for the Compressor settings with default values (Sustain, Level)
+  std::array<double, GA_DECAY - GA_THRESHOLD + 1> gate_setting   = { 66.0, 21.0 }; // Field for the Gate settings with default values (Threshold, Decay)
 	// double echo_setting[EC_MIX-EC_BASS+1]; // Field for the Echo settings
 	
 	std::map<THR30II_ECHO_TYPES, std::map<int, double>> echo_setting = // Fields
