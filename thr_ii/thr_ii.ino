@@ -1,32 +1,22 @@
- /*THR30II Pedal using Teensy 3.6
-* Martin Zwerschke 04/2021
-* 
-* Heavily modified by Buhjuhwuh
-*
-* Further modified by hnnikolov
-*
-* Prerequesites: TODO
-*  - Library "USBHost_t3" for Teensy 3.6  
-*  - Variant "2_8_Friendly_t3" of Library "ST7789_t3" for Teensy 3.6
-*  
-*  - Library "Bounce2"   Web: https://github.com/thomasfredericks/Bounce2
-*  - Library "SPI" version=1.0  Web: http://www.arduino.cc/en/Reference/SPI  , architectures=sam
-*  - Library "SDFAT"   (only if you want to use a SD-card for the patches, can be avoided with Teensy's big PROGMEM)
-*  - Library "ArduinoJson"  https://arduinojson.org (Copyright Benoit Blanchon 2014-2024), version 7 is used
-*  - Library "Adafruit_gfx.h" https://github.com/adafruit/Adafruit-GFX-Library
-*	-Library "ArduinoQueue.h"  https://github.com/EinarArnason/ArduinoQueue
-*
-* IDE:
-*  Arduino-IDE with additions for Teensy (Teensyduino)
-*  THR30II_Pedal.cpp
-*
-* Author: Martin Zwerschke
+/* THR30II MIDI USB Pedal using Teensy 4.1
+
+LIBRARIES USED:
+- USBHost_t36  (https://github.com/PaulStoffregen/USBHost_t36)
+- ArduinoQueue (https://github.com/EinarArnason/ArduinoQueue)
+- ArduinoJson  (https://arduinojson.org)
+- AceButton    (https://github.com/bxparks/AceButton/tree/develop)
+- CRC32        (https://github.com/bakercp/CRC32)
+- Adafruit_gfx (https://github.com/adafruit/Adafruit-GFX-Library)
+- TFT_eSPI     (https://github.com/Bodmer/TFT_eSPI)
+
+IDE:
+- Arduino-IDE with additions for Teensy (Teensyduino)
 */
 
+// NOTE: Without Paul Stoffregen's Teensy3.6-Midi library nothing will work!
+//       Mind increasing rx queue size in MIDI_big_buffer class in "USBHost_t36.h" : RX_QUEUE_SIZE = 2048
+#include <USBHost_t36.h>
 #include <Arduino.h>
-#include <USBHost_t36.h>  // Without Paul Stoffregen's Teensy3.6-Midi library nothing will work! (Mind increasing rx queue size in MIDI_big_buffer class in "USBHost_t36.h" :   RX_QUEUE_SIZE = 2048)
-// NOTE: Adafruit_GFX.h include has to be here to avoid compilation error!
-//#include <Adafruit_GFX.h> // Virtual superclass for drawing (included in "2_8_Friendly_t3.h")
 
 #include "THR30II_Pedal.h"
 #include "Globals.h" // For the global keys	
@@ -94,7 +84,6 @@ uint32_t msgcount = 0;
 uint16_t cur = 0;     // Current index in actual SysEx
 uint16_t cur_len = 0; // Length of actual SysEx if completed
 
-//volatile static byte midi_connected = false; // TODO: Why 'volatile static'?
 bool midi_connected = false;
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -106,9 +95,9 @@ extern int8_t nUserPreset; // Used to cycle the THRII User presets
 
 void init_patches_from_sdcard(); // Forward declaration
 
-//////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 // FSM
-//////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 void fsm_9b_1(UIStates &_uistate, uint8_t &button_state); // Forward declaration
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +111,7 @@ TabataUI tmui = TabataUI(tm, 70, 30, TFT_THRGREY, TFT_BLACK);
 /////////////////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
 /////////////////////////////////////////////////////////////////////////////////////////
-class THR30II_Settings THR_Values;			  // Actual settings of the connected THR30II
+class THR30II_Settings THR_Values; // Actual settings of the connected THR30II
 
 // Initialize in the beginning with the stored presets in the THRII. Use them to switch between them from the pedal board
 // NOTE: We can just send command to activate a stored in the THRII preset. However, still we need to obtain the parameters settings in ordert to update the display

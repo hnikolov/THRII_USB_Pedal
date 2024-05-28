@@ -1,12 +1,3 @@
-/*THR30II Pedal using Teensy 3.6
-* Martin Zwerschke 04/2021
-*
-*
-* ParseSysEx.cpp
-*  last modified 19/02/2023 by Buhjuhwuh
-*  Author: Martin Zwerschke 
-*/
-
 //#include <stdexcept> // exceptions are problematic on Arduino / Teensy we avoid them
 #include "THR30II_Pedal.h"
 #include "Globals.h"

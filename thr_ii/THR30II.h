@@ -1,14 +1,3 @@
-/*THR30II Pedal using Teensy 3.6
-* Martin Zwerschke 04/2021
-*/
-
-/*
- * THR30II.h
- *
- * Last modified: 19/02/2023 Buhjuhwuh
- *  Author: Martin Zwerschke
- *
- */ 
 #ifndef _THR30II_H_
 #define _THR30II_H_
 

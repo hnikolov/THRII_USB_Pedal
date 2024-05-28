@@ -1,11 +1,3 @@
-/*THR30II Pedal using Teensy 3.6
-* Martin Zwerschke 04/2021
-*
-* Globals.cpp
-*  last modified 09/2021
-*  Author: Martin Zwerschke 
-*/
-
 #include <Arduino.h>
 #include <stddef.h>
 #include <string.h>

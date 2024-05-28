@@ -4,7 +4,6 @@
 
 #include "THR30II_Pedal.h"
 
-/////////////////////////
 #include <TFT_eSPI.h> // Include the graphics library (this includes the sprite functions)
 extern TFT_eSPI tft;
 extern TFT_eSprite spr;
@@ -18,25 +17,8 @@ extern TFT_eSprite spr;
 //#include <Fonts/FreeSans9pt7b.h>
 
 
-#include "stompBoxes.h"
+#include "stompBoxes.h" // Fonts definition
 extern std::vector <StompBox*> sboxes;
-
-/*
-// Moved to stompboxes.h
-// Locally supplied fonts
-// #fonts/include "Free_Fonts.h"
-#include "fonts/NotoSansBold15.h"
-#include "fonts/NotoSansBold36.h"
-#include "fonts/NotoSansMonoSCB20.h"
-#include "fonts/Latin_Hiragana_24.h"
-//#include "fonts/Final_Frontier_28.h"
-
-// The font names are arrays references, thus must NOT be in quotes ""
-#define AA_FONT_SMALL NotoSansBold15
-#define AA_FONT_XLARGE NotoSansBold36
-#define AA_FONT_LARGE Latin_Hiragana_24
-#define AA_FONT_MONO  NotoSansMonoSCB20 // NotoSansMono-SemiCondensedBold 20pt
-*/
 
 extern std::vector <String> *active_patch_names;
 
@@ -49,7 +31,6 @@ extern bool factory_presets_active;
 
 extern bool midi_connected;
 
-/////////////////////////
 uint32_t maskCUpdate = 0;
 
 uint32_t maskPatchID       = 1 <<  0;

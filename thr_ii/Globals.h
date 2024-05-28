@@ -1,11 +1,3 @@
-/*THR30II Pedal using Teensy 3.6
-* Martin Zwerschke 04/2021
-*
-* Globals.h
-* last modified 09/2021
-*  Author: Martin Zwerschke
-*/
-
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
 
