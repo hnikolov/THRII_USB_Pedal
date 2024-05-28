@@ -167,51 +167,25 @@ void drawPatchIconBank(int presel_patch_id, int active_patch_id, int8_t active_u
 	int first = ((presel_patch_id-1)/banksize)*banksize+1; // Find number for 1st icon in row
   int x = 110; // Note, coordinate of first patch icon becomes x + 20
 	
-	switch( _uistate ) 
+  if(  (_uistate == UI_home_amp)
+    || (_uistate == UI_manual && _uistate_prev == UI_home_amp ))
   {
-    // TODO: avoid code duplication
-    case UI_manual:
-      if( _uistate_prev == UI_home_amp )
-      {
-        for(int i = 1; i <= 5; i++) { drawPatchIcon(x + 20*i, 0, 20, 20, TFT_THRBROWN, i, false); }
-        drawPatchIcon(x + 20*active_user_setting, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
-      }
-		break;
+    for(int i = 1; i <= 5; i++) { drawPatchIcon(x + 20*i, 0, 20, 20, TFT_THRBROWN, i, false); }
+    // Note: if user preset is selected and parameter is changed via THRII, then getActiveUserSetting() returns -1
+    drawPatchIcon(x + 20*active_user_setting, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
+  }
+  else
+  {
+    for(int i = first; i < first+banksize; i++)
+    {
+      if( i == active_patch_id )      { iconcolour = TFT_THRCREAM;  } // Highlight active patch icon
+      else if( i == presel_patch_id ) { iconcolour = TFT_THRORANGE; } // Highlight pre-selected patch icon
+      else                    				{ iconcolour = TFT_THRBROWN;  } // Colour for unselected patch icons
 
-		case UI_home_amp:
-      for(int i = 1; i <= 5; i++) { drawPatchIcon(x + 20*i, 0, 20, 20, TFT_THRBROWN, i, false); }
-
-      // Note: if user preset is selected and parameter is changed via THRII, then getActiveUserSetting() returns -1
-      drawPatchIcon(x + 20*active_user_setting, 0, 20, 20, TFT_THRCREAM, active_user_setting + 1, false);
-		break;
-		
-		case UI_home_patch:
-		case UI_edit:
-			for(int i = first; i < first+banksize; i++)
-			{
-				if( i == active_patch_id )
-				{
-					iconcolour = TFT_THRCREAM; // Highlight active patch icon
-				}
-				else if( i == presel_patch_id )
-				{
-					iconcolour = TFT_THRORANGE; // Highlight pre-selected patch icon
-				}
-				else
-				{
-					iconcolour = TFT_THRBROWN; // Colour for unselected patch icons
-				}
-				if( i > *npatches )
-				{
-					iconcolour = TFT_BLACK;
-				}
-				drawPatchIcon(x + 20*(i-first+1), 0, 20, 20, iconcolour, i, show_num);
-			}
-		break;
-
-		default:
-		break;
-	}
+      if( i > *npatches )             { iconcolour = TFT_BLACK; 		} // No more patches
+      drawPatchIcon(x + 20*(i-first+1), 0, 20, 20, iconcolour, i, show_num);
+    }
+  }
 }
 
 // Used to indicate Manual mode
