@@ -22,23 +22,23 @@ public:
   {
     stop();
     isMetronome = sel;
-    if( isMetronome == true ) { Serial.println("Selected Metronome"); }
-    else                      { Serial.println("Selected Tabata");    }
+    if( isMetronome == true ) { TRACE_THR30IIPEDAL(Serial.println("Selected Metronome");) }
+    else                      { TRACE_THR30IIPEDAL(Serial.println("Selected Tabata");)    }
   }
 
   void toggleTabataMetronomeMode()
   {
     stop();
     isMetronome = !isMetronome;
-    if( isMetronome == true ) { Serial.println("Switched to Metronome"); }
-    else                      { Serial.println("Switched to Tabata");    }
+    if( isMetronome == true ) { TRACE_THR30IIPEDAL(Serial.println("Switched to Metronome");) }
+    else                      { TRACE_THR30IIPEDAL(Serial.println("Switched to Tabata");)    }
   }
 
   void enableMetronomeInTabata( bool en )
   {
     with_metronome = en;
-    if( with_metronome ) { Serial.println("Tabata metronome: metronome enabled");  }
-    else                 { Serial.println("Tabata metronome: metronome disabled"); }
+    if( with_metronome ) { TRACE_THR30IIPEDAL(Serial.println("Tabata metronome: metronome enabled");)  }
+    else                 { TRACE_THR30IIPEDAL(Serial.println("Tabata metronome: metronome disabled");) }
   }
 
   void toggleMetronomeInTabata()
@@ -47,7 +47,7 @@ public:
     with_metronome = !with_metronome;
     if( with_metronome == true ) { metronome.start(); }
     else                         { metronome.stop();  }
-    Serial.println("Toggled tabata with metronome: " + String(with_metronome));
+    TRACE_THR30IIPEDAL(Serial.println("Toggled tabata with metronome: " + String(with_metronome));)
   }
 
   bool isRunning()
@@ -70,7 +70,7 @@ public:
     tabata.second = millis();
     tabata.running = true;
     metronome.start();
-    Serial.println("Tabata metronome start");
+    TRACE_THR30IIPEDAL(Serial.println("Tabata metronome start");)
   }
 
   void stop()
@@ -84,7 +84,7 @@ public:
   {
     metronome.stop();
     tabata.stop();
-    Serial.println("Tabata metronome stopped");
+    TRACE_THR30IIPEDAL(Serial.println("Tabata metronome stopped");)
   }
 
   void toggle()
@@ -119,7 +119,7 @@ public:
           metronome.update();
           if( now - tabata.second >= 1000 ) // 1 second
           {
-            Serial.println("Tabata metronome Practice: " + String(tabata.practice_cnt));
+            TRACE_THR30IIPEDAL(Serial.println("Tabata metronome Practice: " + String(tabata.practice_cnt));)
             tabata.practice_cnt++;
             tabata.second = now;
 
@@ -127,7 +127,7 @@ public:
             {
               tabata._tbstate = tabata.Tb_rest;
               tabata.rest_cnt = 1; // seconds
-              Serial.println("Tabata metronome: Rest");
+              TRACE_THR30IIPEDAL(Serial.println("Tabata metronome: Rest");)
               metronome.stop();
             }
           }
@@ -136,7 +136,7 @@ public:
         case tabata.Tb_rest:
           if( now - tabata.second >= 1000 ) // 1 second
           {
-            Serial.println("Tabata metronome Rest: " + String(tabata.rest_cnt));
+            TRACE_THR30IIPEDAL(Serial.println("Tabata metronome Rest: " + String(tabata.rest_cnt));)
             tabata.rest_cnt++;
             tabata.second = now;
           
@@ -144,7 +144,7 @@ public:
             {
               tabata._tbstate = tabata.Tb_practice;
               tabata.practice_cnt = 1;
-              Serial.println("Tabata metronome: Practice");
+              TRACE_THR30IIPEDAL(Serial.println("Tabata metronome: Practice");)
               metronome.start();
             }
           }

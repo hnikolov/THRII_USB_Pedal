@@ -1,23 +1,9 @@
 /////////////////////////////////////////////////////////////////////////////////////
 // patchSetAll()
 /////////////////////////////////////////////////////////////////////////////////////
-
-#include "THR30II_Pedal.h"
 #include <algorithm> // fstd::ind_if()
-
-////////////////////////////////////////
-//enum UIStates;
-//extern UIStates _uistate;
-
-// Normal TRACE/DEBUG
-#define TRACE_THR30IIPEDAL(x) x	  // trace on
-// #define TRACE_THR30IIPEDAL(x)	// trace off
-
-// Verbose TRACE/DEBUG
-#define TRACE_V_THR30IIPEDAL(x) x	 // trace on
-// #define TRACE_V_THR30IIPEDAL(x) // trace off
-
-////////////////////////////////////////
+#include "THR30II_Pedal.h"
+#include "trace.h"
 
 uint16_t UnitOnMap(uint16_t u)
 {

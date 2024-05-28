@@ -5,10 +5,10 @@ std::vector <String> param_amp = {" Gain ", " Master ", " Bass ", " Mid ", " Tre
 std::vector <String> param_comprs = {" Sustain ", " Level "};
 std::vector <String> param_nsgate = {" Threshold ", " Decay "};
 
-std::vector <String> param_chorus  = {" Speed ", " Depth ",  " Pre-Dly ", " FeedBk ", " Mix "};  // Depth=OK, Mix=OK, idx[0]==idx[3], idx[3]==idx[2], idx[2]==idx[0]
-std::vector <String> param_flanger = {" Speed ", " Depth ",  " Mix "}; // Mix=OK, others swapped
-std::vector <String> param_phaser  = {" Speed ", " FeedBk ", " Mix "}; // OK
-std::vector <String> param_tremolo = {" Speed ", " Depth ",  " Mix "}; // OK
+std::vector <String> param_chorus  = {" Speed ", " Depth ",  " Pre-Dly ", " FeedBk ", " Mix "};
+std::vector <String> param_flanger = {" Speed ", " Depth ",  " Mix "};
+std::vector <String> param_phaser  = {" Speed ", " FeedBk ", " Mix "};
+std::vector <String> param_tremolo = {" Speed ", " Depth ",  " Mix "};
 
 std::vector <String> param_tape = {" Time ", " Feedback ", " Bass ", " Treble ", " Mix "};
 std::vector <String> param_ddly = {" Time ", " Feedback ", " Bass ", " Treble ", " Mix "};

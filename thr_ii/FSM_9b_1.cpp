@@ -1,14 +1,5 @@
 #include "THR30II_Pedal.h"
-
-/////////////////////////////////////////////////////////////////
-
-// Normal TRACE/DEBUG
-#define TRACE_THR30IIPEDAL(x) x	  // trace on
-// #define TRACE_THR30IIPEDAL(x)	// trace off
-
-// Verbose TRACE/DEBUG
-#define TRACE_V_THR30IIPEDAL(x) x	 // trace on
-// #define TRACE_V_THR30IIPEDAL(x) // trace off
+#include "trace.h"
 
 extern THR30II_Settings THR_Values;
 
@@ -87,7 +78,7 @@ extern std::vector <String> file_paths_user; // Full path, including file name a
 String presetData;
 
 UIStates _uistate_prev = UI_home_patch; // To remember amp vs custom patches state
-/////////////////////////////////////////////////////////////////
+
 
 std::array<byte, 29> ask_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
 // Switch to preset #4 (__0x03__)
@@ -101,12 +92,12 @@ void toggle_boost()
   if(THR_Values.boost_activated)
   {
     undo_gain_boost();
-    Serial.println("Gain boost deactivated");
+    TRACE_THR30IIPEDAL(Serial.println("Gain boost deactivated");)
   }
   else
   {
     do_gain_boost();
-    Serial.println("Gain boost activated");
+    TRACE_THR30IIPEDAL(Serial.println("Gain boost activated");)
   }
 }
 
@@ -148,7 +139,7 @@ void select_thrii_preset(byte nThriiPreset)
   // Request User preset data if not already done
   if(thr_user_presets[nThriiPreset].getActiveUserSetting() == -1)
   {
-    Serial.println("Requesting data for User preset #" + String(nThriiPreset));
+    TRACE_THR30IIPEDAL(Serial.println("Requesting data for User preset #" + String(nThriiPreset));)
 
     // Store to THR_Values and thr_user_presets[nThriiPreset]
     ask_preset_buf[22] = nThriiPreset;
@@ -168,7 +159,7 @@ void select_user_patch(int16_t *presel_patch_id, uint8_t pnr)
     *presel_patch_id = *bank_first_patch + pnr;
     if( *presel_patch_id != *active_patch_id ) // A new patch to be activated
     {
-      Serial.printf("\n\rActivating patch %d ...\n\r", *presel_patch_id);
+      TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating patch %d ...\n\r", *presel_patch_id);)
       show_patch_num = false;
       *active_patch_id = *presel_patch_id;
       patch_activate(*presel_patch_id);
@@ -180,7 +171,7 @@ void select_user_patch(int16_t *presel_patch_id, uint8_t pnr)
   }
   else
   {
-    Serial.printf("\n\rActivating patch - Invalid patch number: %d ...\n\r", *bank_first_patch + pnr);
+    TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating patch - Invalid patch number: %d ...\n\r", *bank_first_patch + pnr);)
   }
 }
 
@@ -266,7 +257,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         case 5: // Activate the patch 1 in a bank
           if(THR_Values.getActiveUserSetting() != 0) // A new thrii preset to be activated
           {
-            Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);
+            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);)
             select_thrii_preset(0);
             maskCUpdate = maskAll;
           }
@@ -280,7 +271,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         case 6: // Activate the patch 2 in a bank
           if(THR_Values.getActiveUserSetting() != 1) // A new thrii preset to be activated
           {
-            Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);
+            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);)
             select_thrii_preset(1);
             maskCUpdate = maskAll;
           }
@@ -294,7 +285,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         case 7: // Activate the patch 3 in a bank
           if(THR_Values.getActiveUserSetting() != 2) // A new thrii preset to be activated
           {
-            Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);
+            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);)
             select_thrii_preset(2);
             maskCUpdate = maskAll;
           }
@@ -308,7 +299,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         case 8: // Activate the patch 4 in a bank
           if(THR_Values.getActiveUserSetting() != 3) // A new thrii preset to be activated
           {
-            Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);
+            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);)
             select_thrii_preset(3);
             maskCUpdate = maskAll;
           }
@@ -322,7 +313,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         case 9: // Activate the patch 5 in a bank
           if(THR_Values.getActiveUserSetting() != 4) // A new thrii preset to be activated
           {
-            Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);
+            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);)
             select_thrii_preset(4);
             maskCUpdate = maskAll;
           }
@@ -357,7 +348,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 14:
-          Serial.println("Activating Metronome mode");
+          TRACE_THR30IIPEDAL(Serial.println("Activating Metronome mode");)
           _uistate = UI_metronome;
           _uistate_prev = UI_home_amp;
           maskCUpdate = maskAll;
@@ -407,7 +398,7 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
           THR_Values.boost_activated = false;
           show_patch_num = true;
           
-          Serial.printf("Patch #%d pre-selected\n\r", *bank_first_patch);
+          TRACE_THR30IIPEDAL(Serial.printf("Patch #%d pre-selected\n\r", *bank_first_patch);)
           maskCUpdate |= (maskPatchName | maskPatchIconBank); 
         break;
 
@@ -420,7 +411,7 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
           *presel_patch_id = *bank_first_patch;
           THR_Values.boost_activated = false;
           show_patch_num = true;
-          Serial.printf("Patch #%d pre-selected\n\r", *bank_first_patch);
+          TRACE_THR30IIPEDAL(Serial.printf("Patch #%d pre-selected\n\r", *bank_first_patch);)
           maskCUpdate |= (maskPatchName | maskPatchIconBank); 
         break;
 
@@ -482,7 +473,7 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 14:
-          Serial.println("Activating Metronome mode");
+          TRACE_THR30IIPEDAL(Serial.println("Activating Metronome mode");)
           _uistate = UI_metronome;
           _uistate_prev = UI_home_patch;
           maskCUpdate = maskAll;
@@ -575,8 +566,8 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
         break;
             
         case 5: // Toggle the Compressor Unit
-          if(THR_Values.unit[COMPRESSOR])	{ Serial.println("Compressor unit switched off"); }
-          else                            { Serial.println("Compressor unit switched on");  }
+          if(THR_Values.unit[COMPRESSOR])	{ TRACE_THR30IIPEDAL(Serial.println("Compressor unit switched off");) }
+          else                            { TRACE_THR30IIPEDAL(Serial.println("Compressor unit switched on");)  }
           THR_Values.Switch_On_Off_Compressor_Unit( !THR_Values.unit[COMPRESSOR] );
           maskCUpdate |= maskCompressor;
         break;
@@ -587,22 +578,22 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 7: // Toggle Effect
-          if(THR_Values.unit[EFFECT]) { Serial.println("Effect unit switched off"); }
-          else                        { Serial.println("Effect unit switched on");  }
+          if(THR_Values.unit[EFFECT]) { TRACE_THR30IIPEDAL(Serial.println("Effect unit switched off");) }
+          else                        { TRACE_THR30IIPEDAL(Serial.println("Effect unit switched on");)  }
           THR_Values.Switch_On_Off_Effect_Unit( !THR_Values.unit[EFFECT] );
           maskCUpdate |= maskFxUnit; 
         break;
 
         case 8: // Toggle Echo
-          if(THR_Values.unit[ECHO]) { Serial.println("Echo unit switched off"); }
-          else                      { Serial.println("Echo unit switched on");  }
+          if(THR_Values.unit[ECHO]) { TRACE_THR30IIPEDAL(Serial.println("Echo unit switched off");) }
+          else                      { TRACE_THR30IIPEDAL(Serial.println("Echo unit switched on");)  }
           THR_Values.Switch_On_Off_Echo_Unit( ! THR_Values.unit[ECHO] );
           maskCUpdate |= maskEcho; 
         break;
         
         case 9: // Toggle Reverb
-          if(THR_Values.unit[REVERB]) { Serial.println("Reverb unit switched off"); }
-          else                        { Serial.println("Reverb unit switched on");  }
+          if(THR_Values.unit[REVERB]) { TRACE_THR30IIPEDAL(Serial.println("Reverb unit switched off");) }
+          else                        { TRACE_THR30IIPEDAL(Serial.println("Reverb unit switched on");)  }
           THR_Values.Switch_On_Off_Reverb_Unit( !THR_Values.unit[REVERB] );
           maskCUpdate |= maskReverb; 
         break;
@@ -613,17 +604,17 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           {
             case COL:
               THR_Values.next_col();
-              Serial.println("Amp collection switched to: " + String(THR_Values.col));
+              TRACE_THR30IIPEDAL(Serial.println("Amp collection switched to: " + String(THR_Values.col));)
             break;
 
             case AMP:
               THR_Values.next_amp();
-              Serial.println("Amp type switched to: " + String(THR_Values.amp));
+              TRACE_THR30IIPEDAL(Serial.println("Amp type switched to: " + String(THR_Values.amp));)
             break;
 
             case CAB:
               THR_Values.next_cab();
-              Serial.println("Cabinet switched to: " + String(THR_Values.cab));
+              TRACE_THR30IIPEDAL(Serial.println("Cabinet switched to: " + String(THR_Values.cab));)
             break;
           }
           THR_Values.createPatch();
@@ -637,7 +628,7 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
               case AMP:	amp_select_mode = CAB; break;
               case CAB:	amp_select_mode = COL; break;
           }
-          Serial.println("Amp Select Mode: " + String(amp_select_mode));
+          TRACE_THR30IIPEDAL(Serial.println("Amp Select Mode: " + String(amp_select_mode));)
           maskCUpdate |= maskAmpSelMode;
         break;
 
@@ -651,7 +642,7 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
 
         case 14:
           // _uistate_prev not set here. Will return to the previous-previuos state, issues when returning to manual mode
-          Serial.println("Activating Metronome mode");
+          TRACE_THR30IIPEDAL(Serial.println("Activating Metronome mode");)
           _uistate = UI_metronome;
           maskCUpdate = maskAll;
           tmui.draw_metronome();
@@ -662,8 +653,8 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 16: // Toggle the Gate Unit
-          if(THR_Values.unit[GATE])	{ Serial.println("Gate unit switched off"); }
-          else                      { Serial.println("Gate unit switched on");  }
+          if(THR_Values.unit[GATE])	{ TRACE_THR30IIPEDAL(Serial.println("Gate unit switched off");) }
+          else                      { TRACE_THR30IIPEDAL(Serial.println("Gate unit switched on");)  }
           THR_Values.Switch_On_Off_Gate_Unit( !THR_Values.unit[GATE] );
           maskCUpdate |= maskNoiseGate;
         break;
@@ -677,7 +668,7 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
             case TREMOLO: THR_Values.EffectSelect(CHORUS);  break;
           }
           THR_Values.createPatch();
-          Serial.println("Effect unit switched to: " + String(THR_Values.effecttype));
+          TRACE_THR30IIPEDAL(Serial.println("Effect unit switched to: " + String(THR_Values.effecttype));)
           maskCUpdate |= maskFxUnit;
         break;
 
@@ -688,7 +679,7 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
             case DIGITAL_DELAY: THR_Values.EchoSelect(TAPE_ECHO);     break;
           }
           THR_Values.createPatch();
-          Serial.println("Echo unit switched to: " + String(THR_Values.echotype));
+          TRACE_THR30IIPEDAL(Serial.println("Echo unit switched to: " + String(THR_Values.echotype));)
           maskCUpdate |= maskEcho;
         break;
         
@@ -701,7 +692,7 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
             case ROOM:   THR_Values.ReverbSelect(SPRING);  break;
           }
           THR_Values.createPatch();
-          Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));
+          TRACE_THR30IIPEDAL(Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));)
           maskCUpdate |= maskReverb; 
         break;
         
@@ -743,14 +734,14 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         case 5: // Edit the Amp
           if( selected_sbox != 0 )
           {
-            Serial.println("Compressor selected");
+            TRACE_THR30IIPEDAL(Serial.println("Compressor selected");)
             selected_sbox = 0;
             maskCUpdate |= (maskCompressor | maskCompressorEn);
           }
           else
           {
-            if(THR_Values.unit[COMPRESSOR])	{ Serial.println("Compressor unit switched off"); }
-            else                            { Serial.println("Compressor unit switched on");  }
+            if(THR_Values.unit[COMPRESSOR])	{ TRACE_THR30IIPEDAL(Serial.println("Compressor unit switched off");) }
+            else                            { TRACE_THR30IIPEDAL(Serial.println("Compressor unit switched on");)  }
             THR_Values.Switch_On_Off_Compressor_Unit( !THR_Values.unit[COMPRESSOR] );
             maskCUpdate |= maskCompressorEn;
           }
@@ -767,7 +758,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         case 7: // Edit Effect
           if( selected_sbox < 3 || selected_sbox > 6 )
           {
-            Serial.println("Effect unit selected");
+            TRACE_THR30IIPEDAL(Serial.println("Effect unit selected");)
             switch(THR_Values.effecttype)
             {
               case CHORUS:  selected_sbox = 3; break;
@@ -779,8 +770,8 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           }
           else
           {
-            if(THR_Values.unit[EFFECT]) { Serial.println("Effect unit switched off"); }
-            else                        { Serial.println("Effect unit switched on");  }
+            if(THR_Values.unit[EFFECT]) { TRACE_THR30IIPEDAL(Serial.println("Effect unit switched off");) }
+            else                        { TRACE_THR30IIPEDAL(Serial.println("Effect unit switched on");)  }
             THR_Values.Switch_On_Off_Effect_Unit( !THR_Values.unit[EFFECT] );
             maskCUpdate |= maskFxUnitEn;
           }
@@ -789,7 +780,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         case 8: // Edit Echo
           if( selected_sbox < 7 || selected_sbox > 8 )
           {
-            Serial.println("Echo unit selected");
+            TRACE_THR30IIPEDAL(Serial.println("Echo unit selected");)
             switch(THR_Values.echotype)
             {
               case TAPE_ECHO:     selected_sbox = 7; break;
@@ -799,8 +790,8 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           }
           else
           {
-            if(THR_Values.unit[ECHO]) { Serial.println("Echo unit switched off"); }
-            else                      { Serial.println("Echo unit switched on");  }
+            if(THR_Values.unit[ECHO]) { TRACE_THR30IIPEDAL(Serial.println("Echo unit switched off");) }
+            else                      { TRACE_THR30IIPEDAL(Serial.println("Echo unit switched on");)  }
             THR_Values.Switch_On_Off_Echo_Unit( !THR_Values.unit[ECHO] );
             maskCUpdate |= maskEchoEn;
           }          
@@ -809,7 +800,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         case 9: // Edit Reverb
           if( selected_sbox < 9 || selected_sbox > 12 )
           {
-            Serial.println("Echo unit selected");
+            TRACE_THR30IIPEDAL(Serial.println("Echo unit selected");)
             switch(THR_Values.reverbtype)
             {
               case SPRING: selected_sbox =  9; break;
@@ -821,8 +812,8 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           }
           else
           {
-            if(THR_Values.unit[REVERB]) { Serial.println("Reverb unit switched off"); }
-            else                        { Serial.println("Reverb unit switched on");  }
+            if(THR_Values.unit[REVERB]) { TRACE_THR30IIPEDAL(Serial.println("Reverb unit switched off");) }
+            else                        { TRACE_THR30IIPEDAL(Serial.println("Reverb unit switched on");)  }
             THR_Values.Switch_On_Off_Reverb_Unit( !THR_Values.unit[REVERB] );
             maskCUpdate |= maskReverbEn;
           } 
@@ -834,17 +825,17 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           {
             case COL:
               THR_Values.next_col();
-              Serial.println("Amp collection switched to: " + String(THR_Values.col));
+              TRACE_THR30IIPEDAL(Serial.println("Amp collection switched to: " + String(THR_Values.col));)
             break;
 
             case AMP:
               THR_Values.next_amp();
-              Serial.println("Amp type switched to: " + String(THR_Values.amp));
+              TRACE_THR30IIPEDAL(Serial.println("Amp type switched to: " + String(THR_Values.amp));)
             break;
 
             case CAB:
               THR_Values.next_cab();
-              Serial.println("Cabinet switched to: " + String(THR_Values.cab));
+              TRACE_THR30IIPEDAL(Serial.println("Cabinet switched to: " + String(THR_Values.cab));)
             break;
           }
           THR_Values.createPatch();
@@ -859,7 +850,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               case AMP:	amp_select_mode = CAB; 	break;
               case CAB:	amp_select_mode = COL; 	break;
           }
-          Serial.println("Amp Select Mode: " + String(amp_select_mode));
+          TRACE_THR30IIPEDAL(Serial.println("Amp Select Mode: " + String(amp_select_mode));)
           selected_sbox = 0;
           maskCUpdate |= (maskAmpUnit | maskGainMaster);
         break;
@@ -885,7 +876,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 14:
-          Serial.println("Activating Metronome mode");
+          TRACE_THR30IIPEDAL(Serial.println("Activating Metronome mode");)
           _uistate = UI_metronome;
           _uistate_prev = UI_edit;
           maskCUpdate = maskAll;
@@ -899,14 +890,14 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         case 16: // Edit the Gate Unit
           if( selected_sbox != 2 )
           {
-            Serial.println("Gate unit selected");
+            TRACE_THR30IIPEDAL(Serial.println("Gate unit selected");)
             selected_sbox = 2;
             maskCUpdate |= (maskNoiseGate | maskNoiseGateEn);
           }
           else
           {
-            if(THR_Values.unit[GATE])	{ Serial.println("Gate unit switched off"); }
-            else                      { Serial.println("Gate unit switched on");  }
+            if(THR_Values.unit[GATE])	{ TRACE_THR30IIPEDAL(Serial.println("Gate unit switched off");) }
+            else                      { TRACE_THR30IIPEDAL(Serial.println("Gate unit switched on");)  }
             THR_Values.Switch_On_Off_Gate_Unit( !THR_Values.unit[GATE] );
             maskCUpdate |= maskNoiseGateEn;
           }
@@ -923,7 +914,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               case TREMOLO: THR_Values.EffectSelect(CHORUS);  selected_sbox = 3; break;
             }
             THR_Values.createPatch();
-            Serial.println("Effect unit switched to: " + String(THR_Values.effecttype));
+            TRACE_THR30IIPEDAL(Serial.println("Effect unit switched to: " + String(THR_Values.effecttype));)
             maskCUpdate |= maskFxUnit;
           }
         break;
@@ -937,7 +928,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               case DIGITAL_DELAY: THR_Values.EchoSelect(TAPE_ECHO);     selected_sbox = 7; break;
             }
             THR_Values.createPatch();
-            Serial.println("Echo unit switched to: " + String(THR_Values.echotype));
+            TRACE_THR30IIPEDAL(Serial.println("Echo unit switched to: " + String(THR_Values.echotype));)
             maskCUpdate |= maskEcho;
           }
         break;
@@ -953,7 +944,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               case ROOM:   THR_Values.ReverbSelect(SPRING); selected_sbox =  9; break;
             }
             THR_Values.createPatch();
-            Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));
+            TRACE_THR30IIPEDAL(Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));)
             maskCUpdate |= maskReverb;
           }
         break;
@@ -1081,7 +1072,7 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
           tm.toggleTabataMetronomeMode();
           if( _uistate == UI_metronome )   { _uistate = UI_tabata;    tmui.draw_tabata();    }
           else if( _uistate == UI_tabata ) { _uistate = UI_metronome; tmui.draw_metronome(); }
-          Serial.println("Toggle Metronome/Tabata");
+          TRACE_THR30IIPEDAL(Serial.println("Toggle Metronome/Tabata");)
 //          maskCUpdate = maskAll;
         break;
 

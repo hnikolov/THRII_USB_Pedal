@@ -29,7 +29,8 @@
 //#include <Adafruit_GFX.h> // Virtual superclass for drawing (included in "2_8_Friendly_t3.h")
 
 #include "THR30II_Pedal.h"
-#include "Globals.h"		 	// For the global keys	
+#include "Globals.h" // For the global keys	
+#include "trace.h"
 
 #include "buttons.h"
 
@@ -62,14 +63,6 @@ TFT_eSprite spr = TFT_eSprite(&tft); // Declare Sprite object "spr" with pointer
 // TFT backlight brightness
 int brightness = 192; // 0 - 255
 int pin_backlight = 24;
-
-// Normal TRACE/DEBUG
-#define TRACE_THR30IIPEDAL(x) x	  // trace on
-// #define TRACE_THR30IIPEDAL(x)	// trace off
-
-// Verbose TRACE/DEBUG
-#define TRACE_V_THR30IIPEDAL(x) x	 // trace on
-// #define TRACE_V_THR30IIPEDAL(x) // trace off
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // USB MIDI
@@ -167,9 +160,9 @@ void setup()
 	} // wait for Arduino Serial Monitor
   //*/
 
-  Serial.begin(250000); // Debug via USB-Serial (Teensy's programming interface, where 250000 is maximum speed)
-  Serial.println();
-  Serial.println("THRxxII Footswitch");
+  TRACE_THR30IIPEDAL(Serial.begin(250000);) // Debug via USB-Serial (Teensy's programming interface, where 250000 is maximum speed)
+  TRACE_THR30IIPEDAL(Serial.println();)
+  TRACE_THR30IIPEDAL(Serial.println("THRxxII Footswitch");)
 
 	while( Serial.read() > 0 ) {}; // Make read buffer empty
   
@@ -257,7 +250,7 @@ void gui_timing()
     if( _uistate == UI_edit && THR_Values.sendEditToTHR == true )
     {
       THR_Values.send_to_thrii();
-      //Serial.println("****************************** Sent edit data to THRII");
+      TRACE_V_THR30IIPEDAL(Serial.println("Sent edit data to THRII");)
       THR_Values.sendEditToTHR = false; // Important to be here, after sending to thrii
     }
     tick2 = millis(); // Start new waiting period
@@ -286,7 +279,7 @@ void loop()
 		if( complete && midi1.getSysExArrayLength() >= 0 )
 		{
 			// printf("\r\nMidi Rec. res. %0d.\t %1d By rec.\r\n",midi1.getSysExArrayLength(),(int)received);
-			Serial.println("Main loop:" + String(midi1.getSysExArrayLength()) + String(" Bytes received"));
+			TRACE_THR30IIPEDAL(Serial.println("Main loop:" + String(midi1.getSysExArrayLength()) + String(" Bytes received"));)
 			// Serial.println(String(cur_len)+String(" Bytes received."));
 	
 			inqueue.enqueue(SysExMessage(currentSysEx, cur_len)); // Feed the queue of incoming messages
@@ -300,7 +293,7 @@ void loop()
 			{
 				drawConnIcon( midi_connected ); // TODO: Do we need this here?
 				
-				Serial.println(F("\r\nSending Midi-Interface Activation..\r\n")); 
+				TRACE_THR30IIPEDAL(Serial.println(F("\r\nSending Midi-Interface Activation..\r\n"));)
 				send_init(); // Send SysEx to activate THR30II-Midi interface
 
 				// TODO: only set true, if SysEx's were acknowledged (MIDI_Activated in ParseSysEx???)
@@ -356,7 +349,7 @@ void send_init()  //Try to activate THR30II MIDI
 	// }
 	
 	while( outqueue.item_count() > 0 ) { outqueue.dequeue(); } // Clear Queue (in case some message got stuck)
-	Serial.println(F("\r\nOutque cleared.\r\n"));
+	TRACE_V_THR30IIPEDAL(Serial.println(F("\r\nOutque cleared.\r\n"));)
 
 	// PC to THR30II Message:
 	//F0 7E 7F 06 01 F7  (First Thing PC sends to THR using "THR Remote" (prepares unlocking MIDI!) )
@@ -381,7 +374,7 @@ void send_init()  //Try to activate THR30II MIDI
 	//#S2 invokes #R3 (ask Firmware-Version) For activating MIDI only necessary to get the right magic key for #S3/#S4  (not needed, if key is known)            
   outqueue.enqueue( Outmessage( SysExMessage( (const byte[29]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7 },29), 2, false, true)); //answer will be the firmware version);
   //outqueue.enqueue( Outmessage( SysExMessage( (const byte[29]) { 0xf0, 0x00, 0x01, 0x0c, 0x22, 0x02, 0x4d, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7 },29), 2, false, true)); //answer will be the firmware version);
-	TRACE_V_THR30IIPEDAL( Serial.println(F("Enqued Ask Firmware-Version.\r\n")));
+	TRACE_V_THR30IIPEDAL(Serial.println(F("Enqued Ask Firmware-Version.\r\n")));
 
   //#S3 + #S4 will follow, when answer to "ask Firmware-Version" comes in 
 	//#S3 + #S4 will invoke #R4 (seems always the same) "MIDI activate" (works only after ID_Req!)														   
@@ -509,13 +502,13 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
       THR_Values.userPresetDownloaded = false;
       THR_Values.boost_activated = false;
       int idx = THR_Values.getActiveUserSetting();
-      Serial.println("Work. Tmr: User preset #" + String(idx) + " " + THR_Values.getPatchName() + " to be copied");
+      TRACE_THR30IIPEDAL(Serial.println("Work. Tmr: User preset #" + String(idx) + " " + THR_Values.getPatchName() + " to be copied");)
       if( idx >= 0 && idx <= 5 )
       {
         // Store latest user preset settings localy
         thr_user_presets[idx] = THR_Values; // THR30II_Settings class is deep copyable
         nUserPreset = idx;
-        Serial.println("Done");
+        TRACE_THR30IIPEDAL(Serial.println("Done");)
       }
       maskCUpdate = maskAll;
       flag = 1; // Then update of single parameters (via amp knobs) does not get visualized
@@ -536,7 +529,7 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
 		{  
 			midi1.sendSysEx(msg->_msg.getSize(), (uint8_t *)(msg->_msg.getData()), true);
 			
-			Serial.println("msg #" + String((msg->_id)) + " sent out");
+			TRACE_THR30IIPEDAL(Serial.println("msg #" + String((msg->_id)) + " sent out");)
 			msg->_sent_out = true;
 			msg->_time_stamp = millis();	
 			msgcount += 1;
@@ -545,7 +538,7 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
 		else if( !msg->_needs_ack && !msg->_needs_answer ) // Needs no ACK and no Answer? ==> done with this message
 		{
 			outqueue.dequeue();
-			Serial.println("msg #" + String((msg->_id)) + " OK: dequ no ack, no answ, t=" + String(millis()-msg->_time_stamp) + " n=" + String(msgcount)); 
+			TRACE_THR30IIPEDAL(Serial.println("msg #" + String((msg->_id)) + " OK: dequ no ack, no answ, t=" + String(millis()-msg->_time_stamp) + " n=" + String(msgcount));)
 		}
 		else // Sent out and needs ack or answer ==> check it
 		{
@@ -556,19 +549,19 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
 					if( !msg->_needs_answer ) // Ack OK, no answer needed ==> done with this message
 					{
 						outqueue.dequeue(); // => ready
-						Serial.println("msg #" + String((msg->_id)) + " OK: dequ ack, no answ, t=" + String(millis()-msg->_time_stamp) + " n=" + String(msgcount));						
+						TRACE_THR30IIPEDAL(Serial.println("msg #" + String((msg->_id)) + " OK: dequ ack, no answ, t=" + String(millis()-msg->_time_stamp) + " n=" + String(msgcount));)						
 					}
 					else if( msg->_answered ) // Ack OK, Answer received
 					{
 						outqueue.dequeue();  // => ready
-					  Serial.println("msg #" + String((msg->_id)) + " OK: dequ ack and answ, t=" + String(millis()-msg->_time_stamp) + " n=" + String(msgcount));						
+					  TRACE_THR30IIPEDAL(Serial.println("msg #" + String((msg->_id)) + " OK: dequ ack and answ, t=" + String(millis()-msg->_time_stamp) + " n=" + String(msgcount));)						
 					}
 				}
 				else if( millis()-msg->_time_stamp > OUTQUEUE_TIMEOUT )	// if msg not acknowledged, check for timeout.
 																	                             	// if timed out, discard.  (Or re-send...?)
 				{
 					outqueue.dequeue();  // => ready
-					Serial.println("Timeout waiting for acknowledge. Discarded Message #" + String((msg->_id)) + " t=" + String(millis()-msg->_time_stamp) + " n=" + String(msgcount));
+					TRACE_THR30IIPEDAL(Serial.println("Timeout waiting for acknowledge. Discarded Message #" + String((msg->_id)) + " t=" + String(millis()-msg->_time_stamp) + " n=" + String(msgcount));)
 
 					// try re-sending msg instead of discarding
 					// midi1.sendSysEx(msg->_msg.getSize(),(uint8_t *)(msg->_msg.getData()),true);
@@ -584,12 +577,12 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
 				if (msg->_answered) // Answer received
 				{
 					outqueue.dequeue(); // => ready
-					Serial.println("msg #" + String((msg->_id)) + " OK: dequ no ack but answ, t=" + String(millis()-msg->_time_stamp) + " n=" + String(msgcount));
+					TRACE_THR30IIPEDAL(Serial.println("msg #" + String((msg->_id)) + " OK: dequ no ack but answ, t=" + String(millis()-msg->_time_stamp) + " n=" + String(msgcount));)
 				}
 				else if( millis()-msg->_time_stamp > OUTQUEUE_TIMEOUT )
 				{
 					outqueue.dequeue(); // => ready
-					Serial.println("Timeout waiting for answer. Discarded Message #" + String((msg->_id)) + " t=" + String(millis()-msg->_time_stamp) + " n=" + String(msgcount));
+					TRACE_THR30IIPEDAL(Serial.println("Timeout waiting for answer. Discarded Message #" + String((msg->_id)) + " t=" + String(millis()-msg->_time_stamp) + " n=" + String(msgcount));)
 				}
 			}
 		}

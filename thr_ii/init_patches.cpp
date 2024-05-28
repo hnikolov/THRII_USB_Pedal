@@ -2,8 +2,9 @@
 #include <string>
 #include <vector>			  	// In some cases we will use dynamic arrays - though heap usage is problematic
 							  	        // Where ever possibly we use std::array instead to keep values on stack instead
-
 #include <SD.h>
+#include "trace.h"
+
 const int sd_chipsel = BUILTIN_SDCARD;
 //File32 file;
 
@@ -23,14 +24,6 @@ std::vector <String> file_paths_user;    // Full path, including file name ad ex
 uint16_t npatches_user = 0;    // Counts the user patches stored on SD-card
 uint16_t npatches_factory = 0; // Counts the factory patches stored on SD-card
 uint16_t *npatches = &npatches_user;
-
-// Normal TRACE/DEBUG
-#define TRACE_THR30IIPEDAL(x) x	  // trace on
-// #define TRACE_THR30IIPEDAL(x)	// trace off
-
-// Verbose TRACE/DEBUG
-#define TRACE_V_THR30IIPEDAL(x) x	 // trace on
-// #define TRACE_V_THR30IIPEDAL(x) // trace off
 
 std::string readFile(File file)
 {
@@ -60,7 +53,7 @@ void initializeSortedPresets(const String &path, std::vector <JsonDocument> &jso
     if( entry.available() ) // Zero is returned for directories
     {
       String fpath = path + "/" + String(entry.name());
-      Serial.println( fpath );
+      TRACE_THR30IIPEDAL(Serial.println( fpath );)
       file_paths.push_back(fpath);
     }
     entry.close();
@@ -72,23 +65,23 @@ void initializeSortedPresets(const String &path, std::vector <JsonDocument> &jso
 
     for(auto fpath : file_paths)
     {
-      //Serial.println(fpath);
+      TRACE_V_THR30IIPEDAL(Serial.println(fpath);)
       File entry = SD.open(fpath.c_str(), FILE_READ);
       std::string data = readFile( entry );
-//      Serial.println( data.c_str() );
+      TRACE_V_THR30IIPEDAL(Serial.println( data.c_str() );)
       entry.close();
 
       DeserializationError dse = deserializeJson(doc, data);
       if( dse )
       {
-        Serial.print("deserializeJson() failed: ");
-        Serial.println( dse.c_str() );
+        TRACE_THR30IIPEDAL(Serial.print("deserializeJson() failed: ");)
+        TRACE_THR30IIPEDAL(Serial.println( dse.c_str() );)
         continue;
       }
       
       json_patchesII.push_back( doc );
       patchNames.push_back((const char*) (doc["data"]["meta"]["name"]));            
-      Serial.println((const char*) (doc["data"]["meta"]["name"])); 
+      TRACE_THR30IIPEDAL(Serial.println((const char*) (doc["data"]["meta"]["name"]));)
     }
     npatches = json_patchesII.size();
   }
@@ -99,17 +92,17 @@ void init_patches_from_sdcard()
 {
   if(!SD.begin(sd_chipsel))
 	{
-    Serial.println(F("Card failed, or not present."));
+    TRACE_THR30IIPEDAL(Serial.println(F("Card failed, or not present."));)
   }
   else
 	{
-		Serial.println(F("Card initialized."));
-    TRACE_THR30IIPEDAL(Serial.print(F("VolumeBegin -> success. FAT-Type: "));)
+		TRACE_THR30IIPEDAL(Serial.println(F("Card initialized."));)
+    TRACE_V_THR30IIPEDAL(Serial.print(F("VolumeBegin -> success. FAT-Type: "));)
 
-    Serial.println("Initializing factory presets from SDCard");
-    initializeSortedPresets(path_presets_factory, json_patchesII_factory, factoryPatchNames, npatches_factory, file_paths_factory);
+    TRACE_THR30IIPEDAL(Serial.println("Initializing factory presets from SDCard");
+    initializeSortedPresets(path_presets_factory, json_patchesII_factory, factoryPatchNames, npatches_factory, file_paths_factory);)
 
-    Serial.println("Initializing user presets from SDCard");
+    TRACE_THR30IIPEDAL(Serial.println("Initializing user presets from SDCard");)
     initializeSortedPresets(path_presets_user, json_patchesII_user, libraryPatchNames, npatches_user, file_paths_user);
 
     TRACE_THR30IIPEDAL(Serial.printf(F("\n\rLoaded %d JSON user patches and %d JSON factory patches.\n\r"), npatches_user, npatches_factory);)
@@ -280,9 +273,9 @@ void deleteFile(String fileName)
 {
   if (SD.exists(fileName.c_str()))
   {
-    Serial.println("Removing file " + fileName);
+    TRACE_THR30IIPEDAL(Serial.println("Removing file " + fileName);)
     SD.remove(fileName.c_str());
-    Serial.println("Done");
+    TRACE_THR30IIPEDAL(Serial.println("Done");)
   }
 }
 
@@ -295,13 +288,13 @@ void writeToFile( String fileName, String data )
   File myFile = SD.open(fileName.c_str(), FILE_WRITE);
   if( myFile )
   {
-    Serial.println("Writing to: " + fileName);
+    TRACE_THR30IIPEDAL(Serial.println("Writing to: " + fileName);)
     myFile.println( data );
     myFile.close();
-    Serial.println("Done");
+    TRACE_THR30IIPEDAL(Serial.println("Done");)
   }
   else
   {
-    Serial.println("Error opening file: " + fileName);
+    TRACE_THR30IIPEDAL(Serial.println("Error opening file: " + fileName);)
   }
 }

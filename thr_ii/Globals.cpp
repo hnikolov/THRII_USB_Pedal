@@ -7,29 +7,23 @@
 */
 
 #include <Arduino.h>
-#include "Globals.h"
 #include <stddef.h>
 #include <string.h>
 
-//Normal TRACE/DEBUG
-#define TRACE_THR30IIPEDAL(x) x
-//#define TRACE_THR30IIPEDAL(x)
-
-//Verbose TRACE/DEBUG
-//#define TRACE_V_THR30IIPEDAL(x)	x
-#define TRACE_V_THR30IIPEDAL(x)
-
 #include <CRC32.h> // https://github.com/bakercp/CRC32
+
+#include "Globals.h"
+#include "trace.h"
 
 void Constants::set_all(const byte* buf)
 {
   uint32_t vals = *((uint32_t*) buf);       //how many values are in the symbol table
   uint32_t len =  *((uint32_t*) (buf+4));   //how many bytes build the symbol table
 
-  TRACE_THR30IIPEDAL(Serial.printf("%d symbols found.\n\r",vals);
-                      Serial.printf("%d file length.\n\r",len);
+  TRACE_THR30IIPEDAL( Serial.printf("%d symbols found.\n\r", vals);
+                      Serial.printf("%d file length.\n\r", len);
                     )
-  int symStart = (int)(12 * vals + 8);   //Where is the start of the symbol names?    
+  int symStart = (int)(12 * vals + 8); // Where is the start of the symbol names?    
   
   TRACE_THR30IIPEDAL(Serial.printf("Start of symbols: %d\n\r"+symStart);)
   
@@ -52,7 +46,7 @@ void Constants::set_all(const byte* buf)
   //     Serial.print(tmp);
   // }
 
-  Serial.println();
+  TRACE_THR30IIPEDAL(Serial.println();)
   glo.clear();
 
   char *beg= (char*) (buf+symStart);

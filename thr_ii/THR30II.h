@@ -14,6 +14,7 @@
 
 #include <Arduino.h>
 #include "Globals.h"
+#include "trace.h"
 
 #undef max // We need another version of max / min, not this one
 #undef min
@@ -348,7 +349,7 @@ class THR30II_Settings
 
   // Using a template function to be able to use it for different types
 	template <typename T>
-	void  SendParameterSetting( un_cmd command, type_val <T> valu)  // Send setting to THR
+	void SendParameterSetting( un_cmd command, type_val <T> valu) // Send setting to THR
 	{
 		// Serial.println("SendParameterSetting()");
 		// Serial.println(command);
@@ -437,11 +438,11 @@ class THR30II_Settings
 		
 		sendbuf_head[PC_SYSEX_BEGIN.size() + 1] = UseSysExSendCounter();
 		
-		hexdump(sendbuf_head, sendbuf_head.size());
+		TRACE_V_THR30IIPEDAL(hexdump(sendbuf_head, sendbuf_head.size());)
 		outqueue.enqueue(Outmessage(SysExMessage(sendbuf_head.data(), sendbuf_head.size()), 1000, false, false)); // No ack/answ for the header  
 		
 		sendbuf_body[PC_SYSEX_BEGIN.size() + 1] = UseSysExSendCounter();
-		hexdump(sendbuf_body, sbblast-sendbuf_body.begin());
+		TRACE_V_THR30IIPEDAL(hexdump(sendbuf_body, sbblast-sendbuf_body.begin());)
 		outqueue.enqueue(Outmessage(SysExMessage(sendbuf_body.data(), sbblast-sendbuf_body.begin()), 1001, true, false)); // Needs ack  
 
 		// TODO: Handle ACK for id=1001

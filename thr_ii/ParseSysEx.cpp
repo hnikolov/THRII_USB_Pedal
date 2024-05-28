@@ -7,9 +7,10 @@
 *  Author: Martin Zwerschke 
 */
 
-//#include <stdexcept>   //exceptions are problematic on Arduino / Teensy we avoid them
+//#include <stdexcept> // exceptions are problematic on Arduino / Teensy we avoid them
 #include "THR30II_Pedal.h"
 #include "Globals.h"
+#include "trace.h"
 #include <CRC32.h> // https://github.com/bakercp/CRC32
 
 extern uint32_t maskCUpdate;
@@ -351,52 +352,52 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                 
             break;  //of "message 9 bytes"
 
-            case 12:  //e.g. Acknowledge
+            case 12: // e.g. Acknowledge
                 result+=" 12-Byte-Message";
                 if (msgVals[0] == 0x0001 && msgVals[1] == 0x0004)
                 {
-                    switch (msgVals[2]) //Block-Key / TargetTypeKey
+                    switch (msgVals[2]) // Block-Key / TargetTypeKey
                     {
                         int id;
-                        case 0x00000000ul:    //this is an acknowledge message
+                        case 0x00000000ul: // This is an acknowledge message
                         {  
                             id = outqueue.getHeadPtr()->_id;
                             result+=" Acknowledge for Message #"+String(id);
                             outqueue.getHeadPtr()->_acknowledged = true;
-                            //function on_ack_reactions(uint16t id)
+                            // Function on_ack_reactions(uint16t id)
 
                             std::tuple<uint16_t, Outmessage, bool * , bool > tp;
                             
-                            while(!on_ack_queue.isEmpty())  //are there "action packs" on the list?
+                            while(!on_ack_queue.isEmpty()) // Are there "action packs" on the list?
                             {  
                                 tp = *on_ack_queue.getHeadPtr();                                
-                                if(std::get<0>(tp) == id)   //do they belong to the last outmessage, that is acknowledged now?
+                                if(std::get<0>(tp) == id) // Do they belong to the last outmessage, that is acknowledged now?
                                 {
-                                     Serial.println("working o on_ack_queue, because upload of actual setting was acknowledged. "); 
+                                    TRACE_THR30IIPEDAL(Serial.println("working o on_ack_queue, because upload of actual setting was acknowledged.");)
 
-                                    if(std::get<1>(tp)._msg.getSize() != 0) //is there a message to send out?
+                                    if(std::get<1>(tp)._msg.getSize() != 0) // Is there a message to send out?
                                     {
-                                       Serial.println("Sending out an outmessage from on_ack_queue. ");
-                                       outqueue.enqueue(std::get<1>(tp));
+                                      TRACE_THR30IIPEDAL(Serial.println("Sending out an outmessage from on_ack_queue.");)
+                                      outqueue.enqueue(std::get<1>(tp));
                                     }
 
-                                    if(std::get<2>(tp)!=nullptr) //is there a  flag to set?
+                                    if(std::get<2>(tp)!=nullptr) // Is there a  flag to set?
                                     {
-                                       Serial.println("Setting a flag from on_ack_queue. ");
-                                        *std::get<2>(tp)=std::get<3>(tp);  //set the value of the flag
+                                      TRACE_THR30IIPEDAL(Serial.println("Setting a flag from on_ack_queue.");)
+                                      *std::get<2>(tp)=std::get<3>(tp); // Set the value of the flag
                                     }
                                     
-                                    //now read actual settings
+                                    // Now read actual settings
                                     on_ack_queue.dequeue();    
                                 }
                             }
 
                             if(id==999)
                             {
-                                Serial.println(" Switch User Setting acknowledged. (999)"); 
-                                //now read actual settings
+                                TRACE_THR30IIPEDAL(Serial.println(" Switch User Setting acknowledged. (999)");) 
+                                // Now read actual settings
 
-                                //#S8   Request actual user settings (Expect several frames - settings dump)
+                                // #S8   Request actual user settings (Expect several frames - settings dump)
                                 outqueue.enqueue(Outmessage(SysExMessage((const byte[29]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x3c, 0x00, 0x7f, 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0xf7 },29), 8, false, true)); //answer will be the settings dump for actual settings
                                 //outqueue.enqueue(Outmessage(SysExMessage((const byte[29]) { 0xf0, 0x00, 0x01, 0x0c, 0x22, 0x02, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x3c, 0x00, 0x7f, 0x7f, 0x7f, 0x7f, 0x00, 0x00, 0xf7 },29), 8, false, true)); //answer will be the settings dump for actual settings
                             }
@@ -1407,7 +1408,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                
                                 if(dump==nullptr)
                                 {
-                                    Serial.println("\n\rAllocation Error for patch dump!");
+                                    TRACE_THR30IIPEDAL(Serial.println("\n\rAllocation Error for patch dump!");)
                                 }
 
                                 if (dumplen <= payloadSize - 8) //complete patch fits in this one message
@@ -1485,7 +1486,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 dump_len=dumplen;
                                 if(dump==nullptr)
                                 {
-                                    Serial.println("\n\rAllocation Error for symbol dump!");
+                                    TRACE_THR30IIPEDAL(Serial.println("\n\rAllocation Error for symbol dump!");)
                                 }
 
                                 if ((dumplen == len) && (dumplen > 0xFF))  //a symbol table dump is very long!
@@ -1507,7 +1508,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                         }
                         else
                         {
-                          Serial.println("\n\rERROR 1: Should not happen during dump!");
+                          TRACE_THR30IIPEDAL(Serial.println("\n\rERROR 1: Should not happen during dump!");)
                         }
 
                         //for any dump type (except patch-name) and for any of it's chunks we have to copy the content
@@ -1560,7 +1561,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 
                                 Init_Dictionaries();  //Now use constants in this App's dictionaries
                                 
-                                Serial.println("\n\rDictionaries initialized:");
+                                TRACE_THR30IIPEDAL(Serial.println("\n\rDictionaries initialized:");)
 
                                 // CRC32 calculation over the symbol table, used to calculate the 'Magic Key' =================================================
                                 uint32_t checksum = CRC32::calculate(dump, dumplen);
@@ -1575,8 +1576,8 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
 
                                 Enbucket(magic_key, raw_crc32, raw_crc32.end());
 
-                                Serial.println("Symbol table CRC32 = 0x" + String(checksum, HEX) + " *******************************************************");
-                                Serial.println("0x" + String(magic_key[0], HEX) + " 0x" + String(magic_key[1], HEX) + " 0x" + String(magic_key[2], HEX) + " 0x" + String(magic_key[3], HEX) + " 0x" + String(magic_key[4], HEX));
+                                TRACE_THR30IIPEDAL(Serial.println("Symbol table CRC32 = 0x" + String(checksum, HEX) + " *******************************************************");)
+                                TRACE_THR30IIPEDAL(Serial.println("0x" + String(magic_key[0], HEX) + " 0x" + String(magic_key[1], HEX) + " 0x" + String(magic_key[2], HEX) + " 0x" + String(magic_key[3], HEX) + " 0x" + String(magic_key[4], HEX));)
                                 // ============================================================================================================================
 
                                 int id = 0;
@@ -1617,7 +1618,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                     } //end of "if it seems to be a dump (  24 < len < 0x100  ) 
                     else //No dump
                     {
-                        Serial.println("\n\rERROR: Should not happen during dump!");
+                        TRACE_THR30IIPEDAL(Serial.println("\n\rERROR: Should not happen during dump!");)
                         dumpInProgress = false;
                         patchdump = false;
                         symboldump = false;
@@ -1828,21 +1829,21 @@ void THR30II_Settings::setParbyAudioVolKnob(double val)
   else if( selected_sbox >= 3 && selected_sbox <= 6 )
   {
     uint8_t effect_type = selected_sbox - 3; // Excluding Amp, Comp, NGate
-    Serial.println("Volume knob: " + String(effect_type) + "(" + String(effecttype) + ")" + ", " + String(idx_par) + ", " + String(val));
+    TRACE_THR30IIPEDAL(Serial.println("Volume knob: " + String(effect_type) + "(" + String(effecttype) + ")" + ", " + String(idx_par) + ", " + String(val));)
     effect_setting[(THR30II_EFF_TYPES)effect_type][idx_par] = val;
     maskCUpdate |= maskFxUnit;
   }
   else if( selected_sbox >= 7 && selected_sbox <= 8 ) // enum THR30II_ECHO_TYPES { TAPE_ECHO, DIGITAL_DELAY }
   {
     uint8_t echo_type = selected_sbox - 7; // Excluding Amp, Comp, NGate, PHASER, TREMOLO, FLANGER, CHORUS
-    Serial.println("Volume knob: " + String(echo_type) + "(" + String(echotype) + ")" + ", " + String(idx_par) + ", " + String(val));
+    TRACE_THR30IIPEDAL(Serial.println("Volume knob: " + String(echo_type) + "(" + String(echotype) + ")" + ", " + String(idx_par) + ", " + String(val));)
     echo_setting[(THR30II_ECHO_TYPES)echo_type][idx_par] = val;
     maskCUpdate |= maskEcho;
   }  
   else if( selected_sbox >= 9 && selected_sbox <= 12 ) // enum THR30II_REV_TYPES { SPRING, PLATE, HALL, ROOM }
   {
     uint8_t reverb_type = selected_sbox - 9; // Excluding Amp, Comp, NGate, PHASER, TREMOLO, FLANGER, CHORUS, TAPE_ECHO, DIGITAL_DELAY
-    Serial.println("Volume knob: " + String(reverb_type) + "(" + String(reverbtype) + ")" + ", " + String(idx_par) + ", " + String(val));
+    TRACE_THR30IIPEDAL(Serial.println("Volume knob: " + String(reverb_type) + "(" + String(reverbtype) + ")" + ", " + String(idx_par) + ", " + String(val));)
     reverb_setting[(THR30II_REV_TYPES)reverb_type][idx_par] = val;
     maskCUpdate |= maskReverb;
   }

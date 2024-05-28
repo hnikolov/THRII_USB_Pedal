@@ -1,6 +1,8 @@
 #ifndef _METRONOME_H_
 #define _METRONOME_H_
 
+#include"trace.h"
+
 class Metronome
 {
 private:
@@ -37,7 +39,7 @@ public:
   void setTimeSignature( uint8_t ts )
   {
     time_signature = ts;
-    Serial.println("Metronome time signature set to: " + String(time_signature) + "/4");
+    TRACE_THR30IIPEDAL(Serial.println("Metronome time signature set to: " + String(time_signature) + "/4");)
   }
 
   uint8_t getTimeSignature()
@@ -49,21 +51,21 @@ public:
   {
     time_signature--;
     if( time_signature < 2 ) { time_signature = max_ts; }
-    Serial.println("Metronome time signature changed to: " + String(time_signature) + "/4");
+    TRACE_THR30IIPEDAL(Serial.println("Metronome time signature changed to: " + String(time_signature) + "/4");)
   }
 
   void nextTimeSignature()
   {
     time_signature++;
     if( time_signature > max_ts ) { time_signature = 2; } // 2/4
-    Serial.println("Metronome time signature changed to: " + String(time_signature) + "/4");
+    TRACE_THR30IIPEDAL(Serial.println("Metronome time signature changed to: " + String(time_signature) + "/4");)
   }
 
   void setBPM( uint16_t _bpm )
   {
     bpm = _bpm;
     interval = bpm_to_interval();
-    Serial.println("Metronome bpm set to: " + String(bpm) + ", interval: " + String(interval));
+    TRACE_THR30IIPEDAL(Serial.println("Metronome bpm set to: " + String(bpm) + ", interval: " + String(interval));)
   }
 
   uint16_t getBPM()
@@ -76,7 +78,7 @@ public:
     bpm += val;
     if( bpm > 300 ) { bpm = 300; }
     interval = bpm_to_interval();
-    Serial.println("Metronome bpm increased to: " + String(bpm) + ", interval: " + String(interval));
+    TRACE_THR30IIPEDAL(Serial.println("Metronome bpm increased to: " + String(bpm) + ", interval: " + String(interval));)
   }
 
   void decBPM( uint16_t val )
@@ -84,7 +86,7 @@ public:
     if( bpm < val ) { bpm  = 0;   }
     else            { bpm -= val; }
     interval = bpm_to_interval();
-    Serial.println("Metronome bpm decreased to: " + String(bpm) + ", interval: " + String(interval));
+    TRACE_THR30IIPEDAL(Serial.println("Metronome bpm decreased to: " + String(bpm) + ", interval: " + String(interval));)
   }
 
   void tapBPM()
@@ -97,7 +99,7 @@ public:
       tempotapint = tempotaptime1 - tempotaptime0; // Time interval between presses
       bpm = 60000 / tempotapint;
       interval = bpm_to_interval();
-      Serial.println("Metronome bpm set by tapping to: " + String(bpm));
+      TRACE_THR30IIPEDAL(Serial.println("Metronome bpm set by tapping to: " + String(bpm));)
     }
   }
 
@@ -111,14 +113,14 @@ public:
     running = true;
     interval = bpm_to_interval();
     next_click = millis() + interval;
-    Serial.println("Metronome start, " + String(bpm) + " bpm, interval: " + String(interval));
+    TRACE_THR30IIPEDAL(Serial.println("Metronome start, " + String(bpm) + " bpm, interval: " + String(interval));)
   }
 
   void stop()
   {
     if( running == true )
     {
-      Serial.println("Metronome stopped");
+      TRACE_THR30IIPEDAL(Serial.println("Metronome stopped");)
       running = false;
       idx = 0;
     }
@@ -139,7 +141,7 @@ public:
       if( now >= next_click )
       {
         next_click = now + interval;
-        Serial.println("Click");
+        TRACE_THR30IIPEDAL(Serial.println("Click");)
         /*
         tone(TICK_PIN, sig[idx++], 5);
         if( idx == ksig ) { idx = 0; }

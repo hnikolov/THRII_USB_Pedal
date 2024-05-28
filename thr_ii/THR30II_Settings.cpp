@@ -1,14 +1,6 @@
-#include "THR30II.h"
 #include <algorithm> // fstd::ind_if()
-
-// TODO: These are defined and used in multiple files
-// Normal TRACE/DEBUG
-#define TRACE_THR30IIPEDAL(x) x	  // trace on
-// #define TRACE_THR30IIPEDAL(x)	// trace off
-
-// Verbose TRACE/DEBUG
-#define TRACE_V_THR30IIPEDAL(x) x	 // trace on
-// #define TRACE_V_THR30IIPEDAL(x) // trace off
+#include "THR30II.h"
+#include "trace.h"
 
 THR30II_Settings::THR30II_Settings() // Constructor
 {
@@ -40,9 +32,9 @@ void THR30II_Settings::EchoTempoTap()
     // TODO Check timing to be similar to using the tap: time THR button 
 		tempotapint = tempotaptime1 - tempotaptime0; // Time interval between presses
 		tempotapsetting = tempotapint / 10;	         // Convert tapped interval to setting value
-		Serial.println(tempotapsetting);
+		TRACE_THR30IIPEDAL(Serial.println(tempotapsetting);)
 		tempotapbpm = 60000 / tempotapint;
-		Serial.println(tempotapbpm);
+		TRACE_THR30IIPEDAL(Serial.println(tempotapbpm);)
 
 		echo_setting[TAPE_ECHO][TA_TIME] = tempotapsetting;
 		echo_setting[DIGITAL_DELAY][DD_TIME] = tempotapsetting;
@@ -501,7 +493,6 @@ void THR30II_Settings::Switch_On_Off_Reverb_Unit(bool state) // Setter for switc
 
 void THR30II_Settings::SetControl(uint8_t ctrl, double value)
 {
-//  Serial.println("SetControl()");
   control[ctrl] = value;
   if( sendChangestoTHR )
   {
@@ -559,7 +550,7 @@ col_amp THR30II_Settings::THR30IIAmpKey_ToColAmp(uint16_t ampkey)
 //--------- FUNCTION FOR SENDING CAB SETTING TO THR30II -----------------
 void THR30II_Settings::SendCab() // Send cabinet setting to THR
 {
-  Serial.println("Swithching Cabinet...");
+  TRACE_THR30IIPEDAL(Serial.println("Swithching Cabinet...");)
 	SendParameterSetting((un_cmd) {THR30II_UNITS_VALS[THR30II_UNITS::GATE].key, THR30II_CAB_COMMAND}, (type_val<uint16_t>) {0x02, (uint16_t)cab});
 }
 
