@@ -71,14 +71,12 @@ ArduinoQueue<SysExMessage> inqueue(40);
 
 bool complete = false; // Used in cooperation with the "OnSysEx"-handler's parameter "complete" 
 
-String s1("MIDI");
 #define MIDI_EVENT_PACKET_SIZE  64 // For THR30II, was much bigger on old THR10
 #define OUTQUEUE_TIMEOUT       250 // Timeout if a message is not acknowledged or answered
 
 uint8_t buf[MIDI_EVENT_PACKET_SIZE]; // Receive buffer for incoming (raw) Messages from THR30II to controller
 uint8_t currentSysEx[310];           // Buffer for the currently processed incoming SysEx message (maybe coming in spanning over up to 5 consecutive buffers)
 						                         // Was needed on Arduino Due. On Teensy3.6 64 could be enough
-
 uint32_t msgcount = 0;
 
 uint16_t cur = 0;     // Current index in actual SysEx
@@ -165,19 +163,10 @@ void setup()
   // ----------------------------
   tft.init();
 	//tft.begin();
-  //tft.setRotation(1);  // for the 2" tft (ST7789)
   tft.setRotation(3);    // for the 3.2" tft (ILI9341)
   spr.setColorDepth(16); // 16 bit colour needed to show antialiased fonts
-  //tft.fillScreen(TFT_THRCREAM); // Show a splash screen instead? :)
   maskCUpdate = 0xffffffff;
   updateStatusMask(THR_Values, maskCUpdate);
-
-  //tft.setTextColor(TFT_BLACK);
-  //tft.setFreeFont(FSB18);       // Select Free Serif 24 point font
-  //tft.println();                // Move cursor down a line
-  //tft.print("UserSetting2");
-  //tft.println();                // Move cursor down a line
-  //tft.print("USB MIDI pedal board for THRII");
 
   // ----------------------------
   // Initialise the TFT backlight
@@ -240,7 +229,7 @@ void gui_timing()
     {
       THR_Values.send_to_thrii();
       TRACE_V_THR30IIPEDAL(Serial.println("Sent edit data to THRII");)
-      THR_Values.sendEditToTHR = false; // Important to be here, after sending to thrii
+      THR_Values.sendEditToTHR = false;
     }
     tick2 = millis(); // Start new waiting period
   }
@@ -341,10 +330,10 @@ void send_init()  //Try to activate THR30II MIDI
 	TRACE_V_THR30IIPEDAL(Serial.println(F("\r\nOutque cleared.\r\n"));)
 
 	// PC to THR30II Message:
-	//F0 7E 7F 06 01 F7  (First Thing PC sends to THR using "THR Remote" (prepares unlocking MIDI!) )
-	//#S1
+	// F0 7E 7F 06 01 F7  (First Thing PC sends to THR using "THR Remote" (prepares unlocking MIDI!) )
+	// #S1
 	//--------------------------------------------  Put outgoing  messages into the queue 
-	//Universal Identity request
+	// Universal Identity request
 	outqueue.enqueue( Outmessage(SysExMessage( (const byte[6]) { 0xF0, 0x7E, 0x7F, 0x06, 0x01, 0xF7}, 6 ), 1, true, true) ); // Acknowledge means receiving 1st reply to Univ. Discovery, Answerded is receiving 2nd. Answer 
 	
 	// THR30II answers:         F0 7E 7F 06 02 00 01 0C 24 00 02 00 63 00 1E 01 F7    (1.30.0c)  (63 = 'c')
@@ -360,13 +349,13 @@ void send_init()  //Try to activate THR30II MIDI
 		(L6ImageType:mainL6ImageVersion:1.3.0.0.c)
 	*/
 	
-	//#S2 invokes #R3 (ask Firmware-Version) For activating MIDI only necessary to get the right magic key for #S3/#S4  (not needed, if key is known)            
+	// #S2 invokes #R3 (ask Firmware-Version) For activating MIDI only necessary to get the right magic key for #S3/#S4  (not needed, if key is known)
   outqueue.enqueue( Outmessage( SysExMessage( (const byte[29]) { 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7 },29), 2, false, true)); //answer will be the firmware version);
-  //outqueue.enqueue( Outmessage( SysExMessage( (const byte[29]) { 0xf0, 0x00, 0x01, 0x0c, 0x22, 0x02, 0x4d, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7 },29), 2, false, true)); //answer will be the firmware version);
+  // outqueue.enqueue( Outmessage( SysExMessage( (const byte[29]) { 0xf0, 0x00, 0x01, 0x0c, 0x22, 0x02, 0x4d, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7 },29), 2, false, true)); //answer will be the firmware version);
 	TRACE_V_THR30IIPEDAL(Serial.println(F("Enqued Ask Firmware-Version.\r\n")));
 
-  //#S3 + #S4 will follow, when answer to "ask Firmware-Version" comes in 
-	//#S3 + #S4 will invoke #R4 (seems always the same) "MIDI activate" (works only after ID_Req!)														   
+  // #S3 + #S4 will follow, when answer to "ask Firmware-Version" comes in
+	// #S3 + #S4 will invoke #R4 (seems always the same) "MIDI activate" (works only after ID_Req!)
 } // End of send_init()
 
 void do_gain_boost()

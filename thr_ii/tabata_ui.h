@@ -182,7 +182,7 @@ public:
           if( tm.with_metronome == true )
           {
             draw_text_line_1(String(tm.metronome.getBPM()));
-            draw_text_line_2(String(tm.metronome.getTimeSignature())+"/4");
+            draw_text_line_2(String(tm.metronome.getTimeSignature()) + "/4");
           }
           else
           {

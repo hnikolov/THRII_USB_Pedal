@@ -36,7 +36,7 @@
 // Normal Manufacturer IDs are onyl 1 Byte, but the 0x00 says: the next 2 bytes are the ID
 // For new THRII series
 const byte LINE6_YAMAHA_MIDI_ID[]   { 0x00, 0x01, 0x0C };
-// const byte LINE6_YAMAHA_DEVICE_ID[] { 0x02, 0x4D }; // THR0II_W
+// const byte LINE6_YAMAHA_DEVICE_ID[] { 0x02, 0x4D }; // THR30II_W
 const byte LINE6_YAMAHA_DEVICE_ID[] { 0x01, 0x4D }; // THR10II_W
 
 class Outmessage; // Forward declaration
@@ -58,7 +58,6 @@ const byte THR30II_RESP_TO_UNIV_SYSEX_REQ [] { 0xF0, 0x7E, 0x7F, 0x06, 0x02, 0x0
 
 // 2nd answer to univ. inquiry
 const byte THR30II_IDENTIFY [] { 0xF0, 0x00, 0x01, 0x0C, 0x24, 0x02, 0x7E, 0x7F, 0x06, 0x02 }; // Note: 0x02, 0x7E hast to be. This is not related to Yamaha device ID (01 4d)
-
 
 // AMP simulation collections 
 enum THR30II_COL { CLASSIC = 0, BOUTIQUE, MODERN };
@@ -90,15 +89,11 @@ enum THR30II_UNITS { COMPRESSOR, CONTROL, EFFECT, ECHO, REVERB, GATE };
 extern std::map<THR30II_UNITS, uint16_t> THR30II_UNIT_ON_OFF_COMMANDS;
 
 // Effect Unit Types, Parameters
-//enum THR30II_EFF_TYPES { PHASER, TREMOLO, FLANGER, CHORUS };
-// NEW 
 enum THR30II_EFF_TYPES { CHORUS, FLANGER, PHASER, TREMOLO };
 
 enum THR30II_EFF_SET_PHAS { PH_SPEED, PH_FEEDBACK, PH_MIX };
 enum THR30II_EFF_SET_TREM { TR_SPEED, TR_DEPTH, TR_MIX };
-//enum THR30II_EFF_SET_FLAN { FL_DEPTH, FL_SPEED, FL_MIX };
 enum THR30II_EFF_SET_FLAN { FL_SPEED, FL_DEPTH, FL_MIX };
-//enum THR30II_EFF_SET_CHOR { CH_FEEDBACK, CH_DEPTH, CH_SPEED, CH_PREDELAY, CH_MIX, CH_SYNCSELECT };
 enum THR30II_EFF_SET_CHOR { CH_SPEED, CH_DEPTH, CH_PREDELAY, CH_FEEDBACK, CH_MIX, CH_SYNCSELECT };
 
 // Reverb Unit Types, Parameters
@@ -108,15 +103,9 @@ enum THR30II_REV_SET_SPRI { SP_REVERB, SP_TONE, SP_MIX };
 enum THR30II_REV_SET_PLAT { PL_DECAY, PL_PREDELAY, PL_TONE, PL_MIX };
 enum THR30II_REV_SET_HALL { HA_DECAY, HA_PREDELAY, HA_TONE, HA_MIX };
 enum THR30II_REV_SET_ROOM { RO_DECAY, RO_PREDELAY, RO_TONE, RO_MIX };
-//enum THR30II_REV_SET_PLAT { PL_DECAY, PL_TONE, PL_PREDELAY, PL_MIX };
-//enum THR30II_REV_SET_HALL { HA_DECAY, HA_TONE, HA_PREDELAY, HA_MIX };
-//enum THR30II_REV_SET_ROOM { RO_DECAY, RO_TONE, RO_PREDELAY, RO_MIX };
 
 // Echo Unit Types, Parameters
 enum THR30II_ECHO_TYPES { TAPE_ECHO, DIGITAL_DELAY }; // NEW for 1.40.0a
-
-//enum THR30II_ECHO_SET_TAPE { TA_BASS, TA_TREBLE, TA_FEEDBACK, TA_TIME, TA_MIX, TA_SYNCSELECT }; // NEW for 1.40.0a
-//enum THR30II_ECHO_SET_DIGI { DD_BASS, DD_TREBLE, DD_FEEDBACK, DD_TIME, DD_MIX, DD_SYNCSELECT }; // NEW for 1.40.0a
 
 enum THR30II_ECHO_SET_TAPE { TA_TIME, TA_FEEDBACK, TA_BASS, TA_TREBLE, TA_MIX, TA_SYNCSELECT }; // NEW for 1.40.0a
 enum THR30II_ECHO_SET_DIGI { DD_TIME, DD_FEEDBACK, DD_BASS, DD_TREBLE, DD_MIX, DD_SYNCSELECT }; // NEW for 1.40.0a
@@ -472,7 +461,6 @@ class THR30II_Settings
   // enum Triggers { Tr_key };
 
   static States _state; // Initial State as pre-Set Value
-	// static States _last_state;
 	bool sendChangestoTHR = true;  // Set to false, if changes come from THR-Knobs
 	// State vars
 
@@ -483,7 +471,7 @@ class THR30II_Settings
 	THR30II_REV_TYPES reverbtype = SPRING;
 	THR30II_EFF_TYPES effecttype = PHASER;
 	THR30II_ECHO_TYPES echotype  = TAPE_ECHO;
-  // TODO: Init default?
+
 	THR30II_AMP amp = CLEAN;        // Field for the simulated AMP model
   THR30II_COL col = CLASSIC;      // Field for the simulation collection (BOUTIQUE, CLASSIC, MODERN)
   THR30II_CAB cab = British_4x12; // Field for the simulated cabinet

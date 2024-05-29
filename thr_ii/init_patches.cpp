@@ -39,7 +39,7 @@ std::string readFile(File file)
 
 //------------------------------------------------------
 // The order of reading the files in a directory on the SD card is not guaranteed to be always the same
-// Therefore, first read and sort the files based on their names. Use file name format: "01 name etc.thrl6p"
+// Therefore, first read and sort the files based on their names. Use file name format: "01_name_etc.thrl6p"
 //------------------------------------------------------
 void initializeSortedPresets(const String &path, std::vector <JsonDocument> &json_patchesII, std::vector <String> &patchNames, uint16_t &npatches, std::vector <String> &file_paths)
 {

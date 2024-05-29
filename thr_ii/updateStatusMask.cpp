@@ -16,7 +16,6 @@ extern TFT_eSprite spr;
 //#include <Fonts/FreeMono9pt7b.h>
 //#include <Fonts/FreeSans9pt7b.h>
 
-
 #include "stompBoxes.h" // Fonts definition
 extern std::vector <StompBox*> sboxes;
 
@@ -79,35 +78,9 @@ void drawPatchSet(uint16_t colour, String ps_name)
   spr.unloadFont();
   spr.deleteSprite();
 }
-/*
-void drawPatchID(uint16_t fgcolour, int patchID, bool inverted = false)
-{
-  // TODO: y = 20, h = 60?
- 	int x = 0, y = 0, w = 80, h = 80;
-  uint16_t fg_colour = fgcolour;
-  uint16_t bg_colour = TFT_THRVDARKGREY;
-  if( inverted )
-  {
-    fg_colour = TFT_THRVDARKGREY;
-    bg_colour = fgcolour;
-  }
-	spr.createSprite(w, h);
-	spr.fillSmoothRoundRect(0, 0, w-1, h-1, 3, bg_colour, TFT_BLACK);
-	spr.setTextFont(7);
-	spr.setTextSize(1);
-	spr.setTextDatum(MR_DATUM);
-	spr.setTextColor(TFT_BLACK, bgcolour, bgfill); // TODO in case of inverted
-	spr.drawNumber(88, w-7, h/2);
-  spr.setTextColor(fg_colour, bg_colour, bgfill);
-	spr.drawNumber(patchID, w-7, h/2);
-	spr.pushSprite(x, y);
-	spr.unloadFont();
-	spr.deleteSprite();
-}
-/*/
+
 void drawPatchID(uint16_t fgcolour, int patchID)
 {
-// 	int x = 0, y = 0, w = 80, h = 80;
  	int x = 0, y = 20, w = 80, h = 60;
 //	uint16_t bgcolour = TFT_THRVDARKGREY;
 	spr.createSprite(w, h);
@@ -125,7 +98,6 @@ void drawPatchID(uint16_t fgcolour, int patchID)
 	spr.unloadFont();
 	spr.deleteSprite();
 }
-//*/
 
 void drawPatchIcon(int x, int y, int w, int h, uint16_t colour, int patchID, bool show_num = true)
 {
@@ -180,7 +152,6 @@ void drawPatchSelMode(uint16_t colour, String string="MAN")
   spr.setTextDatum(MC_DATUM);
   spr.setTextColor(TFT_BLACK, colour, bgfill);
   spr.drawString(string, w/2, h/2+1);
-  //spr.drawString("EDIT", w/2, h/2+1);
   spr.pushSprite(x, y);
   spr.unloadFont();
   spr.deleteSprite();
@@ -269,7 +240,7 @@ void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
   if( spr.textWidth(patchname) > w )
   {
     uint8_t pos = getSplitPos( patchname );
-    String line1 = patchname.substring(0, pos); // TODO: Split at space char
+    String line1 = patchname.substring(0, pos);
     String line2 = patchname.substring(pos, patchname.length());
     spr.drawString(line1, w/2, h/2-18);
     spr.drawString(line2, w/2, h/2+24);
@@ -317,6 +288,7 @@ void draw2BarChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcol
   spr.deleteSprite();
 }
 
+// Obsolete
 void drawPPChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int ped1, int ped2)
 {
 	int tpad = 20; int pad = 0;
@@ -336,6 +308,7 @@ void drawPPChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolou
 	spr.deleteSprite();
 }
 
+// Obsolete
 void drawEQChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int b, int m, int t)
 {
   int tpad = 20; int pad = 0;
@@ -432,7 +405,6 @@ void drawUtilUnit(int x, int y, int w, int h, int bpad, uint16_t bgcolour, uint1
 	spr.loadFont(AA_FONT_SMALL);
 	//spr.setTextFont(2);
   spr.setTextDatum(MC_DATUM);
-//	spr.setTextColor(fgcolour, bgcolour, bgfill);
 	spr.setTextColor(TFT_BLACK, bgcolour, bgfill);
 	spr.drawString(label, w/2, 13);
 	spr.fillRect(grx, gry, grw, grh, fgcolour);	// Draw graph area
@@ -460,7 +432,6 @@ void drawFXUnit(int x, int y, int w, int h, uint16_t fgcolour, uint16_t bgcolour
 	spr.loadFont(AA_FONT_SMALL);
 	//spr.setTextFont(2);
   spr.setTextDatum(MC_DATUM);
-//	spr.setTextColor(bgcolour, fgcolour, bgfill);
 	spr.setTextColor(TFT_BLACK, fgcolour, bgfill);
 	spr.drawString(label, w/2, 13);	// Write label
 
@@ -479,28 +450,8 @@ void drawFXUnit(int x, int y, int w, int h, uint16_t fgcolour, uint16_t bgcolour
 	spr.deleteSprite();
 }
 
-void THR30II_Settings::updateConnectedBanner() // Show the connected Model 
-{
-	// //Display "THRxxII" in blue (as long as connection is established)
-
-	// s1=THRxxII_MODEL_NAME();
-	// if(ConnectedModel != 0)
-	// {
-	// 	tft.loadFont(AA_FONT_LARGE); // Set current font    
-	// 	tft.setTextSize(1);
-	// 	tft.setTextColor(TFT_BLUE, TFT_BLACK, bgfill);
-	// 	tft.setTextDatum(TL_DATUM);
-	// 	tft.setTextPadding(160);
-	// 	tft.drawString(s1, 0, 0);//printAt(tft,0,0, s1 ); // Print e.g. "THR30II" in blue in header position
-	// 	tft.setTextPadding(0);
-	// 	tft.unloadFont();
-	// }
-}
-
 /////////////////////////////////////////////////////////////////
-// Redraw all the bars and values on the TFT
-// x-position (0) where to place top left corner of status mask
-// y-position     where to place top left corner of status mask
+// Redraw updated components on the TFT
 /////////////////////////////////////////////////////////////////
 void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 {
@@ -574,7 +525,6 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 	uint16_t FXfgcolour  =  0;
 	double FXparams[5]   = {0};
 	double utilparams[2] = {0};
-	//uint8_t FXw  =  60;
 	uint8_t FXw  = 56;
 	uint8_t FXw2 = 48;
 	uint8_t FXh  = 65;
@@ -623,7 +573,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     switch( thrs.effecttype )
     {
       case CHORUS:
-        FXtitle = "Chor";	 // Set FX unit title
+        FXtitle = "Chor"; // Set FX unit title
         if( thrs.unit[EFFECT] ) // FX2 activated
         {
           FXbgcolour = TFT_THRCHOR;
@@ -643,7 +593,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       break;
 
       case FLANGER: 
-        FXtitle = "Flan";	 // Set FX unit title
+        FXtitle = "Flan";	// Set FX unit title
         if( thrs.unit[EFFECT] ) // FX2 activated
         {
           FXbgcolour = TFT_THRFLAN;
@@ -663,7 +613,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       break;
 
       case PHASER:
-        FXtitle = "Phas";	 // Set FX unit title
+        FXtitle = "Phas";	// Set FX unit title
         if( thrs.unit[EFFECT] ) // FX2 activated
         {
           FXbgcolour = TFT_THRPHAS;
@@ -683,7 +633,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       break;		
 
       case TREMOLO:
-        FXtitle = "Trem";	 // Set FX unit title
+        FXtitle = "Trem";	// Set FX unit title
         if( thrs.unit[EFFECT] ) // FX2 activated
         {
           FXbgcolour = TFT_THRTREM;
@@ -714,7 +664,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     {
       case TAPE_ECHO:
         FXtitle = "Tape";	// Set FX unit title
-        if( thrs.unit[ECHO] )  // FX3 activated
+        if( thrs.unit[ECHO] ) // FX3 activated
         {
           FXbgcolour = TFT_THRTAPE;
           FXfgcolour = TFT_THRDIMTAPE;
@@ -734,7 +684,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 
       case DIGITAL_DELAY:
         FXtitle = "D.D.";	// Set FX unit title
-        if( thrs.unit[ECHO] )  // FX3 activated
+        if( thrs.unit[ECHO] ) // FX3 activated
         {
           FXbgcolour = TFT_THRDDLY;
           FXfgcolour = TFT_THRDIMDDLY;
@@ -763,7 +713,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     switch( thrs.reverbtype )
     {
       case SPRING:
-        FXtitle = "Spr";   // Set FX unit title
+        FXtitle = "Spr"; // Set FX unit title
         if( thrs.unit[REVERB] ) // FX4 activated
         {
           FXbgcolour = TFT_THRSPR;
@@ -783,7 +733,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       break;
 
       case ROOM:
-        FXtitle = "Room";  // Set FX unit title
+        FXtitle = "Room"; // Set FX unit title
         if( thrs.unit[REVERB] ) // FX4 activated
         {
           FXbgcolour = TFT_THRROOM;
@@ -823,7 +773,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
       break;
 
       case HALL:
-        FXtitle = "Hall";	 // Set FX unit title
+        FXtitle = "Hall";	// Set FX unit title
         if( thrs.unit[REVERB] ) // FX4 activated
         {
           FXbgcolour = TFT_THRHALL;
@@ -846,13 +796,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     drawFXUnit(FXx, FXy, FXw, FXh, FXbgcolour, FXfgcolour, FXtitle, nFXbars, FXparams);
   }
   FXx += FXw;
-/*
-  // Show THRII Guitar and Audio volume values
-  if( maskCUpdate & maskVolumeAudio )
-  {
-    drawPPChart(FXx, FXy, 27, FXh, TFT_THRBROWN, TFT_THRCREAM, "VA", thrs.guitar_volume, thrs.audio_volume);
-  }
-*/
+
   if( maskCUpdate & maskPatchName )
   {
     String s2, s3;
@@ -906,7 +850,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 uint8_t last_updated_sbox = 12;
 
 ////////////////////////////////////////////////////////////////////////
-//
+// Used to refresh TFT content in Edit mode
 ////////////////////////////////////////////////////////////////////////
 void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
 {

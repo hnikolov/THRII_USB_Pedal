@@ -9,8 +9,8 @@
 
 void Constants::set_all(const byte* buf)
 {
-  uint32_t vals = *((uint32_t*) buf);       //how many values are in the symbol table
-  uint32_t len =  *((uint32_t*) (buf+4));   //how many bytes build the symbol table
+  uint32_t vals = *((uint32_t*) buf);     // How many values are in the symbol table
+  uint32_t len =  *((uint32_t*) (buf+4)); // How many bytes build the symbol table
 
   TRACE_THR30IIPEDAL( Serial.printf("%d symbols found.\n\r", vals);
                       Serial.printf("%d file length.\n\r", len);
@@ -21,7 +21,7 @@ void Constants::set_all(const byte* buf)
   
   // CRC32 calculation over the symbol table, used to calculate the 'Magic Key' ==========================================
   // uint32_t checksum = CRC32::calculate(buf, len);
-  // Serial.println("Symbol table CRC32 = 0x" + String(checksum, HEX) + " *******************************************************");
+  // Serial.println("Symbol table CRC32 = 0x" + String(checksum, HEX) + " *********************************************");
   // =====================================================================================================================
 
   // print out for analysis only
@@ -52,13 +52,13 @@ void Constants::set_all(const byte* buf)
   }
 };
 
-//Get count of free memory (for development only)
+// Get count of free memory (for development only)
 #ifdef __arm__
-// should use uinstd.h to define sbrk but Due causes a conflict
+// Should use uinstd.h to define sbrk but Due causes a conflict
 extern "C" char* sbrk(int incr);
-#else  // __ARM__
+#else // __ARM__
 extern char *__brkval;
-#endif  // __arm__
+#endif // __arm__
  
 int freeMemory() {
   char top;
@@ -66,7 +66,7 @@ int freeMemory() {
   return &top - reinterpret_cast<char*>(sbrk(0));
 #elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
   return &top - __brkval;
-#else  // __arm__
+#else // __arm__
   return __brkval ? &top - __brkval : &top - __malloc_heap_start;
-#endif  // __arm__
+#endif // __arm__
 }

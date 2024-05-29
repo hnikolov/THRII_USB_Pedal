@@ -4,7 +4,6 @@
 extern THR30II_Settings THR_Values;
 
 extern ampSelectModes amp_select_mode;
-dynModes dyn_mode = Comp; // Used only in the FSM
 
 extern std::array< THR30II_Settings, 5 > thr_user_presets;
 int8_t nUserPreset = -1; // Used to cycle the THRII User presets
@@ -711,17 +710,14 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
     {
         case 1:
           sboxes[selected_sbox]->setFocusPrev();
-//          maskCUpdate = maskAll;
         break;
 
         case 2:
           sboxes[selected_sbox]->setFocusNext();
-//          maskCUpdate = maskAll;
         break;
 
         case 3: // Switch to previous mode (amp/presets) - cancel the edit mode
           _uistate = _uistate_prev;
-//          _uistate = UI_home_amp; // FIXME: Issues if UI_manual
           maskCUpdate = maskAll;
         break;
 
@@ -884,7 +880,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 15:
-//          maskCUpdate = maskAll;
+          maskCUpdate = maskAll;
         break;
 
         case 16: // Edit the Gate Unit
@@ -964,22 +960,18 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
     {
         case 1:
           tm.metronome.prevTimeSignature();
-//          maskCUpdate = maskAll;
         break;
 
         case 2:
           tm.metronome.nextTimeSignature();
-//          maskCUpdate = maskAll;
         break;
 
         case 3:
           if( _uistate == UI_tabata ) { tm.toggleMetronomeInTabata(); }
-//          maskCUpdate = maskAll;
         break;
 
         case 4: // Tap tempo
           tm.metronome.tapBPM(); // Get tempo tap input and apply to the metronome unit
-//          maskCUpdate = maskAll;
         break;
 
         case 5:
@@ -989,7 +981,6 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
             if( tm.with_metronome ) { tm.metronome.decBPM(10);       }
             else                    { tm.tabata.decPracticeTime(10); } // Note: Practice time
           }
-//          maskCUpdate = maskAll;
         break;
 
         case 6:
@@ -999,12 +990,10 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
             if( tm.with_metronome ) { tm.metronome.decBPM(5);       }
             else                    { tm.tabata.decPracticeTime(5); }
           }
-//          maskCUpdate = maskAll;
         break;
 
         case 7: // Start / Stop
           tm.toggle();
-//          maskCUpdate = maskAll;
         break;
 
         case 8:
@@ -1014,7 +1003,6 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
             if( tm.with_metronome ) { tm.metronome.incBPM(5);       }
             else                    { tm.tabata.incPracticeTime(5); }
           }
-//          maskCUpdate = maskAll;
         break;
 
         case 9:
@@ -1024,20 +1012,16 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
             if( tm.with_metronome ) { tm.metronome.incBPM(10);       }
             else                    { tm.tabata.incPracticeTime(10); }
           }
-//          maskCUpdate = maskAll;
         break;
 
         // Buttons hold ============================================================
         case 11:
-//          maskCUpdate = maskAll;
         break;
 
         case 12:
-//          maskCUpdate = maskAll;
         break;
 
         case 13:
-//          maskCUpdate = maskAll;
         break;
 
         case 14: // Switch to previous mode - cancel the metronome/tabata mode
@@ -1055,7 +1039,6 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
             if( tm.with_metronome ) { tm.metronome.decBPM(20);   }
             else                    { tm.tabata.decRestTime(10); } // Note: Rest time
           }
-//          maskCUpdate = maskAll;
         break;
 
         case 16:
@@ -1065,7 +1048,6 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
             if( tm.with_metronome ) { tm.metronome.decBPM(1);   }
             else                    { tm.tabata.decRestTime(5); }
           }
-//          maskCUpdate = maskAll;
         break;
 
         case 17: // Switch between Tabata and Metronome
@@ -1073,7 +1055,6 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
           if( _uistate == UI_metronome )   { _uistate = UI_tabata;    tmui.draw_tabata();    }
           else if( _uistate == UI_tabata ) { _uistate = UI_metronome; tmui.draw_metronome(); }
           TRACE_THR30IIPEDAL(Serial.println("Toggle Metronome/Tabata");)
-//          maskCUpdate = maskAll;
         break;
 
         case 18:
@@ -1083,7 +1064,6 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
             if( tm.with_metronome ) { tm.metronome.incBPM(1);   }
             else                    { tm.tabata.incRestTime(5); }
           }
-//          maskCUpdate = maskAll;
         break;
 
         case 19:
@@ -1093,7 +1073,6 @@ void handle_metronome_mode(UIStates &_uistate, uint8_t &button_state)
             if( tm.with_metronome ) { tm.metronome.incBPM(20);   }
             else                    { tm.tabata.incRestTime(10); }
           }
-//          maskCUpdate = maskAll;
         break;
 
         default:

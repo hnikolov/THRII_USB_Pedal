@@ -43,7 +43,7 @@ public:
 
   void toggleMetronomeInTabata()
   {
-    // TODO: If metronome is enabled during the ready counting state, the effect is "pause"
+    // FIXME: If metronome is enabled during the ready counting state, the effect is "pause"
     with_metronome = !with_metronome;
     if( with_metronome == true ) { metronome.start(); }
     else                         { metronome.stop();  }

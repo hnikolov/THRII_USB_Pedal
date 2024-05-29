@@ -760,10 +760,6 @@ int THR30II_Settings::SetLoadedPatch( const JsonDocument djd ) // Invoke all set
 
 	std::map<String, uint16_t> &glob = Constants::glo;
 	
-	// Patch name FIXME: This overwrites the user preset patch names!!!!!!!!!
-  // This set may not be needed
-	//SetPatchName(djd["data"]["meta"]["name"].as<const char*>(), presel_patch_id);
-	
 	// Unknown global parameter
 	Tnid = djd["data"]["meta"]["tnid"].as<uint32_t>();
 
