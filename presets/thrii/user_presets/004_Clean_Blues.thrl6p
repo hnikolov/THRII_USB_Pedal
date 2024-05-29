@@ -1,59 +1,61 @@
 {
   "data": {
     "device": 2359298,
-    "device_version": 20971617,
+    "device_version": 19923043,
     "meta": {
-      "name": "EarlyVH",
+      "name": "Clean Blues",
       "tnid": 0
     },
     "tone": {
       "THRGroupAmp": {
-        "@asset": "THR10X_Brown1",
-        "Bass": 0.409973,
-        "Drive": 0.525651,
-        "Master": 0.689062,
-        "Mid": 0.694118,
-        "Treble": 0.745062
+        "@asset": "THR10C_BJunior2",
+        "Bass": 0.354031,
+        "Drive": 0.401307,
+        "Master": 0.803704,
+        "Mid": 0.808497,
+        "Treble": 0.653159
       },
       "THRGroupCab": {
         "@asset": "speakerSimulator",
-        "SpkSimType": 2
+        "SpkSimType": 3
       },
       "THRGroupFX1Compressor": {
         "@asset": "RedComp",
-        "@enabled": false,
-        "Level": 0.83,
-        "Sustain": 0.3
+        "@enabled": true,
+        "Level": 0.607778,
+        "Sustain": 0.6
       },
       "THRGroupFX2Effect": {
-        "@asset": "Phaser",
+        "@asset": "StereoSquareChorus",
         "@enabled": false,
-        "@wetDry": 0.334071,
-        "Feedback": 0.434175,
-        "Speed": 0.0144242
+        "@wetDry": 0.429216,
+        "Depth": 0.24942,
+        "Feedback": 0.122343,
+        "Freq": 0.113012,
+        "Pre": 0.5
       },
       "THRGroupFX3EffectEcho": {
         "@asset": "TapeEcho",
         "@enabled": true,
-        "@wetDry": 0.212781,
-        "Bass": 0.5,
-        "Feedback": 0.344024,
-        "Time": 0.422019,
-        "Treble": 0.320351
+        "@wetDry": 0.204662,
+        "Bass": 0.307407,
+        "Feedback": 0.303542,
+        "Time": 0.153963,
+        "Treble": 0.302986
       },
       "THRGroupFX4EffectReverb": {
         "@asset": "LargePlate1",
         "@enabled": true,
-        "@wetDry": 0.19566,
-        "Decay": 0.237066,
-        "PreDelay": 0.314381,
-        "Tone": 0.536849
+        "@wetDry": 0.153355,
+        "Decay": 0.151852,
+        "PreDelay": 0.155556,
+        "Tone": 0.5
       },
       "THRGroupGate": {
         "@asset": "noiseGate",
         "@enabled": true,
         "Decay": 0.205,
-        "Thresh": -33
+        "Thresh": -47.2222
       },
       "global": {
         "THRPresetParamTempo": 110

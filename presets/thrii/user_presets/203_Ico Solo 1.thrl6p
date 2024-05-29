@@ -1,0 +1,72 @@
+{
+ "data" : {
+  "device" : 2359297,
+  "device_version" : 21102695,
+  "meta" : {
+   "name" : "Ico Solo 1",
+   "tnid" : 0
+  },
+  "tone" : {
+   "THRGroupAmp" : {
+    "@asset" : "THR30_Stealth",
+    "Bass" : 0.470588,
+    "Drive" : 0.580392,
+    "Master" : 0.352941,
+    "Mid" : 0.341176,
+    "Treble" : 0.603922
+   },
+   "THRGroupCab" : {
+    "@asset" : "speakerSimulator",
+    "SpkSimType" : 5
+   },
+   "THRGroupFX1Compressor" : {
+    "@asset" : "RedComp",
+    "@enabled" : true,
+    "Level" : 0.692963,
+    "Sustain" : 0.255556
+   },
+   "THRGroupFX2Effect" : {
+    "@asset" : "StereoSquareChorus",
+    "@enabled" : false,
+    "@wetDry" : 0.50,
+    "Depth" : 0.20,
+    "Feedback" : 0.130,
+    "Freq" : 0.040,
+    "Pre" : 0.50
+   },
+   "THRGroupFX3EffectEcho" : {
+    "@asset" : "TapeEcho",
+    "@enabled" : true,
+    "@wetDry" : 0.264815,
+    "Bass" : 0.429631,
+    "Feedback" : 0.502221,
+    "Time" : 0.405815,
+    "Treble" : 0.546297
+   },
+   "THRGroupFX4EffectReverb" : {
+    "@asset" : "ReallyLargeHall",
+    "@enabled" : true,
+    "@wetDry" : 0.309260,
+    "Decay" : 0.50,
+    "PreDelay" : 0.50,
+    "Tone" : 0.50
+   },
+   "THRGroupGate" : {
+    "@asset" : "noiseGate",
+    "@enabled" : false,
+    "Decay" : 0.2050,
+    "Thresh" : -33.0
+   },
+   "global" : {
+    "THRPresetParamTempo" : 110
+   }
+  }
+ },
+ "meta" : {
+  "original" : 0,
+  "pbn" : 0,
+  "premium" : 0
+ },
+ "schema" : "L6Preset",
+ "version" : 5
+}

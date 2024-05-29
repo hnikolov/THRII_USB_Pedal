@@ -1,0 +1,72 @@
+{
+ "data" : {
+  "device" : 2359296,
+  "device_version" : 20971617,
+  "meta" : {
+   "name" : "JCM800",
+   "tnid" : 0
+  },
+  "tone" : {
+   "THRGroupAmp" : {
+    "@asset" : "THR10_Brit",
+    "Bass" : 0.259259,
+    "Drive" : 0.718420,
+    "Master" : 0.718523,
+    "Mid" : 0.456338,
+    "Treble" : 0.651138
+   },
+   "THRGroupCab" : {
+    "@asset" : "speakerSimulator",
+    "SpkSimType" : 11
+   },
+   "THRGroupFX1Compressor" : {
+    "@asset" : "RedComp",
+    "@enabled" : true,
+    "Level" : 0.315185,
+    "Sustain" : 0.30
+   },
+   "THRGroupFX2Effect" : {
+    "@asset" : "StereoSquareChorus",
+    "@enabled" : false,
+    "@wetDry" : 0.268861,
+    "Depth" : 0.414677,
+    "Feedback" : 0.107841,
+    "Freq" : 0.200665,
+    "Pre" : 0.245240
+   },
+   "THRGroupFX3EffectEcho" : {
+    "@asset" : "TapeEcho",
+    "@enabled" : false,
+    "@wetDry" : 0.152554,
+    "Bass" : 0.430975,
+    "Feedback" : 0.261538,
+    "Time" : 0.254320,
+    "Treble" : 0.0
+   },
+   "THRGroupFX4EffectReverb" : {
+    "@asset" : "LargePlate1",
+    "@enabled" : false,
+    "@wetDry" : 0.0722367,
+    "Decay" : 0.232567,
+    "PreDelay" : 0.216999,
+    "Tone" : 0.50
+   },
+   "THRGroupGate" : {
+    "@asset" : "noiseGate",
+    "@enabled" : true,
+    "Decay" : 0.2050,
+    "Thresh" : -16.0
+   },
+   "global" : {
+    "THRPresetParamTempo" : 780
+   }
+  }
+ },
+ "meta" : {
+  "original" : 0,
+  "pbn" : 0,
+  "premium" : 0
+ },
+ "schema" : "L6Preset",
+ "version" : 5
+}

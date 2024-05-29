@@ -1,0 +1,72 @@
+{
+ "data" : {
+  "device" : 2359297,
+  "device_version" : 21102695,
+  "meta" : {
+   "name" : "Crunch Ico LP",
+   "tnid" : 0
+  },
+  "tone" : {
+   "THRGroupAmp" : {
+    "@asset" : "THR10C_DC30",
+    "Bass" : 0.392157,
+    "Drive" : 0.413725,
+    "Master" : 1.0,
+    "Mid" : 0.796078,
+    "Treble" : 0.670588
+   },
+   "THRGroupCab" : {
+    "@asset" : "speakerSimulator",
+    "SpkSimType" : 10
+   },
+   "THRGroupFX1Compressor" : {
+    "@asset" : "RedComp",
+    "@enabled" : true,
+    "Level" : 0.504074,
+    "Sustain" : 0.440741
+   },
+   "THRGroupFX2Effect" : {
+    "@asset" : "StereoSquareChorus",
+    "@enabled" : false,
+    "@wetDry" : 0.407843,
+    "Depth" : 0.27340,
+    "Feedback" : 0.113992,
+    "Freq" : 0.107882,
+    "Pre" : 0.50
+   },
+   "THRGroupFX3EffectEcho" : {
+    "@asset" : "TapeEcho",
+    "@enabled" : true,
+    "@wetDry" : 0.212941,
+    "Bass" : 0.50,
+    "Feedback" : 0.327797,
+    "Time" : 0.3910,
+    "Treble" : 0.271973
+   },
+   "THRGroupFX4EffectReverb" : {
+    "@asset" : "LargePlate1",
+    "@enabled" : true,
+    "@wetDry" : 0.0747059,
+    "Decay" : 0.150,
+    "PreDelay" : 0.30,
+    "Tone" : 0.849488
+   },
+   "THRGroupGate" : {
+    "@asset" : "noiseGate",
+    "@enabled" : false,
+    "Decay" : 0.60,
+    "Thresh" : -38.0
+   },
+   "global" : {
+    "THRPresetParamTempo" : 913
+   }
+  }
+ },
+ "meta" : {
+  "original" : 0,
+  "pbn" : 0,
+  "premium" : 0
+ },
+ "schema" : "L6Preset",
+ "version" : 5
+}

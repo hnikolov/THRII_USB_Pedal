@@ -1,0 +1,70 @@
+{
+ "data" : {
+  "device" : 2359297,
+  "device_version" : 21102695,
+  "meta" : {
+   "name" : "7str Riff",
+   "tnid" : 0
+  },
+  "tone" : {
+   "THRGroupAmp" : {
+    "@asset" : "THR30_Stealth",
+    "Bass" : 0.367861,
+    "Drive" : 0.414043,
+    "Master" : 0.665278,
+    "Mid" : 0.568304,
+    "Treble" : 0.718687
+   },
+   "THRGroupCab" : {
+    "@asset" : "speakerSimulator",
+    "SpkSimType" : 4
+   },
+   "THRGroupFX1Compressor" : {
+    "@asset" : "RedComp",
+    "@enabled" : true,
+    "Level" : 0.562963,
+    "Sustain" : 0.396296
+   },
+   "THRGroupFX2Effect" : {
+    "@asset" : "Phaser",
+    "@enabled" : true,
+    "@wetDry" : 0.148148,
+    "Feedback" : 0.182222,
+    "Speed" : 0.0851852
+   },
+   "THRGroupFX3EffectEcho" : {
+    "@asset" : "TapeEcho",
+    "@enabled" : false,
+    "@wetDry" : 0.309412,
+    "Bass" : 0.50,
+    "Feedback" : 0.342296,
+    "Time" : 0.440,
+    "Treble" : 0.316510
+   },
+   "THRGroupFX4EffectReverb" : {
+    "@asset" : "LargePlate1",
+    "@enabled" : true,
+    "@wetDry" : 0.0736966,
+    "Decay" : 0.314424,
+    "PreDelay" : 0.160185,
+    "Tone" : 0.651630
+   },
+   "THRGroupGate" : {
+    "@asset" : "noiseGate",
+    "@enabled" : true,
+    "Decay" : 0.2050,
+    "Thresh" : -49.6528
+   },
+   "global" : {
+    "THRPresetParamTempo" : 110
+   }
+  }
+ },
+ "meta" : {
+  "original" : 0,
+  "pbn" : 0,
+  "premium" : 0
+ },
+ "schema" : "L6Preset",
+ "version" : 5
+}

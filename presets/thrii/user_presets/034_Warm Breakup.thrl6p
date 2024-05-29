@@ -1,0 +1,69 @@
+{
+ "data" : {
+  "device" : 2359298,
+  "device_version" : 19988587,
+  "meta" : {
+   "name" : "Warm Breakup",
+   "tnid" : 0
+  },
+  "tone" : {
+   "THRGroupAmp" : {
+    "@asset" : "THR10C_DC30",
+    "Bass" : 0.325490,
+    "Drive" : 0.807843,
+    "Master" : 0.80,
+    "Mid" : 0.337255,
+    "Treble" : 0.501961
+   },
+   "THRGroupCab" : {
+    "@asset" : "speakerSimulator",
+    "SpkSimType" : 4
+   },
+   "THRGroupFX1Compressor" : {
+    "@asset" : "RedComp",
+    "@enabled" : false,
+    "Level" : 0.830,
+    "Sustain" : 0.30
+   },
+   "THRGroupFX2Effect" : {
+    "@asset" : "BiasTremolo",
+    "@enabled" : false,
+    "@wetDry" : 0.430,
+    "Depth" : 0.306160,
+    "Speed" : 0.25320
+   },
+   "THRGroupFX3EffectEcho" : {
+    "@asset" : "TapeEcho",
+    "@enabled" : false,
+    "@wetDry" : 0.277777,
+    "Bass" : 0.396296,
+    "Feedback" : 0.0466660,
+    "Time" : 0.3910,
+    "Treble" : 0.177778
+   },
+   "THRGroupFX4EffectReverb" : {
+    "@asset" : "StandardSpring",
+    "@enabled" : true,
+    "@wetDry" : 0.237364,
+    "Time" : 0.409259,
+    "Tone" : 0.707407
+   },
+   "THRGroupGate" : {
+    "@asset" : "noiseGate",
+    "@enabled" : false,
+    "Decay" : 0.60,
+    "Thresh" : -38.0
+   },
+   "global" : {
+    "THRPresetParamTempo" : 110
+   }
+  }
+ },
+ "meta" : {
+  "original" : 0,
+  "pbn" : 0,
+  "premium" : 0
+ },
+ "schema" : "L6Preset",
+ "version" : 5
+}

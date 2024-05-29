@@ -1,0 +1,72 @@
+{
+ "data" : {
+  "device" : 2359296,
+  "device_version" : 19923043,
+  "meta" : {
+   "name" : "il suono che piu si avvicina a quello di angus young",
+   "tnid" : 0
+  },
+  "tone" : {
+   "THRGroupAmp" : {
+    "@asset" : "THR10X_Brown1",
+    "Bass" : 0.576471,
+    "Drive" : 0.378431,
+    "Master" : 0.333333,
+    "Mid" : 0.517647,
+    "Treble" : 0.717647
+   },
+   "THRGroupCab" : {
+    "@asset" : "speakerSimulator",
+    "SpkSimType" : 3
+   },
+   "THRGroupFX1Compressor" : {
+    "@asset" : "RedComp",
+    "@enabled" : false,
+    "Level" : 0.830,
+    "Sustain" : 0.30
+   },
+   "THRGroupFX2Effect" : {
+    "@asset" : "StereoSquareChorus",
+    "@enabled" : true,
+    "@wetDry" : 1.0,
+    "Depth" : 0.102150,
+    "Feedback" : 0.114299,
+    "Freq" : 0.152515,
+    "Pre" : 0.50
+   },
+   "THRGroupFX3EffectEcho" : {
+    "@asset" : "TapeEcho",
+    "@enabled" : true,
+    "@wetDry" : 0.271329,
+    "Bass" : 0.177778,
+    "Feedback" : 0.210949,
+    "Time" : 0.350667,
+    "Treble" : 0.162245
+   },
+   "THRGroupFX4EffectReverb" : {
+    "@asset" : "LargePlate1",
+    "@enabled" : true,
+    "@wetDry" : 0.468170,
+    "Decay" : 0.703704,
+    "PreDelay" : 0.50,
+    "Tone" : 0.50
+   },
+   "THRGroupGate" : {
+    "@asset" : "noiseGate",
+    "@enabled" : false,
+    "Decay" : 0.2050,
+    "Thresh" : -33.0
+   },
+   "global" : {
+    "THRPresetParamTempo" : 484
+   }
+  }
+ },
+ "meta" : {
+  "original" : 0,
+  "pbn" : 0,
+  "premium" : 0
+ },
+ "schema" : "L6Preset",
+ "version" : 5
+}

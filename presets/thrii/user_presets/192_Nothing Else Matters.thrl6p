@@ -1,0 +1,72 @@
+{
+ "data" : {
+  "device" : 2359296,
+  "device_version" : 20971617,
+  "meta" : {
+   "name" : "Nothing Else Matters",
+   "tnid" : 0
+  },
+  "tone" : {
+   "THRGroupAmp" : {
+    "@asset" : "THR10_Aco_Condenser1",
+    "Bass" : 0.559259,
+    "Drive" : 0.508061,
+    "Master" : 1.0,
+    "Mid" : 0.903050,
+    "Treble" : 0.657081
+   },
+   "THRGroupCab" : {
+    "@asset" : "speakerSimulator",
+    "SpkSimType" : 16
+   },
+   "THRGroupFX1Compressor" : {
+    "@asset" : "RedComp",
+    "@enabled" : false,
+    "Level" : 0.652222,
+    "Sustain" : 0.0814815
+   },
+   "THRGroupFX2Effect" : {
+    "@asset" : "StereoSquareChorus",
+    "@enabled" : true,
+    "@wetDry" : 0.501373,
+    "Depth" : 0.358889,
+    "Feedback" : 0.307407,
+    "Freq" : 0.0518518,
+    "Pre" : 0.103704
+   },
+   "THRGroupFX3EffectEcho" : {
+    "@asset" : "TapeEcho",
+    "@enabled" : true,
+    "@wetDry" : 0.255556,
+    "Bass" : 0.50,
+    "Feedback" : 0.307408,
+    "Time" : 0.705815,
+    "Treble" : 0.351688
+   },
+   "THRGroupFX4EffectReverb" : {
+    "@asset" : "LargePlate1",
+    "@enabled" : true,
+    "@wetDry" : 0.30,
+    "Decay" : 0.150,
+    "PreDelay" : 0.30,
+    "Tone" : 0.708472
+   },
+   "THRGroupGate" : {
+    "@asset" : "noiseGate",
+    "@enabled" : false,
+    "Decay" : 0.50,
+    "Thresh" : -32.0
+   },
+   "global" : {
+    "THRPresetParamTempo" : 110
+   }
+  }
+ },
+ "meta" : {
+  "original" : 0,
+  "pbn" : 0,
+  "premium" : 0
+ },
+ "schema" : "L6Preset",
+ "version" : 5
+}

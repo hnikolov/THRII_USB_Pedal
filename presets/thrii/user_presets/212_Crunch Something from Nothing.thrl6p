@@ -1,0 +1,71 @@
+{
+  "data" : {
+    "meta" : {
+      "name" : "Crunch Something from Nothing",
+      "tnid" : 0
+    },
+    "device" : 2359298,
+    "tone" : {
+      "THRGroupGate" : {
+        "Decay" : 0.60000002384185791,
+        "@enabled" : false,
+        "@asset" : "noiseGate",
+        "Thresh" : -38
+      },
+      "THRGroupFX3EffectEcho" : {
+        "@asset" : "TapeEcho",
+        "Time" : 0.39100000262260437,
+        "Bass" : 0.5,
+        "Treble" : 0.25154423713684082,
+        "@wetDry" : 0.18000000715255737,
+        "@enabled" : false,
+        "Feedback" : 0.323527991771698
+      },
+      "global" : {
+        "THRPresetParamTempo" : 110
+      },
+      "THRGroupFX1Compressor" : {
+        "@enabled" : false,
+        "Sustain" : 0.30000001192092896,
+        "@asset" : "RedComp",
+        "Level" : 0.82999998331069946
+      },
+      "THRGroupFX4EffectReverb" : {
+        "@wetDry" : 0.14882352948188782,
+        "@enabled" : true,
+        "Time" : 0.39566469192504883,
+        "@asset" : "StandardSpring",
+        "Tone" : 0.36364176869392395
+      },
+      "THRGroupCab" : {
+        "@asset" : "speakerSimulator",
+        "SpkSimType" : 15
+      },
+      "THRGroupFX2Effect" : {
+        "@asset" : "StereoSquareChorus",
+        "Depth" : 0.256460040807724,
+        "Freq" : 0.11150588095188141,
+        "Pre" : 0.5,
+        "@wetDry" : 0.42294114828109741,
+        "@enabled" : false,
+        "Feedback" : 0.11989156901836395
+      },
+      "THRGroupAmp" : {
+        "Treble" : 0.75686275959014893,
+        "Bass" : 0.40675380825996399,
+        "Master" : 1,
+        "@asset" : "THR10C_Mini",
+        "Drive" : 0.82352942228317261,
+        "Mid" : 0.65403050184249878
+      }
+    },
+    "device_version" : 19923043
+  },
+  "meta" : {
+    "original" : 0,
+    "pbn" : 0,
+    "premium" : 0
+  },
+  "schema" : "L6Preset",
+  "version" : 5
+}
