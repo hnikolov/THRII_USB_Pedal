@@ -847,6 +847,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   maskCUpdate = 0; // Display has been updated
 }
 
+//extern SBOXES sbox;
 uint8_t last_updated_sbox = 12;
 
 ////////////////////////////////////////////////////////////////////////
@@ -868,7 +869,7 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     drawConnIcon( midi_connected ); // Just for completeness
   }
 
-	// Amp select mode (COL/AMP/CAB); Highlighted only in Manual mode
+	// Amp select mode (COL/AMP/CAB); Highlighted only in Manual and Edit modes
   if( maskCUpdate )
   {
     uint16_t colour = TFT_THRCREAM;
@@ -882,74 +883,73 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   }
 // =================================================================================
 
-// FIXME: Get rid of hard-coded indexes.
 // NOTE: Alignment is a must: updateStatusMask, FSM9b_1, enums definitions (THR30II.h)
 
   // FX1 Compressor -------------------------------------------------------------
   if( maskCUpdate & maskCompressor || (maskCUpdate & maskCompressorEn) )
   {
-    if( last_updated_sbox != 0 )
+    if( last_updated_sbox != CO )
     {
       sboxes[last_updated_sbox]->erase();
-      last_updated_sbox = 0;
-      sboxes[0]->draw();
+      last_updated_sbox = CO;
+      sboxes[CO]->draw();
     }
   }
 
-  if( maskCUpdate & maskCompressorEn ) { sboxes[0]->setEnabled(thrs.unit[COMPRESSOR]); }
+  if( maskCUpdate & maskCompressorEn ) { sboxes[CO]->setEnabled(thrs.unit[COMPRESSOR]); }
 
   if( maskCUpdate & maskCompressor )
   {
-    sboxes[0]->draw_knob(0, thrs.compressor_setting[CO_SUSTAIN]);
-    sboxes[0]->draw_knob(1, thrs.compressor_setting[CO_LEVEL]);
+    sboxes[CO]->draw_knob(0, thrs.compressor_setting[CO_SUSTAIN]);
+    sboxes[CO]->draw_knob(1, thrs.compressor_setting[CO_LEVEL]);
   }
 
 	// Amp/Cabinet ---------------------------------------------------------------
   if( maskCUpdate & maskAmpUnit )
   {
-    if( last_updated_sbox != 1 )
+    if( last_updated_sbox != AM )
     {
       sboxes[last_updated_sbox]->erase();
-      last_updated_sbox = 1;
-      sboxes[1]->draw();
+      last_updated_sbox = AM;
+      sboxes[AM]->draw();
     }
 
     switch( thrs.col )
     {
-      case BOUTIQUE: tft.setTextColor(TFT_BLUE,  TFT_BLACK, bgfill);	break;
-      case MODERN:   tft.setTextColor(TFT_GREEN, TFT_BLACK, bgfill); 	break;
-      case CLASSIC:  tft.setTextColor(TFT_RED,   TFT_BLACK, bgfill); 	break;
+      case BOUTIQUE: tft.setTextColor(TFT_BLUE,  TFT_BLACK, bgfill); break;
+      case MODERN:   tft.setTextColor(TFT_GREEN, TFT_BLACK, bgfill); break;
+      case CLASSIC:  tft.setTextColor(TFT_RED,   TFT_BLACK, bgfill); break;
     }
     drawAmpUnit(40, 35, 240, 60, TFT_THRCREAM, TFT_THRBROWN, "Amp", thrs.col, thrs.amp, thrs.cab);    
   }
 
   if( maskCUpdate & maskGainMaster )
   {
-    sboxes[1]->draw_knob(0, thrs.control[CTRL_GAIN]);
-    sboxes[1]->draw_knob(1, thrs.control[CTRL_MASTER]);
-    sboxes[1]->draw_knob(2, thrs.control[CTRL_BASS]);
-    sboxes[1]->draw_knob(3, thrs.control[CTRL_MID]);
-    sboxes[1]->draw_knob(4, thrs.control[CTRL_TREBLE]);
+    sboxes[AM]->draw_knob(0, thrs.control[CTRL_GAIN]);
+    sboxes[AM]->draw_knob(1, thrs.control[CTRL_MASTER]);
+    sboxes[AM]->draw_knob(2, thrs.control[CTRL_BASS]);
+    sboxes[AM]->draw_knob(3, thrs.control[CTRL_MID]);
+    sboxes[AM]->draw_knob(4, thrs.control[CTRL_TREBLE]);
   }
 
  	// Gate -----------------------------------------------------------------------
   if( maskCUpdate & maskNoiseGate || (maskCUpdate & maskNoiseGateEn) )
   {
-    if( last_updated_sbox != 2 )
+    if( last_updated_sbox != GA )
     {
       sboxes[last_updated_sbox]->erase();
-      last_updated_sbox = 2;
-      sboxes[2]->draw();
+      last_updated_sbox = GA;
+      sboxes[GA]->draw();
     }
   }
 
-  if( maskCUpdate & maskNoiseGateEn ) { sboxes[2]->setEnabled(thrs.unit[GATE]); }
+  if( maskCUpdate & maskNoiseGateEn ) { sboxes[GA]->setEnabled(thrs.unit[GATE]); }
 
   if( maskCUpdate & maskNoiseGate )
   {
     // TODO: Draw selected knob only???
-    sboxes[2]->draw_knob(0, thrs.gate_setting[GA_THRESHOLD]);
-    sboxes[2]->draw_knob(1, thrs.gate_setting[GA_DECAY]);    
+    sboxes[GA]->draw_knob(0, thrs.gate_setting[GA_THRESHOLD]);
+    sboxes[GA]->draw_knob(1, thrs.gate_setting[GA_DECAY]);
   }
 
 	// FX2 Effect (Chorus/Flanger/Phaser/Tremolo) ----------------------------------
@@ -958,76 +958,76 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     switch( thrs.effecttype )
     {
       case CHORUS:
-        if( last_updated_sbox != 3 )
+        if( last_updated_sbox != CH )
         {
           sboxes[last_updated_sbox]->erase();
-          last_updated_sbox = 3;
-          sboxes[3]->draw();
+          last_updated_sbox = CH;
+          sboxes[CH]->draw();
         }
 
-        if( maskCUpdate & maskFxUnitEn ) { sboxes[3]->setEnabled(thrs.unit[EFFECT]); }
+        if( maskCUpdate & maskFxUnitEn ) { sboxes[CH]->setEnabled(thrs.unit[EFFECT]); }
 
         if( maskCUpdate & maskFxUnit )
         {
-          sboxes[3]->draw_knob(0, thrs.effect_setting[CHORUS][CH_SPEED]);
-          sboxes[3]->draw_knob(1, thrs.effect_setting[CHORUS][CH_DEPTH]);
-          sboxes[3]->draw_knob(2, thrs.effect_setting[CHORUS][CH_PREDELAY]);
-          sboxes[3]->draw_knob(3, thrs.effect_setting[CHORUS][CH_FEEDBACK]);
-          sboxes[3]->draw_knob(4, thrs.effect_setting[CHORUS][CH_MIX]);
+          sboxes[CH]->draw_knob(0, thrs.effect_setting[CHORUS][CH_SPEED]);
+          sboxes[CH]->draw_knob(1, thrs.effect_setting[CHORUS][CH_DEPTH]);
+          sboxes[CH]->draw_knob(2, thrs.effect_setting[CHORUS][CH_PREDELAY]);
+          sboxes[CH]->draw_knob(3, thrs.effect_setting[CHORUS][CH_FEEDBACK]);
+          sboxes[CH]->draw_knob(4, thrs.effect_setting[CHORUS][CH_MIX]);
         }
       break;
 
       case FLANGER: 
-        if( last_updated_sbox != 4 )
+        if( last_updated_sbox != FL )
         {
           sboxes[last_updated_sbox]->erase();
-          last_updated_sbox = 4;
-          sboxes[4]->draw();
+          last_updated_sbox = FL;
+          sboxes[FL]->draw();
         }
 
-        if( maskCUpdate & maskFxUnitEn ) { sboxes[4]->setEnabled(thrs.unit[EFFECT]); }
+        if( maskCUpdate & maskFxUnitEn ) { sboxes[FL]->setEnabled(thrs.unit[EFFECT]); }
 
         if( maskCUpdate & maskFxUnit )
         {
-          sboxes[4]->draw_knob(0, thrs.effect_setting[FLANGER][FL_SPEED]);
-          sboxes[4]->draw_knob(1, thrs.effect_setting[FLANGER][FL_DEPTH]);    
-          sboxes[4]->draw_knob(2, thrs.effect_setting[FLANGER][FL_MIX]);       
+          sboxes[FL]->draw_knob(0, thrs.effect_setting[FLANGER][FL_SPEED]);
+          sboxes[FL]->draw_knob(1, thrs.effect_setting[FLANGER][FL_DEPTH]);
+          sboxes[FL]->draw_knob(2, thrs.effect_setting[FLANGER][FL_MIX]);
         }
       break;
 
       case PHASER:
-        if( last_updated_sbox != 5 )
+        if( last_updated_sbox != PH )
         {
           sboxes[last_updated_sbox]->erase();
-          last_updated_sbox = 5;
-          sboxes[5]->draw();
+          last_updated_sbox = PH;
+          sboxes[PH]->draw();
         }
 
-        if( maskCUpdate & maskFxUnitEn ) { sboxes[5]->setEnabled(thrs.unit[EFFECT]); }
+        if( maskCUpdate & maskFxUnitEn ) { sboxes[PH]->setEnabled(thrs.unit[EFFECT]); }
 
         if( maskCUpdate & maskFxUnit )
         {
-          sboxes[5]->draw_knob(0, thrs.effect_setting[PHASER][PH_SPEED]);
-          sboxes[5]->draw_knob(1, thrs.effect_setting[PHASER][PH_FEEDBACK]);    
-          sboxes[5]->draw_knob(2, thrs.effect_setting[PHASER][PH_MIX]);       
+          sboxes[PH]->draw_knob(0, thrs.effect_setting[PHASER][PH_SPEED]);
+          sboxes[PH]->draw_knob(1, thrs.effect_setting[PHASER][PH_FEEDBACK]);
+          sboxes[PH]->draw_knob(2, thrs.effect_setting[PHASER][PH_MIX]);
         }
       break;		
 
       case TREMOLO:
-        if( last_updated_sbox != 6 )
+        if( last_updated_sbox != TR )
         {
           sboxes[last_updated_sbox]->erase();
-          last_updated_sbox = 6;
-          sboxes[6]->draw();
+          last_updated_sbox = TR;
+          sboxes[TR]->draw();
         }
 
-        if( maskCUpdate & maskFxUnitEn ) { sboxes[6]->setEnabled(thrs.unit[EFFECT]); }
+        if( maskCUpdate & maskFxUnitEn ) { sboxes[TR]->setEnabled(thrs.unit[EFFECT]); }
 
         if( maskCUpdate & maskFxUnit )
         {
-          sboxes[6]->draw_knob(0, thrs.effect_setting[TREMOLO][TR_SPEED]);
-          sboxes[6]->draw_knob(1, thrs.effect_setting[TREMOLO][TR_DEPTH]);    
-          sboxes[6]->draw_knob(2, thrs.effect_setting[TREMOLO][TR_MIX]);       
+          sboxes[TR]->draw_knob(0, thrs.effect_setting[TREMOLO][TR_SPEED]);
+          sboxes[TR]->draw_knob(1, thrs.effect_setting[TREMOLO][TR_DEPTH]);
+          sboxes[TR]->draw_knob(2, thrs.effect_setting[TREMOLO][TR_MIX]);
         }
       break;
     } // of switch(effecttype)
@@ -1039,42 +1039,42 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     switch( thrs.echotype )
     {
       case TAPE_ECHO:
-        if( last_updated_sbox != 7 )
+        if( last_updated_sbox != TA )
         {
           sboxes[last_updated_sbox]->erase();
-          last_updated_sbox = 7;
-          sboxes[7]->draw();
+          last_updated_sbox = TA;
+          sboxes[TA]->draw();
         }
 
-        if( maskCUpdate & maskEchoEn ) { sboxes[7]->setEnabled(thrs.unit[ECHO]); }
+        if( maskCUpdate & maskEchoEn ) { sboxes[TA]->setEnabled(thrs.unit[ECHO]); }
 
         if( maskCUpdate & maskEcho )
         {
-          sboxes[7]->draw_knob(0, thrs.echo_setting[TAPE_ECHO][TA_TIME]);
-          sboxes[7]->draw_knob(1, thrs.echo_setting[TAPE_ECHO][TA_FEEDBACK]);    
-          sboxes[7]->draw_knob(2, thrs.echo_setting[TAPE_ECHO][TA_BASS]);       
-          sboxes[7]->draw_knob(3, thrs.echo_setting[TAPE_ECHO][TA_TREBLE]);       
-          sboxes[7]->draw_knob(4, thrs.echo_setting[TAPE_ECHO][TA_MIX]);       
+          sboxes[TA]->draw_knob(0, thrs.echo_setting[TAPE_ECHO][TA_TIME]);
+          sboxes[TA]->draw_knob(1, thrs.echo_setting[TAPE_ECHO][TA_FEEDBACK]);
+          sboxes[TA]->draw_knob(2, thrs.echo_setting[TAPE_ECHO][TA_BASS]);
+          sboxes[TA]->draw_knob(3, thrs.echo_setting[TAPE_ECHO][TA_TREBLE]);
+          sboxes[TA]->draw_knob(4, thrs.echo_setting[TAPE_ECHO][TA_MIX]);
         }
       break;
 
       case DIGITAL_DELAY:
-        if( last_updated_sbox != 8 )
+        if( last_updated_sbox != DD )
         {
           sboxes[last_updated_sbox]->erase();
-          last_updated_sbox = 8;
-          sboxes[8]->draw();
+          last_updated_sbox = DD;
+          sboxes[DD]->draw();
         }
 
-        if( maskCUpdate & maskEchoEn ) { sboxes[8]->setEnabled(thrs.unit[ECHO]); }
+        if( maskCUpdate & maskEchoEn ) { sboxes[DD]->setEnabled(thrs.unit[ECHO]); }
 
         if( maskCUpdate & maskEcho )
         {
-          sboxes[8]->draw_knob(0, thrs.echo_setting[DIGITAL_DELAY][DD_TIME]);
-          sboxes[8]->draw_knob(1, thrs.echo_setting[DIGITAL_DELAY][DD_FEEDBACK]);    
-          sboxes[8]->draw_knob(2, thrs.echo_setting[DIGITAL_DELAY][DD_BASS]);       
-          sboxes[8]->draw_knob(3, thrs.echo_setting[DIGITAL_DELAY][DD_TREBLE]);       
-          sboxes[8]->draw_knob(4, thrs.echo_setting[DIGITAL_DELAY][DD_MIX]);       
+          sboxes[DD]->draw_knob(0, thrs.echo_setting[DIGITAL_DELAY][DD_TIME]);
+          sboxes[DD]->draw_knob(1, thrs.echo_setting[DIGITAL_DELAY][DD_FEEDBACK]);
+          sboxes[DD]->draw_knob(2, thrs.echo_setting[DIGITAL_DELAY][DD_BASS]);
+          sboxes[DD]->draw_knob(3, thrs.echo_setting[DIGITAL_DELAY][DD_TREBLE]);
+          sboxes[DD]->draw_knob(4, thrs.echo_setting[DIGITAL_DELAY][DD_MIX]);
         } 
       break;
     }	// of switch(echotype)
@@ -1086,76 +1086,77 @@ void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate)
     switch( thrs.reverbtype )
     {
       case SPRING:
-        if( last_updated_sbox != 9 )
+        if( last_updated_sbox != SP )
         {
           sboxes[last_updated_sbox]->erase();
-          last_updated_sbox = 9;
-          sboxes[9]->draw();
+          last_updated_sbox = SP;
+          sboxes[SP]->draw();
         }
-        if( maskCUpdate & maskReverbEn ) { sboxes[9]->setEnabled(thrs.unit[REVERB]); }
+
+        if( maskCUpdate & maskReverbEn ) { sboxes[SP]->setEnabled(thrs.unit[REVERB]); }
 
         if( maskCUpdate & maskReverb )
         {
-          sboxes[9]->draw_knob(0, thrs.reverb_setting[SPRING][SP_REVERB]);
-          sboxes[9]->draw_knob(1, thrs.reverb_setting[SPRING][SP_TONE]);    
-          sboxes[9]->draw_knob(2, thrs.reverb_setting[SPRING][SP_MIX]);           
-        }
-      break;
-
-      case ROOM:
-        if( last_updated_sbox != 12 )
-        {
-          sboxes[last_updated_sbox]->erase();
-          last_updated_sbox = 12;
-          sboxes[12]->draw();
-        }
-
-        if( maskCUpdate & maskReverbEn ) { sboxes[12]->setEnabled(thrs.unit[REVERB]); }
-
-        if( maskCUpdate & maskReverb )
-        {
-          sboxes[12]->draw_knob(0, thrs.reverb_setting[ROOM][RO_DECAY]);
-          sboxes[12]->draw_knob(1, thrs.reverb_setting[ROOM][RO_PREDELAY]);    
-          sboxes[12]->draw_knob(2, thrs.reverb_setting[ROOM][RO_TONE]);           
-          sboxes[12]->draw_knob(3, thrs.reverb_setting[ROOM][RO_MIX]);           
+          sboxes[SP]->draw_knob(0, thrs.reverb_setting[SPRING][SP_REVERB]);
+          sboxes[SP]->draw_knob(1, thrs.reverb_setting[SPRING][SP_TONE]);
+          sboxes[SP]->draw_knob(2, thrs.reverb_setting[SPRING][SP_MIX]);
         }
       break;
 
       case PLATE:
-        if( last_updated_sbox != 10 )
+        if( last_updated_sbox != PL )
         {
           sboxes[last_updated_sbox]->erase();
-          last_updated_sbox = 10;
-          sboxes[10]->draw();
+          last_updated_sbox = PL;
+          sboxes[PL]->draw();
         }
 
-        if( maskCUpdate & maskReverbEn ) { sboxes[10]->setEnabled(thrs.unit[REVERB]); }
+        if( maskCUpdate & maskReverbEn ) { sboxes[PL]->setEnabled(thrs.unit[REVERB]); }
 
         if( maskCUpdate & maskReverb )
         {
-          sboxes[10]->draw_knob(0, thrs.reverb_setting[PLATE][PL_DECAY]);
-          sboxes[10]->draw_knob(1, thrs.reverb_setting[PLATE][PL_PREDELAY]);    
-          sboxes[10]->draw_knob(2, thrs.reverb_setting[PLATE][PL_TONE]);           
-          sboxes[10]->draw_knob(3, thrs.reverb_setting[PLATE][PL_MIX]);           
+          sboxes[PL]->draw_knob(0, thrs.reverb_setting[PLATE][PL_DECAY]);
+          sboxes[PL]->draw_knob(1, thrs.reverb_setting[PLATE][PL_PREDELAY]);
+          sboxes[PL]->draw_knob(2, thrs.reverb_setting[PLATE][PL_TONE]);
+          sboxes[PL]->draw_knob(3, thrs.reverb_setting[PLATE][PL_MIX]);
         }
       break;
 
       case HALL:
-        if( last_updated_sbox != 11 )
+        if( last_updated_sbox != HA )
         {
           sboxes[last_updated_sbox]->erase();
-          last_updated_sbox = 11;
-          sboxes[11]->draw();
+          last_updated_sbox = HA;
+          sboxes[HA]->draw();
         }
 
-        if( maskCUpdate & maskReverbEn ) { sboxes[11]->setEnabled(thrs.unit[REVERB]); }
+        if( maskCUpdate & maskReverbEn ) { sboxes[HA]->setEnabled(thrs.unit[REVERB]); }
 
         if( maskCUpdate & maskReverb )
         {
-          sboxes[11]->draw_knob(0, thrs.reverb_setting[HALL][HA_DECAY]);
-          sboxes[11]->draw_knob(1, thrs.reverb_setting[HALL][HA_PREDELAY]);    
-          sboxes[11]->draw_knob(2, thrs.reverb_setting[HALL][HA_TONE]);           
-          sboxes[11]->draw_knob(3, thrs.reverb_setting[HALL][HA_MIX]);           
+          sboxes[HA]->draw_knob(0, thrs.reverb_setting[HALL][HA_DECAY]);
+          sboxes[HA]->draw_knob(1, thrs.reverb_setting[HALL][HA_PREDELAY]);
+          sboxes[HA]->draw_knob(2, thrs.reverb_setting[HALL][HA_TONE]);
+          sboxes[HA]->draw_knob(3, thrs.reverb_setting[HALL][HA_MIX]);
+        }
+      break;
+
+      case ROOM:
+        if( last_updated_sbox != RO )
+        {
+          sboxes[last_updated_sbox]->erase();
+          last_updated_sbox = RO;
+          sboxes[RO]->draw();
+        }
+
+        if( maskCUpdate & maskReverbEn ) { sboxes[RO]->setEnabled(thrs.unit[REVERB]); }
+
+        if( maskCUpdate & maskReverb )
+        {
+          sboxes[RO]->draw_knob(0, thrs.reverb_setting[ROOM][RO_DECAY]);
+          sboxes[RO]->draw_knob(1, thrs.reverb_setting[ROOM][RO_PREDELAY]);
+          sboxes[RO]->draw_knob(2, thrs.reverb_setting[ROOM][RO_TONE]);
+          sboxes[RO]->draw_knob(3, thrs.reverb_setting[ROOM][RO_MIX]);
         }
       break;
     }	// of switch(reverbtype)

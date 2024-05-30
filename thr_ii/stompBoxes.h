@@ -22,6 +22,8 @@ extern TFT_eSprite spr;
 //#define AA_FONT_LARGE Latin_Hiragana_24
 #define AA_FONT_MONO  NotoSansMonoSCB20 // NotoSansMono-SemiCondensedBold 20pt
 
+enum SBOX_IDXS { CO = 0, AM, GA, CH, FL, PH, TR, TA, DD, SP, PL, HA, RO };
+
 ////////////////////////////////////////////////////////////////////////
 //
 ////////////////////////////////////////////////////////////////////////
