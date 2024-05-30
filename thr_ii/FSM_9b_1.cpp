@@ -53,6 +53,7 @@ extern uint32_t maskAll;
 #include "stompBoxes.h"
 extern std::vector <StompBox*> sboxes;
 
+extern uint8_t last_updated_sbox;
 uint8_t selected_sbox = 12;
 
 extern std::vector <JsonDocument> json_patchesII_user;
@@ -633,10 +634,10 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
 
         case 13:
           _uistate = UI_edit;
-          // _uistate_prev not set here. Will return to the previous-previuos state, issues when returning to manual mode
+          // _uistate_prev not set here. Will return to the previous-previuos state; Patch name not updated when returning to manual mode
           // ALso, in edit mode, we need to detect that we came there from user presets, so we can write changes
           selected_sbox = 1; // Amp unit
-          maskCUpdate = (maskClearTft | maskAmpUnit);
+          maskCUpdate = (maskClearTft | maskAmpUnit | maskGainMaster);
         break;
 
         case 14:
@@ -717,6 +718,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 3: // Switch to previous mode (amp/presets) - cancel the edit mode
+          last_updated_sbox = 12; // ROOM REVERB
           _uistate = _uistate_prev;
           maskCUpdate = maskAll;
         break;
@@ -867,6 +869,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               writeToFile( file_paths_user[*active_patch_id - 1], presetData );
             }
           }
+          last_updated_sbox = 12; // ROOM REVERB
           _uistate = _uistate_prev;
           maskCUpdate = maskAll;
         break;
