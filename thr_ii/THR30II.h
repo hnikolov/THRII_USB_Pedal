@@ -436,6 +436,7 @@ class THR30II_Settings
 	static uint32_t ValToNumber(double val);                            // Convert a 0..100 Slider value to a 32Bit parameter value
 	static uint32_t ValToNumber_Threshold(double val);                  // Convert a 0..100 Slider value to a 32Bit parameter value (for internal -96dB to 0dB range)
 
+  void SetDefaults(); // Set usable default values of all (effect, echo, reverb)
 	void EchoSetting(THR30II_ECHO_TYPES type, uint16_t ctrl, double value);  // Setter for the Echo Parameters
 	void EchoSetting(uint16_t ctrl, double value);                           // Using the internally selected actual Echo type
 	void EffectSetting(THR30II_EFF_TYPES type, uint16_t ctrl, double value); // Setter for Effect parameters
@@ -523,6 +524,7 @@ class THR30II_Settings
   int8_t activeUserSetting = -1; // Field for the selected user preset's index (0..4 , -1 for none / actual)
   bool userSettingsHaveChanged;  // Field for state of selected user preset
 
+  // FIXME: Do we need to init default values everytime we switch to a different preset?
   std::array<double, CO_MIX - CO_SUSTAIN + 1> compressor_setting = { 36.0, 69.0 }; // Field for the Compressor settings with default values (Sustain, Level)
   std::array<double, GA_DECAY - GA_THRESHOLD + 1> gate_setting   = { 66.0, 21.0 }; // Field for the Gate settings with default values (Threshold, Decay)
 	

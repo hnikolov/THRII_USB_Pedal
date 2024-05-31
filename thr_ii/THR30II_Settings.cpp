@@ -752,9 +752,8 @@ int THR30II_Settings::SetLoadedPatch( const JsonDocument djd ) // Invoke all set
 		// return -1; // TODO: Shall we return?
 	}
 
-  // TODO: Is this assignment here needed? It is irrelevant for createPatch() call
-	sendChangestoTHR = false; // We apply all the settings in one shot with a MIDI-Patch-Upload to THRII via "createPatch()" 
-                            // and not each setting separately. So we use the setters only for our local fields!
+	sendChangestoTHR = false; // Note: We apply all the settings in one shot with a MIDI-Patch-Upload to THRII via "createPatch()"
+                            //       and not each setting separately. So we use the setters only for our local fields!
 
 	TRACE_THR30IIPEDAL(Serial.println(F("SetLoadedPatch(): Setting loaded patch..."));)
 
@@ -816,6 +815,10 @@ int THR30II_Settings::SetLoadedPatch( const JsonDocument djd ) // Invoke all set
 	// FX2 Effect Settings ---------------------------------------------------------
 	String type = djd["data"]["tone"]["THRGroupFX2Effect"]["@asset"].as<const char*>();
 	TRACE_V_THR30IIPEDAL(Serial.printf("EffType: %s\n\r", type.c_str() );)
+
+  // NOTE: Set usable default values of all (effect, echo, reverb)
+  //       In this way, all effects can be switched and used although settings not available in a preset
+  SetDefaults();
 
 	if( type == "BiasTremolo" )
 	{
@@ -1456,6 +1459,61 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 	//                 Send it out.
 
 } // End of THR30II_Settings::createPatch()
+
+void THR30II_Settings::SetDefaults()
+{
+  // NOTE: Set usable default values of all (effect, echo, reverb)
+  //       In this way, all effects can be switched and used although settings not available in a preset
+  //       Compressor, Amp, and Noise Gate are always set in a preset, no reason to set defaults
+  effect_setting[TREMOLO][TR_SPEED] = 34.0;  // 27
+  effect_setting[TREMOLO][TR_DEPTH] = 71.0;  // 31
+  effect_setting[TREMOLO][TR_MIX]   = 41.0;  // 62
+
+  effect_setting[CHORUS][CH_SPEED]    = 12.0;
+  effect_setting[CHORUS][CH_DEPTH]    = 23.0;
+  effect_setting[CHORUS][CH_PREDELAY] = 50.0;
+  effect_setting[CHORUS][CH_FEEDBACK] = 12.0;
+  effect_setting[CHORUS][CH_MIX]      = 45.0;
+
+  effect_setting[FLANGER][FL_SPEED] = 4.0;
+  effect_setting[FLANGER][FL_DEPTH] = 44.0;
+  effect_setting[FLANGER][FL_MIX]   = 26.0;
+
+  effect_setting[PHASER][PH_SPEED]    =  1.0;
+  effect_setting[PHASER][PH_FEEDBACK] = 43.0;
+  effect_setting[PHASER][PH_MIX]      = 33.0;
+  // --
+  echo_setting[TAPE_ECHO][TA_TIME]     = 41.0;
+  echo_setting[TAPE_ECHO][TA_FEEDBACK] = 50.0;
+  echo_setting[TAPE_ECHO][TA_BASS]     = 43.0;
+  echo_setting[TAPE_ECHO][TA_TREBLE]   = 55.0;
+  echo_setting[TAPE_ECHO][TA_MIX]      = 26.0;
+
+  echo_setting[DIGITAL_DELAY][DD_TIME]     = 39.0;
+  echo_setting[DIGITAL_DELAY][DD_FEEDBACK] = 38.0;
+  echo_setting[DIGITAL_DELAY][DD_BASS]     = 26.0;
+  echo_setting[DIGITAL_DELAY][DD_TREBLE]   = 37.0;
+  echo_setting[DIGITAL_DELAY][DD_MIX]      = 36.0;
+  // --
+  reverb_setting[SPRING][SP_REVERB] = 25.0;
+  reverb_setting[SPRING][SP_TONE]   = 50.0;
+  reverb_setting[SPRING][SP_MIX]    = 19.0;
+
+  reverb_setting[PLATE][PL_DECAY]    = 24.0;
+  reverb_setting[PLATE][PL_PREDELAY] = 31.0;
+  reverb_setting[PLATE][PL_TONE]     = 54.0;
+  reverb_setting[PLATE][PL_MIX]      = 20.0;
+
+  reverb_setting[HALL][HA_DECAY]    = 18.0;
+  reverb_setting[HALL][HA_PREDELAY] = 10.0;
+  reverb_setting[HALL][HA_TONE]     = 62.0;
+  reverb_setting[HALL][HA_MIX]      = 45.0;
+
+  reverb_setting[ROOM][RO_DECAY]    = 13.0;
+  reverb_setting[ROOM][RO_PREDELAY] =  6.0;
+  reverb_setting[ROOM][RO_TONE]     = 59.0;
+  reverb_setting[ROOM][RO_MIX]      = 10.0;
+}
 
 //---------FUNCTION FOR SENDING COL/AMP SETTING TO THR30II -----------------
 // TODO

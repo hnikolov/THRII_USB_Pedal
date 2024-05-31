@@ -638,6 +638,8 @@ int THR30II_Settings::patch_setAll(uint8_t * buf, uint16_t buf_len)
 				
 				std::map<uint16_t, key_longval> &dict = du.second.values; // Values -directly- contained in Unit GATE/MIX
 
+        SetDefaults(); // Set usable default values of all (effect, echo, reverb)
+
 				for( std::pair<uint16_t, key_longval> kvp: dict )
 				{
 					if     ( unitOnMap[kvp.first] == THR30II_UNIT_ON_OFF_COMMANDS[EFFECT]      ) { Switch_On_Off_Effect_Unit(kvp.second.val     != 0); }
