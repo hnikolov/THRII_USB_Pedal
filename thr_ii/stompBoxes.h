@@ -156,28 +156,6 @@ public:
     // NOTE: Issues with large sprites, therefore, reduce color depth and use palette
     spr.setColorDepth(4);
     spr.createSprite(width, height);
-
-    // Amp unit is not rendered correctly when:
-    //   i) switch to edit mode (OK)
-    //  ii) exit edit mode
-    // iii) switch to edit mode again (not OK)
-    // NOTE:
-    //   It seems sprites are always created OK, the issue exists even if sprites not used
-    //   Investigation is needed
-    if( spr.created() == false ) // Try again
-    {
-      Serial.println("Create Sprite Error 1 ***********************"); // To be removed
-      spr.deleteSprite();
-      spr.createSprite(width, height);
-    }
-
-    if( spr.width() != width || spr.height() != height ) // Try again
-    {
-      Serial.println("Create Sprite Error 2 ***********************"); // To be removed
-      spr.deleteSprite();
-      spr.createSprite(width, height);
-    }
-    // ----------------------------------------------------------------
     spr.createPalette(cmap);
     spr.setPaletteColor(2, fg); // To set FG of a stompbox
     spr.setPaletteColor(3, bg); // To set FG of a stompbox
