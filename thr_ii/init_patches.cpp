@@ -99,8 +99,8 @@ void init_patches_from_sdcard()
 		TRACE_THR30IIPEDAL(Serial.println(F("Card initialized."));)
     TRACE_V_THR30IIPEDAL(Serial.print(F("VolumeBegin -> success. FAT-Type: "));)
 
-    TRACE_THR30IIPEDAL(Serial.println("Initializing factory presets from SDCard");
-    initializeSortedPresets(path_presets_factory, json_patchesII_factory, factoryPatchNames, npatches_factory, file_paths_factory);)
+    TRACE_THR30IIPEDAL(Serial.println("Initializing factory presets from SDCard");)
+    initializeSortedPresets(path_presets_factory, json_patchesII_factory, factoryPatchNames, npatches_factory, file_paths_factory);
 
     TRACE_THR30IIPEDAL(Serial.println("Initializing user presets from SDCard");)
     initializeSortedPresets(path_presets_user, json_patchesII_user, libraryPatchNames, npatches_user, file_paths_user);
