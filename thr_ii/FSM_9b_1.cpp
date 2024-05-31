@@ -271,7 +271,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         case 6: // Activate the patch 2 in a bank
           if(THR_Values.getActiveUserSetting() != 1) // A new thrii preset to be activated
           {
-            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);)
+            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 2);)
             select_thrii_preset(1);
             maskCUpdate = maskAll;
           }
@@ -285,7 +285,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         case 7: // Activate the patch 3 in a bank
           if(THR_Values.getActiveUserSetting() != 2) // A new thrii preset to be activated
           {
-            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);)
+            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 3);)
             select_thrii_preset(2);
             maskCUpdate = maskAll;
           }
@@ -299,7 +299,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         case 8: // Activate the patch 4 in a bank
           if(THR_Values.getActiveUserSetting() != 3) // A new thrii preset to be activated
           {
-            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);)
+            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 4);)
             select_thrii_preset(3);
             maskCUpdate = maskAll;
           }
@@ -313,7 +313,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         case 9: // Activate the patch 5 in a bank
           if(THR_Values.getActiveUserSetting() != 4) // A new thrii preset to be activated
           {
-            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 1);)
+            TRACE_THR30IIPEDAL(Serial.printf("\n\rActivating thrii preset %d ...\n\r", 5);)
             select_thrii_preset(4);
             maskCUpdate = maskAll;
           }
