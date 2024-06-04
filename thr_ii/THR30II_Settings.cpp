@@ -1447,9 +1447,9 @@ void THR30II_Settings::SetDefaults()
   // NOTE: Set usable default values of all (effect, echo, reverb)
   //       In this way, all effects can be switched and used although settings not available in a preset
   //       Compressor, Amp, and Noise Gate are always set in a preset, no reason to set defaults
-  effect_setting[TREMOLO][TR_SPEED] = 34.0;  // 27
-  effect_setting[TREMOLO][TR_DEPTH] = 71.0;  // 31
-  effect_setting[TREMOLO][TR_MIX]   = 41.0;  // 62
+  effect_setting[TREMOLO][TR_SPEED] = 27.0;  // 34
+  effect_setting[TREMOLO][TR_DEPTH] = 31.0;  // 71
+  effect_setting[TREMOLO][TR_MIX]   = 62.0;  // 41
 
   effect_setting[CHORUS][CH_SPEED]    = 12.0;
   effect_setting[CHORUS][CH_DEPTH]    = 23.0;
