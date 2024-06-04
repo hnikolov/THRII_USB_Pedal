@@ -686,10 +686,10 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
         case 19: // Rotate Reverb Mode ( Spring > Room > Plate > Hall > )
           switch(THR_Values.reverbtype)
           {
-            case SPRING: THR_Values.ReverbSelect(PLATE);   break;
+            case SPRING: THR_Values.ReverbSelect(PLATE);  break;
             case PLATE:  THR_Values.ReverbSelect(HALL);   break;
-            case HALL:   THR_Values.ReverbSelect(ROOM); break;
-            case ROOM:   THR_Values.ReverbSelect(SPRING);  break;
+            case HALL:   THR_Values.ReverbSelect(ROOM);   break;
+            case ROOM:   THR_Values.ReverbSelect(SPRING); break;
           }
           THR_Values.createPatch();
           TRACE_THR30IIPEDAL(Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));)
@@ -844,9 +844,9 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         case 12: // Rotate amp select mode ( COL -> AMP -> CAB -> )
           switch(amp_select_mode)
           {
-              case COL:	amp_select_mode = AMP;	break;
-              case AMP:	amp_select_mode = CAB; 	break;
-              case CAB:	amp_select_mode = COL; 	break;
+              case COL:	amp_select_mode = AMP; break;
+              case AMP:	amp_select_mode = CAB; break;
+              case CAB:	amp_select_mode = COL; break;
           }
           TRACE_THR30IIPEDAL(Serial.println("Amp Select Mode: " + String(amp_select_mode));)
           selected_sbox = 0;
@@ -914,7 +914,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             }
             THR_Values.createPatch();
             TRACE_THR30IIPEDAL(Serial.println("Effect unit switched to: " + String(THR_Values.effecttype));)
-            maskCUpdate |= maskFxUnit;
+            maskCUpdate |= (maskFxUnit | maskFxUnitEn);
           }
         break;
 
@@ -928,7 +928,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             }
             THR_Values.createPatch();
             TRACE_THR30IIPEDAL(Serial.println("Echo unit switched to: " + String(THR_Values.echotype));)
-            maskCUpdate |= maskEcho;
+            maskCUpdate |= (maskEcho | maskEchoEn);
           }
         break;
 
@@ -944,7 +944,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             }
             THR_Values.createPatch();
             TRACE_THR30IIPEDAL(Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));)
-            maskCUpdate |= maskReverb;
+            maskCUpdate |= (maskReverb | maskReverbEn);
           }
         break;
 
