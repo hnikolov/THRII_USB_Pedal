@@ -132,10 +132,6 @@ void THR30II_Settings::EchoSetting(THR30II_ECHO_TYPES type, uint16_t ctrl, doubl
 			if( value >= THR30II_INFO_TAPE[stt].ll && value <= THR30II_INFO_TAPE[stt].ul )
 			{
 				echo_setting[TAPE_ECHO][stt] = value; // All double values
-				// if( stt == TA_MIX ) // Mix is identical for both types!
-				// {
-				// 	 echo_setting[DIGITAL_DELAY][DD_MIX] = value;
-				// }
 
 				if( sendChangestoTHR )
 				{
@@ -156,10 +152,6 @@ void THR30II_Settings::EchoSetting(THR30II_ECHO_TYPES type, uint16_t ctrl, doubl
 			if( value >= THR30II_INFO_DIGI[std].ll && value <= THR30II_INFO_DIGI[std].ul )
 			{
 				echo_setting[DIGITAL_DELAY][std] = value; // All double values
-				// if (std == DD_MIX) // Mix is identical for both types!
-				// {
-				// 	 echo_setting[TAPE_ECHO][TA_MIX] = value;
-				// }
 
 				if( sendChangestoTHR )
 				{
@@ -227,12 +219,7 @@ void THR30II_Settings::EffectSetting(THR30II_EFF_TYPES type, uint16_t ctrl, doub
 				if( value >= THR30II_INFO_CHOR[stc].ll && value <= THR30II_INFO_CHOR[stc].ul )
 				{
 					effect_setting[CHORUS][stc] = value; // All double values
-					// if(stc == CH_MIX) // MIX is identical for all types!
-					// {
-					// 	effect_setting[FLANGER][FL_MIX] = value;
-					// 	effect_setting[PHASER][PH_MIX] = value;
-					// 	effect_setting[TREMOLO][TR_MIX] = value;
-					// }
+
 					if( sendChangestoTHR )  // Do not send back if change results from THR itself
 					{
 						SendParameterSetting((un_cmd) { THR30II_INFO_CHOR[stc].uk, THR30II_INFO_CHOR[stc].sk}, (type_val<double>) {0x04, value}); // Send settings change to THR
@@ -254,12 +241,7 @@ void THR30II_Settings::EffectSetting(THR30II_EFF_TYPES type, uint16_t ctrl, doub
 				if( value >= THR30II_INFO_FLAN[stf].ll && value <= THR30II_INFO_FLAN[stf].ul )
 				{
 					effect_setting[FLANGER][stf] = value; // All double values
-					// if (stf == FL_MIX) // MIX is identical for all types!
-					// {
-					// 	effect_setting[CHORUS][CH_MIX] = value;
-					// 	effect_setting[PHASER][PH_MIX] = value;
-					// 	effect_setting[TREMOLO][TR_MIX] = value;
-					// }					
+
 					if( sendChangestoTHR ) // Do not send back, if change results from THR itself
 					{
 						SendParameterSetting((un_cmd){THR30II_INFO_FLAN[stf].uk, THR30II_INFO_FLAN[stf].sk}, (type_val<double>) {0x04, value}); // Send settings change to THR
@@ -277,16 +259,11 @@ void THR30II_Settings::EffectSetting(THR30II_EFF_TYPES type, uint16_t ctrl, doub
 					stt= it->first;
 				}
 			}
-			
+
       if( value >= THR30II_INFO_TREM[stt].ll && value <= THR30II_INFO_TREM[stt].ul )
 			{
 				effect_setting[TREMOLO][stt] = value; // All double values
-				//  if (stt == TR_MIX)   // MIX is identical for all types!
-        //         {
-        //             effect_setting[FLANGER][FL_MIX] = value;
-        //             effect_setting[PHASER][PH_MIX] = value;
-        //             effect_setting[CHORUS][CH_MIX] = value;
-        //         }
+
 				if( sendChangestoTHR ) // Do not send back, if change results from THR itself
 				{
 					SendParameterSetting((un_cmd){THR30II_INFO_TREM[stt].uk, THR30II_INFO_TREM[stt].sk}, (type_val<double>) {0x04, value}); // Send settings change to THR
@@ -308,12 +285,7 @@ void THR30II_Settings::EffectSetting(THR30II_EFF_TYPES type, uint16_t ctrl, doub
 			if( value >= THR30II_INFO_PHAS[stp].ll && value <= THR30II_INFO_PHAS[stp].ul )
 			{
 				effect_setting[PHASER][stp] = value; // All double values
-				// if (stp == PH_MIX)   //MIX is identical for all types!
-        //             {
-        //                 effect_setting[FLANGER][FL_MIX] = value;
-        //                 effect_setting[CHORUS][CH_MIX] = value;
-        //                 effect_setting[TREMOLO][TR_MIX] = value;
-        //             }
+
 				if( sendChangestoTHR ) // Do not send back, if changes result from THR itself
 				{
 					SendParameterSetting((un_cmd){THR30II_INFO_PHAS[stp].uk, THR30II_INFO_PHAS[stp].sk}, (type_val<double>) {0x04, value}); // Send settings change to THR
@@ -341,12 +313,7 @@ void THR30II_Settings::ReverbSetting(THR30II_REV_TYPES type, uint16_t ctrl, doub
 			if( value >= THR30II_INFO_SPRI[sts].ll && value <= THR30II_INFO_SPRI[sts].ul )
 			{
 				reverb_setting[SPRING][sts] = value; // All double values
-				//  if(sts== SP_MIX)   //MIX is identical for all types!
-        //             {
-        //                 reverb_setting[PLATE][PL_MIX] = value;
-        //                 reverb_setting[HALL][HA_MIX] = value;
-        //                 reverb_setting[ROOM][RO_MIX] = value;
-        //             }
+
 				if( sendChangestoTHR )
 				{
 					SendParameterSetting((un_cmd){THR30II_INFO_SPRI[sts].uk, THR30II_INFO_SPRI[sts].sk}, (type_val<double>) {0x04, value}); // Send settings change to THR
@@ -368,12 +335,7 @@ void THR30II_Settings::ReverbSetting(THR30II_REV_TYPES type, uint16_t ctrl, doub
 			if( value >= THR30II_INFO_PLAT[stp].ll && value <= THR30II_INFO_PLAT[stp].ul )
 			{
 				reverb_setting[PLATE][stp] = value; // All double values
-				//  if (stp == PL_MIX) // MIX is identical for all types!
-        //             {
-        //                 reverb_setting[SPRING][SP_MIX] = value;
-        //                 reverb_setting[HALL][HA_MIX] = value;
-        //                 reverb_setting[ROOM][RO_MIX] = value;
-        //             }
+
 				if( sendChangestoTHR )
 				{
 					SendParameterSetting((un_cmd){THR30II_INFO_PLAT[stp].uk, THR30II_INFO_PLAT[stp].sk}, (type_val<double>){0x04, value}); // Send settings change to THR
@@ -395,12 +357,7 @@ void THR30II_Settings::ReverbSetting(THR30II_REV_TYPES type, uint16_t ctrl, doub
 			if( value >= THR30II_INFO_HALL[sth].ll && value <= THR30II_INFO_HALL[sth].ul )
 			{
 				reverb_setting[HALL][sth] = value; // All double values
-				// if (sth == HA_MIX) // MIX is identical for all types!
-				// {
-				// 	reverb_setting[SPRING][SP_MIX] = value;
-				// 	reverb_setting[PLATE][PL_MIX] = value;
-				// 	reverb_setting[ROOM][RO_MIX] = value;
-				// }
+
 				if( sendChangestoTHR )
 				{
 					SendParameterSetting((un_cmd){THR30II_INFO_HALL[sth].uk, THR30II_INFO_HALL[sth].sk}, (type_val<double>) {0x04, value}); // Send settings change to THR
@@ -421,12 +378,7 @@ void THR30II_Settings::ReverbSetting(THR30II_REV_TYPES type, uint16_t ctrl, doub
 			if( value >= THR30II_INFO_ROOM[str].ll && value <= THR30II_INFO_ROOM[str].ul )
 			{
 				reverb_setting[ROOM][str] = value; // All double values
-				// if (str == RO_MIX) // MIX is identical for all types!
-        //             {
-        //                 reverb_setting[SPRING][SP_MIX] = value;
-        //                 reverb_setting[PLATE][PL_MIX] = value;
-        //                 reverb_setting[HALL][HA_MIX] = value;
-        //             }
+
 				if( sendChangestoTHR )
 				{
 					SendParameterSetting((un_cmd){THR30II_INFO_ROOM[str].uk, THR30II_INFO_ROOM[str].sk}, (type_val<double>) {0x04, value}); // Send settings change to THR
@@ -1053,8 +1005,20 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 	// 1801 = FX2MixState     (Eff.Mix)
 	conbyt2(glob["FX2MixState"]);				
 	conbyt4(0x00030000u); // Type int
-	
-	conbyt4(ValToNumber(effect_setting[PHASER][PH_MIX])); // MIX is independent from the effect type!
+  //===============================
+  // MIX per effect
+  //===============================
+  double FX_MIX = 0.0;
+  switch( effecttype )
+  {
+    case CHORUS:  FX_MIX = effect_setting[CHORUS][CH_MIX];  break;
+    case FLANGER: FX_MIX = effect_setting[FLANGER][FL_MIX]; break;
+    case PHASER:  FX_MIX = effect_setting[PHASER][PH_MIX];  break;
+    case TREMOLO: FX_MIX = effect_setting[TREMOLO][TR_MIX]; break;
+  }
+	conbyt4(ValToNumber(FX_MIX));
+	//conbyt4(ValToNumber(effect_setting[PHASER][PH_MIX])); // MIX is independent from the effect type!
+
 	//1C01 = FX3EnableState  (EchoOn)
 	conbyt2(glob["FX3EnableState"]);
 	conbyt4(0x00010000u); // Type binary
@@ -1062,7 +1026,15 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 	// 1B01 = FX3MixState     (EchoMix)
 	conbyt2(glob["FX3MixState"]);
 	conbyt4(0x00030000u); // Type int
-	conbyt4(ValToNumber(echo_setting[TAPE_ECHO][TA_MIX])); // MIX is independent from the echo type!
+
+  double DL_MIX = 0.0;
+  switch( echotype )
+  {
+    case TAPE_ECHO:     DL_MIX = echo_setting[TAPE_ECHO][TA_MIX];     break;
+    case DIGITAL_DELAY: DL_MIX = echo_setting[DIGITAL_DELAY][DD_MIX]; break;
+  }
+	conbyt4(ValToNumber(DL_MIX));
+	//conbyt4(ValToNumber(echo_setting[TAPE_ECHO][TA_MIX])); // MIX is independent from the echo type!
 	
 	// 1F01 = FX4EnableState  (RevOn)
 	conbyt2(glob["FX4EnableState"]);		
@@ -1071,7 +1043,17 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 	// 2601 = FX4WetSendState (RevMix)
 	conbyt2(glob["FX4WetSendState"]);
 	conbyt4(0x00030000u); // Type int
-	conbyt4(ValToNumber(reverb_setting[SPRING][SP_MIX]) ); // MIX is independent from the effect type!
+
+  double RB_MIX = 0.0;
+  switch( reverbtype )
+  {
+    case SPRING: RB_MIX = reverb_setting[SPRING][SP_MIX]; break;
+    case PLATE:  RB_MIX = reverb_setting[PLATE][PL_MIX];  break;
+    case HALL:   RB_MIX = reverb_setting[HALL][HA_MIX];   break;
+    case ROOM:   RB_MIX = reverb_setting[ROOM][RO_MIX];   break;
+  }
+	conbyt4(ValToNumber(RB_MIX));
+	//conbyt4(ValToNumber(reverb_setting[SPRING][SP_MIX]) ); // MIX is independent from the effect type!
 	
   // 2101 = GateEnableState (GateOn)
 	conbyt2(glob["GateEnableState"]);
