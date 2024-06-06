@@ -473,7 +473,8 @@ void WorkingTimer_Tick() // Latest martinzw version + BJW debug msgs
 	{
 		SysExMessage msg (inqueue.dequeue());
     // CHECK: If ParseSysEx() is called without printing the result, some timeout occurs, Are we too quick?
-		THR_Values.ParseSysEx(msg.getData(),msg.getSize());
+		String result = THR_Values.ParseSysEx(msg.getData(), msg.getSize());
+    TRACE_THR30IIPEDAL(Serial.println("Work. Tmr: " + result);)
 		//Serial.println("Work. Tmr: " + THR_Values.ParseSysEx(msg.getData(), msg.getSize()));
     if( THR_Values.userPresetDownloaded )
     {
