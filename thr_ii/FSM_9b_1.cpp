@@ -737,7 +737,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           maskCUpdate |= maskEcho;
         break;
 
-        case 5: // Edit the Amp
+        case 5: // Edit the Compressor Unit
           if( selected_sbox != 0 )
           {
             TRACE_THR30IIPEDAL(Serial.println("Compressor selected");)
@@ -753,7 +753,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           }
           break;
 
-        case 6: // Edit the Compressor Unit
+        case 6: // Edit the Amp
           if( selected_sbox != 1 )
           {
             selected_sbox = 1;

@@ -729,7 +729,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 TRACE_THR30IIPEDAL(result += " Compressor: unknown ";)
                             }
                             // maskCUpdate |= maskCompressor;
-                            // selected_sbox = 1; // No need to select the compressor in the GUI (Edit mode)
+                            // selected_sbox = 0; // No need to select the compressor in the GUI (Edit mode)
                         }
                         else if( msgVals[2] == THR30II_UNITS_VALS[GATE].key ) // == 0x013C  Block "GuitarProc"
                         {                                                     // Normally this should not occure
@@ -1080,7 +1080,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 TRACE_THR30IIPEDAL(result += " UNIT COMPRESSOR " + String((msgVals[5] != 0 ? "On" : "Off"));)
                                 Switch_On_Off_Compressor_Unit(msgVals[5] != 0);
                                 maskCUpdate |= (maskCompressor | maskCompressorEn);
-                                selected_sbox = 1;
+                                selected_sbox = 0;
                             }
                             else if( msgVals[3] == THR30II_UNIT_ON_OFF_COMMANDS[REVERB] ) // 0x0130:
                             {
@@ -1166,7 +1166,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             TRACE_THR30IIPEDAL(result += String("Amp: ");)
                             userSettingsHaveChanged = true;
                             activeUserSetting = -1;
-                            selected_sbox = 0;
+                            selected_sbox = 1;
                             maskCUpdate |= maskAmpUnit;
 
                             // Select from msgVals[3] (the value - here the parameter key)
