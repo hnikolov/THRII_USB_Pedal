@@ -32,7 +32,6 @@ extern uint32_t maskConnIcon; // Not used
 extern uint32_t maskPatchName;
 extern uint32_t maskGainMaster;
 extern uint32_t maskVolumeAudio;
-extern uint32_t maskEQChart;
 extern uint32_t maskAmpUnit;
 extern uint32_t maskCompressor;
 extern uint32_t maskNoiseGate;
@@ -272,7 +271,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
           else // Solo switch
           {
             toggle_boost();
-            maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);
+            maskCUpdate |= (maskPatchName | maskGainMaster);
           }
         break;
 
@@ -286,7 +285,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
           else // Solo switch
           {
             toggle_boost();
-            maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);
+            maskCUpdate |= (maskPatchName | maskGainMaster);
           }
         break;
 
@@ -300,7 +299,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
           else // Solo switch
           {
             toggle_boost();
-            maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);
+            maskCUpdate |= (maskPatchName | maskGainMaster);
           }
         break;
 
@@ -314,7 +313,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
           else // Solo switch
           {
             toggle_boost();
-            maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);
+            maskCUpdate |= (maskPatchName | maskGainMaster);
           }
         break;
         
@@ -328,7 +327,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
           else // Solo switch
           {
             toggle_boost();
-            maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);
+            maskCUpdate |= (maskPatchName | maskGainMaster);
           }
         break;
 
@@ -582,7 +581,8 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
 
         case 6:
           toggle_boost();
-          maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);        
+          // maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);        
+          maskCUpdate |= (maskPatchName | maskGainMaster);        
         break;
 
         case 7: // Toggle Effect

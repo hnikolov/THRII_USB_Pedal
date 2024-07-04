@@ -15,7 +15,6 @@ extern uint32_t maskConnIcon; // Not used
 extern uint32_t maskPatchName;
 extern uint32_t maskGainMaster;
 extern uint32_t maskVolumeAudio;
-extern uint32_t maskEQChart;
 extern uint32_t maskAmpUnit;
 extern uint32_t maskCompressor;
 extern uint32_t maskCompressorEn;
@@ -1192,7 +1191,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 TRACE_THR30IIPEDAL(result += String(val, 0);)
                                 SetControl(CTRL_BASS, val);
-                                maskCUpdate |= maskEQChart | maskGainMaster;
+                                maskCUpdate |= maskGainMaster;
                             }
                             else if( msgVals[3] == THR30II_CTRL_VALS[CTRL_MID] ) // 0x56:
                             {
@@ -1200,7 +1199,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 SetControl(CTRL_MID, val);
                                 TRACE_THR30IIPEDAL(result += String(val, 0);)
-                                maskCUpdate |= maskEQChart | maskGainMaster;
+                                maskCUpdate |= maskGainMaster;
                             }
                             else if( msgVals[3] == THR30II_CTRL_VALS[CTRL_TREBLE] ) // 0x57:
                             {
@@ -1208,7 +1207,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 val = THR30II_Settings::NumberToVal(msgVals[5]);
                                 SetControl(CTRL_TREBLE, val);
                                 TRACE_THR30IIPEDAL(result += String(val, 0);)
-                                maskCUpdate |= maskEQChart | maskGainMaster;
+                                maskCUpdate |= maskGainMaster;
                             }
                             else
                             {

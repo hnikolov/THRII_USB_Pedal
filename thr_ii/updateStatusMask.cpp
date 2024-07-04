@@ -41,7 +41,7 @@ uint32_t maskConnIcon      = 1 <<  5; // Not used
 uint32_t maskPatchName     = 1 <<  6;
 uint32_t maskGainMaster    = 1 <<  7; // drawPPChart
 uint32_t maskVolumeAudio   = 1 <<  8; // drawPPChart
-uint32_t maskEQChart       = 1 <<  9;
+// uint32_t maskEQChart       = 1 <<  9;
 uint32_t maskAmpUnit       = 1 << 10;
 uint32_t maskCompressor    = 1 << 11; // drawUtilUnit
 uint32_t maskNoiseGate     = 1 << 12; // drawUtilUnit
@@ -544,7 +544,7 @@ void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate)
   FXx += FXw2;
 
   // Amp unit -------------------------------------------------------------------
-  if( maskCUpdate & (maskGainMaster | maskEQChart) )
+  if( maskCUpdate & maskGainMaster )
   {
     FXparams[0] = thrs.control[CTRL_GAIN];
     FXparams[1] = thrs.control[CTRL_MASTER];
