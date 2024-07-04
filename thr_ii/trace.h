@@ -3,10 +3,10 @@
 
 // NOTE: Switch the modes on/off by changing '//*' to '/*'
 
-//* Normal TRACE/DEBUG
+/* Normal TRACE/DEBUG
 #define TRACE_THR30IIPEDAL(x) x // Trace on
 /*/
-#define TRACE_THR30IIPEDAL(x)	  // Trace off
+#define TRACE_THR30IIPEDAL(x)   // Trace off
 //*/
 
 /* Verbose TRACE/DEBUG
@@ -15,4 +15,4 @@
 #define TRACE_V_THR30IIPEDAL(x)   // Trace off
 //*/
 
-#endif // _TRACE_H
+#endif  // _TRACE_H
