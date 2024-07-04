@@ -477,8 +477,9 @@ int THR30II_Settings::patch_setAll(uint8_t * buf, uint16_t buf_len)
 		}
 	}
 
-  // Switch GUI to THR amp mode
-  _uistate = UI_home_amp;
+  // Switch GUI to THR amp mode. However, do not switch if in amp manual mode.
+  if( _uistate == UI_manual && _uistate_prev == UI_home_amp ) { /* Do not switch mode */ }
+  else  { _uistate = UI_home_amp; }
 
 	TRACE_THR30IIPEDAL(Serial.println("... setting unit vals: ");)
 	// Recurse through the whole data structure created while parsing the dump
