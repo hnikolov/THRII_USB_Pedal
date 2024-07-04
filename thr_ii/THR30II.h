@@ -569,6 +569,9 @@ class THR30II_Settings
 	uint32_t ParTempo;      // Global from Patch dump (minimum value of 110 is coded with 0x00000000)
 
 	byte SysExSendCounter;
+
+  uint8_t M_NR = 0; // Model number, e.g., 0x01 = THR10II-W
+  uint8_t F_ID = 0; // Family ID, e.g., 0x24
 }; // of class THR30II_Settings
 
 struct Dumpunit

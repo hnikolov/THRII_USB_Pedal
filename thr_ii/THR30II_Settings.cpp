@@ -1357,8 +1357,7 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 	sblast = sb.begin(); // Start the buffer to send
 	
 	std::array<byte, 12> toInsert;
-	toInsert = std::array<byte,12>({ 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, memframecnt++, 0x00, 0x01, 0x0b });
-	//toInsert=std::array<byte,12>({ 0xf0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x01, memframecnt++, 0x00, 0x01, 0x0b });
+  toInsert = std::array<byte, 12>({ 0xf0, 0x00, 0x01, 0x0c, F_ID, M_NR, 0x4d, 0x01, memframecnt++, 0x00, 0x01, 0x0b });
 	sblast = std::copy(toInsert.begin(), toInsert.end(), sb.begin());
 	sblast = std::copy(sb2.begin(), sb2last, sblast);
 
@@ -1376,9 +1375,8 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 		std::array<byte, 210> slice;
 		std::copy(dat.begin() + i*210, dat.begin() + i*210+210, slice.begin());
 		sb2last = Enbucket(sb2, slice, slice.end());
-		sblast = sb.begin(); // sStart new buffer to send
-		toInsert =  { 0xF0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, memframecnt, (byte)(i % 128), 0x0d, 0x01 }; // memframecount is not incremented inside sent patches
-		//toInsert=  { 0xF0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x01, memframecnt, (byte)(i % 128), 0x0d, 0x01 };  //memframecount is not incremented inside sent patches
+		sblast = sb.begin(); // Start new buffer to send
+    toInsert = { 0xF0, 0x00, 0x01, 0x0c, F_ID, M_NR, 0x4d, 0x01, memframecnt, (byte)(i % 128), 0x0d, 0x01 }; // memframecount is not incremented inside sent patches
 		sblast = std::copy(toInsert.begin(), toInsert.end(), sblast);
 		sblast = std::copy( sb2.begin(), sb2last, sblast);
 		*sblast ++= 0xF7;
@@ -1402,8 +1400,7 @@ void THR30II_Settings::createPatch() // Fill send buffer with actual settings, c
 		slicelast = std::copy(dat.begin() + numslices * 210, dat.begin() + numslices * 210 + lastlen, slicelast);
 		sb2last = Enbucket(sb2, slice, slicelast);
 		sblast = sb.begin(); // Start new buffer to send
-		toInsert = { 0xF0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, memframecnt++, (byte)((numslices) % 128), (byte)((lastlen - 1) / 16), (byte)((lastlen - 1) % 16) }; 
-		//toInsert={ 0xF0, 0x00, 0x01, 0x0c, 0x24, 0x02, 0x4d, 0x01, memframecnt++, (byte)((numslices) % 128), (byte)((lastlen - 1) / 16), (byte)((lastlen - 1) % 16) }; 
+    toInsert = { 0xF0, 0x00, 0x01, 0x0c, F_ID, M_NR, 0x4d, 0x01, memframecnt++, (byte)((numslices) % 128), (byte)((lastlen - 1) / 16), (byte)((lastlen - 1) % 16) }; 
 		sblast = std::copy(toInsert.begin(),toInsert.end(), sblast);
 		sblast = std::copy(sb2.begin(), sb2last, sblast);
 		*sblast ++= 0xF7;

@@ -79,7 +79,7 @@ String presetData;
 
 UIStates _uistate_prev = UI_home_patch; // To remember amp vs custom patches state
 
-
+// NOTE: Use F_ID and M_NR iso 0x24 and 0x01, see select_thrii_preset()
 std::array<byte, 29> ask_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
 // Switch to preset #4 (__0x03__)
 std::array<byte, 29> switch_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x08, 0x00, 0x0e, 0x0b, 0x00, 0x0e, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
@@ -132,6 +132,10 @@ void select_thrii_preset(byte nThriiPreset)
   THR_Values.thrSettings = false;
   THR_Values.boost_activated = false;
 
+  // Fill in Family ID and model number
+  switch_preset_buf[4] = THR_Values.F_ID;
+  switch_preset_buf[5] = THR_Values.M_NR;
+
   // Switch to User preset ASAP, TODO: Check for timeouts...
   switch_preset_buf[22] = nThriiPreset;
   outqueue.enqueue(Outmessage(SysExMessage(switch_preset_buf.data(), switch_preset_buf.size()), 88, false, true));
@@ -140,6 +144,10 @@ void select_thrii_preset(byte nThriiPreset)
   if(thr_user_presets[nThriiPreset].getActiveUserSetting() == -1)
   {
     TRACE_THR30IIPEDAL(Serial.println("Requesting data for User preset #" + String(nThriiPreset));)
+
+    // Fill in Family ID and model number
+    ask_preset_buf[4] = THR_Values.F_ID;
+    ask_preset_buf[5] = THR_Values.M_NR;
 
     // Store to THR_Values and thr_user_presets[nThriiPreset]
     ask_preset_buf[22] = nThriiPreset;
