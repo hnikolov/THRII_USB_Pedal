@@ -581,7 +581,6 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
 
         case 6:
           toggle_boost();
-          // maskCUpdate |= (maskPatchName | maskGainMaster | maskEQChart);        
           maskCUpdate |= (maskPatchName | maskGainMaster);        
         break;
 

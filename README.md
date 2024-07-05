@@ -22,6 +22,12 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
   - See "SysExMessage m(sb.data(), sblast - sb.begin());" in CreatePatch()
 - setup_t conflict in TFT_eSPI library: renamed the setup_t type
 
+**SUPPORT OF DIFFERENT THRII MODELS**
+
+In this development, I use THR10II-W. To make the original code working with my amp, I needed to change at many places the hard coded family if (FID) and model number (MNR) values. In order to (facilitate) support of different THRII models, I removed hard coded FID and MNR from the USB/MIDI communication with THRII, mainly in ParseSysEx.cpp file. In this way, different THRII models can be connected and controlled with almost no need of code changes and SW rebuild. However, still some changes are needed, because:
+- In the beginning, FID and MNR are not known, therefore, in function send_init(), hard coded values are used
+- Hard coded values are present in THR30II.h file, see LINE6_YAMAHA_DEVICE_ID and PC_SYSEX_BEGIN. These values are used in function SendParameterSetting() further in this file.
+
 **HARDWARE USED**
 - Teensy 4.1
 - 3.2" TFT with ILI9341 controller is used. 
@@ -214,15 +220,12 @@ I set Visual Studio Code (PlatformIO) with all libraries needed but could not in
 
 **TODOs**
 
-- Use Family ID and model number: obtain after connection and use in communication
-  - In this way, all THRxII flavours should be supported
-  - Currently, it is hard-coded to represent THR10II-W
+- Select effects by sending parameters. Currently, complete patch is created and sent to THRII
 - Cannot switch THRII amp/col without calling createPatch() 
   - Can switch from 'Boom SendSX' Midi software sending hex data. The 'same' data does not switch amp/col when sent from Teensy
 - Use Guitar volume for Boost (Solo switch). Currently uses Master+EQ. Make it selectable?
   - Care to be taken when switching presets and the solo switch was on!
-- Define useable settings for all parameters/effects and initialize them at startup. I
-  - In this case even if nothing is loaded from the amp or preset, effects can be selected and used. Currently, they can be switched but not very usable
+- Reconnect issue: disconnect and connect again (cable unplug or pedal board reboot) while THRII remains powered on, does not work as expected
 
 <br />
 
