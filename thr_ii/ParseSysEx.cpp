@@ -2,6 +2,7 @@
 #include "THR30II_Pedal.h"
 #include "Globals.h"
 #include "trace.h"
+#include "stompBoxes.h"
 #include <CRC32.h> // https://github.com/bakercp/CRC32
 
 extern uint32_t maskCUpdate;
@@ -653,25 +654,25 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             {
                                 TRACE_THR30IIPEDAL(result += " Reverb: Mode SPRING selected ";)
                                 ReverbSelect(SPRING);
-                                selected_sbox = 9;
+                                selected_sbox = SP;
                             }
                             else if( msgVals[3] == THR30II_REV_TYPES_VALS[HALL].key ) // 0x00FC : "ReallyLargeHall"
                             {
                                 TRACE_THR30IIPEDAL(result += " Reverb: Mode HALL selected ";)
                                 ReverbSelect(HALL);
-                                selected_sbox = 11;
+                                selected_sbox = HA;
                             }
                             else if( msgVals[3] == THR30II_REV_TYPES_VALS[PLATE].key ) // 0x00F7 : "LargePlate1"
                             {
                                 TRACE_THR30IIPEDAL(result += " Reverb: Mode PLATE selected ";)
                                 ReverbSelect(PLATE);
-                                selected_sbox = 10;
+                                selected_sbox = PL;
                             }
                             else if( msgVals[3] == THR30II_REV_TYPES_VALS[ROOM].key ) // 0x00FE : "SmallRoom1"
                             {
                                 TRACE_THR30IIPEDAL(result += " Reverb: Mode Room selected ";)
                                 ReverbSelect(ROOM);
-                                selected_sbox = 12;
+                                selected_sbox = RO;
                             }
                             else
                             {
@@ -685,25 +686,25 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             {
                                 TRACE_THR30IIPEDAL(result += " Effect: Mode PHASER selected ";)
                                 EffectSelect(PHASER);
-                                selected_sbox = 5;
+                                selected_sbox = PH;
                             }
                             else if( msgVals[3] == THR30II_EFF_TYPES_VALS[TREMOLO].key ) // 0x00DC : "BiasTremolo"
                             {
                                 TRACE_THR30IIPEDAL(result += " Effect: Mode TREMOLO selected ";)
                                 EffectSelect(TREMOLO);
-                                selected_sbox = 6;
+                                selected_sbox = TR;
                             }
                             else if( msgVals[3] == THR30II_EFF_TYPES_VALS[FLANGER].key ) // 0x00E2 : "L6Flanger"
                             {
                                 TRACE_THR30IIPEDAL(result += " Effect: Mode FLANGER selected ";)
                                 EffectSelect(FLANGER);
-                                selected_sbox = 4;
+                                selected_sbox = FL;
                             }
                             else if( msgVals[3] == THR30II_EFF_TYPES_VALS[CHORUS].key ) // 0x00E6 : "StereoSquareChorus"
                             {
                                 TRACE_THR30IIPEDAL(result += " Effect: Mode CHORUS selected ";)
                                 EffectSelect(CHORUS);
-                                selected_sbox = 3;
+                                selected_sbox = CH;
                             }
                             else 
                             {   
@@ -728,7 +729,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 TRACE_THR30IIPEDAL(result += " Compressor: unknown ";)
                             }
                             // maskCUpdate |= maskCompressor;
-                            // selected_sbox = 0; // No need to select the compressor in the GUI (Edit mode)
+                            // selected_sbox = CO; // No need to select the compressor in the GUI (Edit mode)
                         }
                         else if( msgVals[2] == THR30II_UNITS_VALS[GATE].key ) // == 0x013C  Block "GuitarProc"
                         {                                                     // Normally this should not occure
@@ -742,7 +743,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 TRACE_THR30IIPEDAL(result += " Gate: unknown ";)
                             }                                                                                              
                             // maskCUpdate |= maskNoiseGate;
-                            // selected_sbox = 2; No need to select the noise gate in the GUI (Edit mode)
+                            // selected_sbox = GA; No need to select the noise gate in the GUI (Edit mode)
 
                         }  // Since firmware 1.40.0a Block Echo could eventually appear (Types TapeEcho/DigitalDelay)
                         else if(msgVals[2] == THR30II_UNITS_VALS[ECHO].key ) // 0x010F Block ECHO ("FX3")
@@ -751,13 +752,13 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             {
                                 TRACE_THR30IIPEDAL(result += " UnitEcho: Mode TapeEcho selected ";)
                                 //EchoSelect(TAPE_ECHO);
-                                //selected_sbox = 7;
+                                //selected_sbox = TA;
                             }
                             else if( msgVals[3] == glob["L6DigitalDelay"] )
                             {
                                 TRACE_THR30IIPEDAL(result += " UnitEcho: Mode DigitalDelay selected ";)
                                 //EchoSelect(DIGITAL_DELAY);
-                                //selected_sbox = 8;
+                                //selected_sbox = DD;
                             }
                             else
                             {
@@ -1055,7 +1056,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 if( _uistate != UI_edit )
                                 {
                                   maskCUpdate |= maskNoiseGate;
-                                  // selected_sbox = 2; // NOTE: Do not switch to the noise gate
+                                  // selected_sbox = GA; // NOTE: Do not switch to the noise gate
                                   // NOTE: In Edit mode, when switching amps from THRII, the last sent parameter update from THRII is
                                   //       about the noise gate unit, however, the selected sbox is the Amp unit
                                 }
@@ -1079,7 +1080,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 TRACE_THR30IIPEDAL(result += " UNIT COMPRESSOR " + String((msgVals[5] != 0 ? "On" : "Off"));)
                                 Switch_On_Off_Compressor_Unit(msgVals[5] != 0);
                                 maskCUpdate |= (maskCompressor | maskCompressorEn);
-                                selected_sbox = 0;
+                                selected_sbox = CO;
                             }
                             else if( msgVals[3] == THR30II_UNIT_ON_OFF_COMMANDS[REVERB] ) // 0x0130:
                             {
@@ -1165,7 +1166,7 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             TRACE_THR30IIPEDAL(result += String("Amp: ");)
                             userSettingsHaveChanged = true;
                             activeUserSetting = -1;
-                            selected_sbox = 1;
+                            selected_sbox = AM;
 
                             // Select from msgVals[3] (the value - here the parameter key)
                             if( msgVals[3] == THR30II_CTRL_VALS[CTRL_GAIN] ) // 0x58:
@@ -1334,11 +1335,11 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                                 TRACE_THR30IIPEDAL(result += (String(val,0));)
                                 if(val>99.0)
                                 {
-                                    //Perhaps show this in GUI "Tuner On"
+                                    // Perhaps show this in GUI "Tuner On"
                                 }
                                 else
                                 {
-                                    //Perhaps show this in GUI "Tuner Off"
+                                    // Perhaps show this in GUI "Tuner Off"
                                 }
                             }
                             else if( msgVals[3] == glob["GuitarVolume"] ) // 0x0155:
@@ -1743,49 +1744,49 @@ uint32_t THR30II_Settings::ValToNumber_Threshold(double val) //convert a 0..100 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Use the audio volume knob on the THRII to set parameter values in Edit mode
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "stompBoxes.h"
+// #include "stompBoxes.h"
 extern std::vector <StompBox*> sboxes;
 
 // Call this function to actualy send changed parameters to the amp (a couple of times per second)
 // sendEditToTHR must be set to true
 void THR30II_Settings::send_to_thrii()
 {
-  if( selected_sbox_glob == 0 )
+  if( selected_sbox_glob == CO )
   {
     CompressorSetting((THR30II_COMP)idx_par_glob, val_glob); // Set (again) and send
   }
-  else if( selected_sbox_glob == 1 )
+  else if( selected_sbox_glob == AM )
   {
     SetControl(idx_par_glob, val_glob); // Set (again) and send
   }
-  else if( selected_sbox_glob == 2 )
+  else if( selected_sbox_glob == GA )
   {
     GateSetting((THR30II_GATE)idx_par_glob, val_glob); // Set (again) and send
   }
   else if( selected_sbox_glob >= 3 && selected_sbox_glob <= 6 )
   {
-    uint8_t effect_type = selected_sbox_glob - 3; // Excluding Amp, Comp, NGate
-    //EffectSetting((THR30II_EFF_TYPES)effect_type, (uint16_t)idx_par_glob, val_glob); // FIXME: Does not work, therefore, the code below
-    if(effect_type == 0)      { SendParameterSetting((un_cmd) { THR30II_INFO_CHOR[(THR30II_EFF_SET_CHOR)idx_par_glob].uk, THR30II_INFO_CHOR[(THR30II_EFF_SET_CHOR)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); } // Send settings change to THR
-    else if(effect_type == 1) { SendParameterSetting((un_cmd) { THR30II_INFO_FLAN[(THR30II_EFF_SET_FLAN)idx_par_glob].uk, THR30II_INFO_FLAN[(THR30II_EFF_SET_FLAN)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
-    else if(effect_type == 2) { SendParameterSetting((un_cmd) { THR30II_INFO_PHAS[(THR30II_EFF_SET_PHAS)idx_par_glob].uk, THR30II_INFO_PHAS[(THR30II_EFF_SET_PHAS)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
-    else if(effect_type == 3) { SendParameterSetting((un_cmd) { THR30II_INFO_TREM[(THR30II_EFF_SET_TREM)idx_par_glob].uk, THR30II_INFO_TREM[(THR30II_EFF_SET_TREM)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+    // uint8_t effect_type = selected_sbox_glob - 3; // Excluding Amp, Comp, NGate
+    // EffectSetting((THR30II_EFF_TYPES)effect_type, (uint16_t)idx_par_glob, val_glob); // FIXME: Does not work, therefore, the code below
+    if(selected_sbox_glob == CH)      { SendParameterSetting((un_cmd) { THR30II_INFO_CHOR[(THR30II_EFF_SET_CHOR)idx_par_glob].uk, THR30II_INFO_CHOR[(THR30II_EFF_SET_CHOR)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); } // Send settings change to THR
+    else if(selected_sbox_glob == FL) { SendParameterSetting((un_cmd) { THR30II_INFO_FLAN[(THR30II_EFF_SET_FLAN)idx_par_glob].uk, THR30II_INFO_FLAN[(THR30II_EFF_SET_FLAN)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+    else if(selected_sbox_glob == PH) { SendParameterSetting((un_cmd) { THR30II_INFO_PHAS[(THR30II_EFF_SET_PHAS)idx_par_glob].uk, THR30II_INFO_PHAS[(THR30II_EFF_SET_PHAS)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+    else if(selected_sbox_glob == TR) { SendParameterSetting((un_cmd) { THR30II_INFO_TREM[(THR30II_EFF_SET_TREM)idx_par_glob].uk, THR30II_INFO_TREM[(THR30II_EFF_SET_TREM)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
   }
   else if( selected_sbox_glob >= 7 && selected_sbox_glob <= 8 ) // enum THR30II_ECHO_TYPES { TAPE_ECHO, DIGITAL_DELAY }
   {
-    uint8_t echo_type = selected_sbox_glob - 7; // Excluding Amp, Comp, NGate, PHASER, TREMOLO, FLANGER, CHORUS
-    //EchoSetting((THR30II_ECHO_TYPES)echo_type, (uint16_t)idx_par_glob, val_glob); // FIXME: Does not work, therefore, the code below
-    if(echo_type == 0)      { SendParameterSetting((un_cmd) { THR30II_INFO_TAPE[(THR30II_ECHO_SET_TAPE)idx_par_glob].uk, THR30II_INFO_TAPE[(THR30II_ECHO_SET_TAPE)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); } // Send settings change to THR
-    else if(echo_type == 1) { SendParameterSetting((un_cmd) { THR30II_INFO_DIGI[(THR30II_ECHO_SET_DIGI)idx_par_glob].uk, THR30II_INFO_DIGI[(THR30II_ECHO_SET_DIGI)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+    // uint8_t echo_type = selected_sbox_glob - 7; // Excluding Amp, Comp, NGate, PHASER, TREMOLO, FLANGER, CHORUS
+    // EchoSetting((THR30II_ECHO_TYPES)echo_type, (uint16_t)idx_par_glob, val_glob); // FIXME: Does not work, therefore, the code below
+    if(selected_sbox_glob == TA)      { SendParameterSetting((un_cmd) { THR30II_INFO_TAPE[(THR30II_ECHO_SET_TAPE)idx_par_glob].uk, THR30II_INFO_TAPE[(THR30II_ECHO_SET_TAPE)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); } // Send settings change to THR
+    else if(selected_sbox_glob == DD) { SendParameterSetting((un_cmd) { THR30II_INFO_DIGI[(THR30II_ECHO_SET_DIGI)idx_par_glob].uk, THR30II_INFO_DIGI[(THR30II_ECHO_SET_DIGI)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
   }
   else if( selected_sbox_glob >= 9 && selected_sbox_glob <= 12 ) // enum THR30II_REV_TYPES { SPRING, PLATE, HALL, ROOM }
   {
-    uint8_t reverb_type = selected_sbox_glob - 9; // Excluding Amp, Comp, NGate, PHASER, TREMOLO, FLANGER, CHORUS, TAPE_ECHO, DIGITAL_DELAY
-    //ReverbSetting((THR30II_REV_TYPES)reverb_type, (uint16_t)idx_par_glob, val_glob); // FIXME: Does not work, therefore, the code below
-    if(reverb_type == 0)      { SendParameterSetting((un_cmd) { THR30II_INFO_SPRI[(THR30II_REV_SET_SPRI)idx_par_glob].uk, THR30II_INFO_SPRI[(THR30II_REV_SET_SPRI)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); } // Send settings change to THR
-    else if(reverb_type == 1) { SendParameterSetting((un_cmd) { THR30II_INFO_PLAT[(THR30II_REV_SET_PLAT)idx_par_glob].uk, THR30II_INFO_PLAT[(THR30II_REV_SET_PLAT)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
-    else if(reverb_type == 2) { SendParameterSetting((un_cmd) { THR30II_INFO_HALL[(THR30II_REV_SET_HALL)idx_par_glob].uk, THR30II_INFO_HALL[(THR30II_REV_SET_HALL)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
-    else if(reverb_type == 3) { SendParameterSetting((un_cmd) { THR30II_INFO_ROOM[(THR30II_REV_SET_ROOM)idx_par_glob].uk, THR30II_INFO_ROOM[(THR30II_REV_SET_ROOM)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+    // uint8_t reverb_type = selected_sbox_glob - 9; // Excluding Amp, Comp, NGate, PHASER, TREMOLO, FLANGER, CHORUS, TAPE_ECHO, DIGITAL_DELAY
+    // ReverbSetting((THR30II_REV_TYPES)reverb_type, (uint16_t)idx_par_glob, val_glob); // FIXME: Does not work, therefore, the code below
+    if(selected_sbox_glob == SP)      { SendParameterSetting((un_cmd) { THR30II_INFO_SPRI[(THR30II_REV_SET_SPRI)idx_par_glob].uk, THR30II_INFO_SPRI[(THR30II_REV_SET_SPRI)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); } // Send settings change to THR
+    else if(selected_sbox_glob == PL) { SendParameterSetting((un_cmd) { THR30II_INFO_PLAT[(THR30II_REV_SET_PLAT)idx_par_glob].uk, THR30II_INFO_PLAT[(THR30II_REV_SET_PLAT)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+    else if(selected_sbox_glob == HA) { SendParameterSetting((un_cmd) { THR30II_INFO_HALL[(THR30II_REV_SET_HALL)idx_par_glob].uk, THR30II_INFO_HALL[(THR30II_REV_SET_HALL)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
+    else if(selected_sbox_glob == RO) { SendParameterSetting((un_cmd) { THR30II_INFO_ROOM[(THR30II_REV_SET_ROOM)idx_par_glob].uk, THR30II_INFO_ROOM[(THR30II_REV_SET_ROOM)idx_par_glob].sk}, (type_val<double>) {0x04, val_glob}); }
   }
 }
 
@@ -1804,17 +1805,17 @@ void THR30II_Settings::setParbyAudioVolKnob(double val)
   val_glob = val;
   //--------------------------------------------------
 
-  if( selected_sbox == 0 )
+  if( selected_sbox == CO )
   {
     compressor_setting[(THR30II_COMP)idx_par] = constrain(val, 0, 100);
     maskCUpdate |= maskCompressor;
   }
-  else if( selected_sbox == 1 )
+  else if( selected_sbox == AM )
   {
     control[idx_par] = val;
     maskCUpdate |= maskGainMaster;
   }
-  else if( selected_sbox == 2 )
+  else if( selected_sbox == GA )
   {
     gate_setting[(THR30II_GATE)idx_par] = constrain(val, 0, 100);
     maskCUpdate |= maskNoiseGate;

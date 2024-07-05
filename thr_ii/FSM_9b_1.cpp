@@ -53,7 +53,7 @@ extern uint32_t maskAll;
 extern std::vector <StompBox*> sboxes;
 
 extern uint8_t last_updated_sbox;
-uint8_t selected_sbox = 12;
+uint8_t selected_sbox = RO; // The last sbox: Room Reverb
 
 extern std::vector <JsonDocument> json_patchesII_user;
 extern std::vector <JsonDocument> json_patchesII_factory;
@@ -350,7 +350,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         case 13: // Select the Edit mode
           _uistate = UI_edit;
           _uistate_prev = UI_home_amp;
-          selected_sbox = 1; // Amp unit
+          selected_sbox = AM; // Amp unit
           maskCUpdate = (maskClearTft | maskAmpUnit | maskGainMaster);
         break;
 
@@ -475,7 +475,7 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
         case 13: // Switch to Edit mode
           _uistate = UI_edit;
           _uistate_prev = UI_home_patch;
-          selected_sbox = 1; // Amp unit
+          selected_sbox = AM; // Amp unit
           maskCUpdate = (maskClearTft | maskAmpUnit | maskGainMaster);
         break;
 
@@ -643,7 +643,7 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           _uistate = UI_edit;
           // _uistate_prev not set here. Will return to the previous-previuos state; Patch name not updated when returning to manual mode
           // ALso, in edit mode, we need to detect that we came there from user presets, so we can write changes
-          selected_sbox = 1; // Amp unit
+          selected_sbox = AM; // Amp unit
           maskCUpdate = (maskClearTft | maskAmpUnit | maskGainMaster);
         break;
 
@@ -725,22 +725,22 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 3: // Switch to previous mode (amp/presets) - cancel the edit mode
-          last_updated_sbox = 12; // ROOM REVERB
+          last_updated_sbox = RO; // The last sbox: ROOM REVERB
           _uistate = _uistate_prev;
           maskCUpdate = maskAll;
         break;
 
         case 4: // Tap tempo
           THR_Values.EchoTempoTap(); // Get tempo tap input and apply to echo unit
-          selected_sbox = 7;
+          selected_sbox = TA;
           maskCUpdate |= maskEcho;
         break;
 
         case 5: // Edit the Compressor Unit
-          if( selected_sbox != 0 )
+          if( selected_sbox != CO )
           {
             TRACE_THR30IIPEDAL(Serial.println("Compressor selected");)
-            selected_sbox = 0;
+            selected_sbox = CO;
             maskCUpdate |= (maskCompressor | maskCompressorEn);
           }
           else
@@ -753,9 +753,9 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           break;
 
         case 6: // Edit the Amp
-          if( selected_sbox != 1 )
+          if( selected_sbox != AM )
           {
-            selected_sbox = 1;
+            selected_sbox = AM;
             maskCUpdate |= (maskAmpUnit | maskGainMaster);
           }
         break;
@@ -766,10 +766,10 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             TRACE_THR30IIPEDAL(Serial.println("Effect unit selected");)
             switch(THR_Values.effecttype)
             {
-              case CHORUS:  selected_sbox = 3; break;
-              case FLANGER: selected_sbox = 4; break;
-              case PHASER:  selected_sbox = 5; break;
-              case TREMOLO: selected_sbox = 6; break;
+              case CHORUS:  selected_sbox = CH; break;
+              case FLANGER: selected_sbox = FL; break;
+              case PHASER:  selected_sbox = PH; break;
+              case TREMOLO: selected_sbox = TR; break;
             }
             maskCUpdate |= (maskFxUnit | maskFxUnitEn);
           }
@@ -788,8 +788,8 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             TRACE_THR30IIPEDAL(Serial.println("Echo unit selected");)
             switch(THR_Values.echotype)
             {
-              case TAPE_ECHO:     selected_sbox = 7; break;
-              case DIGITAL_DELAY: selected_sbox = 8; break;
+              case TAPE_ECHO:     selected_sbox = TA; break;
+              case DIGITAL_DELAY: selected_sbox = DD; break;
             }
             maskCUpdate |= (maskEcho | maskEchoEn);
           }
@@ -808,10 +808,10 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             TRACE_THR30IIPEDAL(Serial.println("Echo unit selected");)
             switch(THR_Values.reverbtype)
             {
-              case SPRING: selected_sbox =  9; break;
-              case PLATE:  selected_sbox = 10; break;
-              case HALL:   selected_sbox = 11; break;
-              case ROOM:   selected_sbox = 12; break;
+              case SPRING: selected_sbox = SP; break;
+              case PLATE:  selected_sbox = PL; break;
+              case HALL:   selected_sbox = HA; break;
+              case ROOM:   selected_sbox = RO; break;
             }
             maskCUpdate |= (maskReverb | maskReverbEn);
           }
@@ -844,7 +844,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             break;
           }
           THR_Values.createPatch();
-          selected_sbox = 0;
+          selected_sbox = AM;
           maskCUpdate |= (maskAmpUnit | maskGainMaster);
         break;
 
@@ -856,7 +856,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               case CAB:	amp_select_mode = COL; break;
           }
           TRACE_THR30IIPEDAL(Serial.println("Amp Select Mode: " + String(amp_select_mode));)
-          selected_sbox = 0;
+          selected_sbox = AM;
           maskCUpdate |= (maskAmpUnit | maskGainMaster);
         break;
 
@@ -876,7 +876,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
               writeToFile( file_paths_user[*active_patch_id - 1], presetData );
             }
           }
-          last_updated_sbox = 12; // ROOM REVERB
+          last_updated_sbox = RO; // The last sbox: ROOM REVERB
           _uistate = _uistate_prev;
           maskCUpdate = maskAll;
         break;
@@ -894,10 +894,10 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         break;
 
         case 16: // Edit the Gate Unit
-          if( selected_sbox != 2 )
+          if( selected_sbox != GA )
           {
             TRACE_THR30IIPEDAL(Serial.println("Gate unit selected");)
-            selected_sbox = 2;
+            selected_sbox = GA;
             maskCUpdate |= (maskNoiseGate | maskNoiseGateEn);
           }
           else
@@ -914,10 +914,10 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           {
             switch(THR_Values.effecttype)
             {
-              case CHORUS:  THR_Values.EffectSelect(FLANGER); selected_sbox = 4; break;
-              case FLANGER: THR_Values.EffectSelect(PHASER);  selected_sbox = 5; break;
-              case PHASER:  THR_Values.EffectSelect(TREMOLO); selected_sbox = 6; break;
-              case TREMOLO: THR_Values.EffectSelect(CHORUS);  selected_sbox = 3; break;
+              case CHORUS:  THR_Values.EffectSelect(FLANGER); selected_sbox = FL; break;
+              case FLANGER: THR_Values.EffectSelect(PHASER);  selected_sbox = PH; break;
+              case PHASER:  THR_Values.EffectSelect(TREMOLO); selected_sbox = TR; break;
+              case TREMOLO: THR_Values.EffectSelect(CHORUS);  selected_sbox = CH; break;
             }
             THR_Values.createPatch();
             TRACE_THR30IIPEDAL(Serial.println("Effect unit switched to: " + String(THR_Values.effecttype));)
@@ -930,8 +930,8 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           {
             switch(THR_Values.echotype)
             {
-              case TAPE_ECHO:     THR_Values.EchoSelect(DIGITAL_DELAY); selected_sbox = 8; break;
-              case DIGITAL_DELAY: THR_Values.EchoSelect(TAPE_ECHO);     selected_sbox = 7; break;
+              case TAPE_ECHO:     THR_Values.EchoSelect(DIGITAL_DELAY); selected_sbox = DD; break;
+              case DIGITAL_DELAY: THR_Values.EchoSelect(TAPE_ECHO);     selected_sbox = TA; break;
             }
             THR_Values.createPatch();
             TRACE_THR30IIPEDAL(Serial.println("Echo unit switched to: " + String(THR_Values.echotype));)
@@ -944,10 +944,10 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           {
             switch(THR_Values.reverbtype)
             {
-              case SPRING: THR_Values.ReverbSelect(PLATE);  selected_sbox = 10; break;
-              case PLATE:  THR_Values.ReverbSelect(HALL);   selected_sbox = 11; break;
-              case HALL:   THR_Values.ReverbSelect(ROOM);   selected_sbox = 12; break;
-              case ROOM:   THR_Values.ReverbSelect(SPRING); selected_sbox =  9; break;
+              case SPRING: THR_Values.ReverbSelect(PLATE);  selected_sbox = PL; break;
+              case PLATE:  THR_Values.ReverbSelect(HALL);   selected_sbox = HA; break;
+              case HALL:   THR_Values.ReverbSelect(ROOM);   selected_sbox = RO; break;
+              case ROOM:   THR_Values.ReverbSelect(SPRING); selected_sbox = SP; break;
             }
             THR_Values.createPatch();
             TRACE_THR30IIPEDAL(Serial.println("Reverb unit switched to: " + String(THR_Values.reverbtype));)
