@@ -1166,7 +1166,6 @@ String THR30II_Settings::ParseSysEx(const byte cur[], int cur_len)
                             userSettingsHaveChanged = true;
                             activeUserSetting = -1;
                             selected_sbox = 1;
-                            maskCUpdate |= maskAmpUnit;
 
                             // Select from msgVals[3] (the value - here the parameter key)
                             if( msgVals[3] == THR30II_CTRL_VALS[CTRL_GAIN] ) // 0x58:
