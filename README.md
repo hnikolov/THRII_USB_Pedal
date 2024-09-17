@@ -30,6 +30,7 @@ In this development, I use THR10II-W. To make the original code working with my 
 
 **HARDWARE USED**
 - Teensy 4.1
+- Micro SDCard
 - 3.2" TFT with ILI9341 controller is used. 
   - The controller is selected and SPI is configured in *User_Setup.h* of TFT_eSPI library source!
 - 9 buttons for guitar stomp-boxes
@@ -45,6 +46,7 @@ In this development, I use THR10II-W. To make the original code working with my 
 <br>- Adafruit_gfx (https://github.com/adafruit/Adafruit-GFX-Library)
 <br>- TFT_eSPI     (https://github.com/Bodmer/TFT_eSPI). Below, the changes made in *User_Setup.h*:
 ```
+
 // TFT Display DRiver
 #define ILI9341_DRIVER
 
@@ -56,6 +58,8 @@ In this development, I use THR10II-W. To make the original code working with my 
 #define TFT_CS   10
 #define TFT_RST   8
 ```
+
+NOTE: Pin 24 is used in the code to control the TFT backlight brightness via PWM
 
 <br />
 
@@ -71,7 +75,7 @@ In this development, I use THR10II-W. To make the original code working with my 
 - Preset name color changes to orange when parameter values are changed from THRII
   - Switching presets discard the changes - nothing is stored
 
-![THRII USB Pedal](images/thr_presets.png)
+![THRII USB Pedal](images/thr_presets.PNG)
 
 | Button | Action | Function                            |
 |--------|--------|-------------------------------------|
@@ -79,10 +83,10 @@ In this development, I use THR10II-W. To make the original code working with my 
 |        | Hold   | Toggle THRII/User(Factory) presets  |
 |   2    | Press  |                                     |
 |        | Hold   | Toggle User/Factory presets         |
-|   3    | Press  | Toggle “Manual” mode                |
-|        | Hold   | Toggle “Edit” mode                  |
+|   3    | Press  | Switch to “Manual” mode             |
+|        | Hold   | Switch to “Edit” mode               |
 |   4    | Press  | TAP Echo/Delay time                 |
-|        | Hold   | Toggle Tabata/Metronome mode        |
+|        | Hold   | Switch to Tabata/Metronome mode     |
 |   5    | Press  | Select THRII preset/memory 1. Press again for “Solo boost” (on/off) |
 |        | Hold   |                                     |
 |   6    | Press  | Select THRII preset/memory 2. Press again for “Solo boost” (on/off) |
@@ -103,7 +107,7 @@ In this development, I use THR10II-W. To make the original code working with my 
 - User/Factory preset name color changes to orange when parameter values are changed
   - The status is remembered when switching between User/Factory and THRII presets
 
-![THRII USB Pedal](images/presets.png)
+![THRII USB Pedal](images/presets.PNG)
 
 | Button | Action | Function                            |
 |--------|--------|-------------------------------------|
@@ -111,10 +115,10 @@ In this development, I use THR10II-W. To make the original code working with my 
 |        | Hold   | Toggle THRII/User(Factory) presets  |
 |   2    | Press  | Bank down (-5 presets)              |
 |        | Hold   | Toggle User/Factory presets         |
-|   3    | Press  | Toggle “Manual” mode                |
-|        | Hold   | Toggle “Edit” mode                  |
+|   3    | Press  | Switch to “Manual” mode             |
+|        | Hold   | Switch to “Edit” mode               |
 |   4    | Press  | TAP Echo/Delay time                 |
-|        | Hold   | Toggle Tabata/Metronome mode        |
+|        | Hold   | Switch to Tabata/Metronome mode     |
 |   5    | Press  | Select preset 1 from the current bank. Press again for “Solo boost” (on/off) |
 |        | Hold   |                                     |
 |   6    | Press  | Select preset 2 from the current bank. Press again for “Solo boost” (on/off) |
@@ -134,7 +138,7 @@ In this development, I use THR10II-W. To make the original code working with my 
 - Amp model/collection and speakers can be changed as well
 - In manual mode, bank up/down buttons are used to select next/previous preset
 
-![THRII USB Pedal](images/manual.png)
+![THRII USB Pedal](images/manual.PNG)
 
 | Button | Action | Function                                       |
 |--------|--------|------------------------------------------------|
@@ -142,10 +146,10 @@ In this development, I use THR10II-W. To make the original code working with my 
 |        | Hold   | Toggle Collection/Amp/Cabinet                  |
 |   2    | Press  | Previous preset (-1)                           |
 |        | Hold   | Next from selected Collection, Amp, or Cabinet |
-|   3    | Press  | Toggle “Manual” mode                           |
-|        | Hold   | Toggle “Edit” mode                             |
+|   3    | Press  | Exit “Manual” mode                             |
+|        | Hold   | Switch to “Edit” mode                          |
 |   4    | Press  | TAP Echo/Delay time                            |
-|        | Hold   | Toggle Tabata/Metronome mode                   |
+|        | Hold   | Switch to Tabata/Metronome mode                |
 |   5    | Press  | Toggle Compressor (on/off)                     |
 |        | Hold   |                                                |
 |   6    | Press  | Toggle “Solo boost” (on/off)                   |
@@ -164,22 +168,22 @@ In this development, I use THR10II-W. To make the original code working with my 
 - THRII knobs can be used to directly change parameter settings. New values are reflected in the GUI
 - The THRII Audio knob can be used to change a parameter value. Press buttons 1 and 2 to select a parameter, then use the audio knob to set value
 
-![THRII USB Pedal](images/edit.png)
+![THRII USB Pedal](images/edit.PNG)
 
 | Button | Action | Function                                                            |
 |--------|--------|---------------------------------------------------------------------|
 |   1    | Press  | Select Next parameter                                               |
-|   	 | Hold	  | Toggle Collection/Amp/Cabinet                                       |
+|   	   | Hold	  | Toggle Collection/Amp/Cabinet                                       |
 |   2    | Press  | Select Previous                                                     |
-|   	 | Hold	  | Next from selected Collection, Amp, or Cabinet                      |
+|   	   | Hold	  | Next from selected Collection, Amp, or Cabinet                      |
 |   3    | Press  | Exit/Cancel “Edit” mode                                             |
-|   	 | Hold	  | Store the changes (TODO) and exit “Edit” mode                       |
+|   	   | Hold	  | Store the changes (TODO) and exit “Edit” mode                       |
 |   4    | Press  | TAP Echo/Delay time                                                 |
-|   	 | Hold	  | Toggle Tabata/Metronome mode (changes not stored)                   |
+|   	   | Hold	  | Switch to Tabata/Metronome mode (changes not stored)                |
 |   5    | Press  | Select Compressor Settings. Press again to toggle (on/off)          |
-|   	 | Hold   |                                                                     |
+|   	   | Hold   |                                                                     |
 |   6    | Press  | Select Amp Unit                                                     |
-|   	 | Hold   | Select Noise Gate Settings. Press and hold again to toggle (on/off) |
+|   	   | Hold   | Select Noise Gate Settings. Press and hold again to toggle (on/off) |
 |   7    | Press  | Select Effect Settings. Press again to toggle (on/off)              |
 |        | Hold   | Select Effect (Chorus/Flanger/Phaser/Tremolo)                       |
 |   8    | Press  | Select Delay Settings. Press again to toggle (on/off)               |
@@ -190,12 +194,13 @@ In this development, I use THR10II-W. To make the original code working with my 
 <br />
 
 ***Tabata/Metronome Mode***
+<br> To enter this mode, hold button 4. Hold again to exit.
 <br> There are 3 variants available: 
 -	Metronome: this is the default mode
 -	Tabata: a repeating sequence of 2 timed intervals: Practice (workout) and Rest (recovery). Default settings are 45s/15s
 -	Metronome in Tabata: this is a tabata in which the metronome is on during the practice period
 
-![THRII USB Pedal](images/metronome.png)
+![THRII USB Pedal](images/metronome.PNG)
 
 | Button | Action | Function                                          |
 |--------|--------|---------------------------------------------------|
@@ -218,14 +223,17 @@ In this development, I use THR10II-W. To make the original code working with my 
 |   9    | Press  | BPM + 10 (Practice time + 10 when in Tabata mode) |
 |        | Hold   | BPM + 20 (Rest time + 10 when in Tabata mode)     |
 
-**TODOs**
+**TODOs/Known issues**
 
 - Select effects by sending parameters. Currently, complete patch is created and sent to THRII
 - Cannot switch THRII amp/col without calling createPatch() 
   - Can switch from 'Boom SendSX' Midi software sending hex data. The 'same' data does not switch amp/col when sent from Teensy
-- Use Guitar volume for Boost (Solo switch). Currently uses Master+EQ. Make it selectable?
+- Reconnect issue: disconnect and connect again (cable unplug or pedal board reboot) while THRII remains powered on and activated, does not work as expected
+- Solo boost amount requires some fine-tuning
+  - Currently uses Master volume + EQ if needed to increase overall volume
+  - Use also Guitar volume parameter? Make it selectable?
   - Care to be taken when switching presets and the solo switch was on!
-- Reconnect issue: disconnect and connect again (cable unplug or pedal board reboot) while THRII remains powered on, does not work as expected
+- If metronome is enabled during the ready counting state in tabata, the effect is 'pause'
 
 <br />
 
