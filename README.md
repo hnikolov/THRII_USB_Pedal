@@ -46,6 +46,7 @@ In this development, I use THR10II-W. To make the original code working with my 
 <br>- Adafruit_gfx (https://github.com/adafruit/Adafruit-GFX-Library)
 <br>- TFT_eSPI     (https://github.com/Bodmer/TFT_eSPI). Below, the changes made in *User_Setup.h*:
 ```
+
 // TFT Display DRiver
 #define ILI9341_DRIVER
 
@@ -57,6 +58,8 @@ In this development, I use THR10II-W. To make the original code working with my 
 #define TFT_CS   10
 #define TFT_RST   8
 ```
+
+NOTE: Pin 24 is used in the code to control the TFT backlight brightness via PWM
 
 <br />
 
