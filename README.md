@@ -30,6 +30,7 @@ In this development, I use THR10II-W. To make the original code working with my 
 
 **HARDWARE USED**
 - Teensy 4.1
+- Micro SDCard
 - 3.2" TFT with ILI9341 controller is used. 
   - The controller is selected and SPI is configured in *User_Setup.h* of TFT_eSPI library source!
 - 9 buttons for guitar stomp-boxes
