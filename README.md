@@ -63,6 +63,10 @@ NOTE: Pin 24 is used in the code to control the TFT backlight brightness via PWM
 
 <br />
 
+**GUI**
+
+![THRII USB Pedal](images/gui.PNG)
+
 **OPERATION MODES**
 <br />
 
