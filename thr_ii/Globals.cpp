@@ -17,7 +17,7 @@ void Constants::set_all(const byte* buf)
                     )
   int symStart = (int)(12 * vals + 8); // Where is the start of the symbol names?    
   
-  TRACE_THR30IIPEDAL(Serial.printf("Start of symbols: %d\n\r"+symStart);)
+  TRACE_THR30IIPEDAL(Serial.printf("Start of symbols: %d\n\r", symStart);)
   
   // CRC32 calculation over the symbol table, used to calculate the 'Magic Key' ==========================================
   // uint32_t checksum = CRC32::calculate(buf, len);
