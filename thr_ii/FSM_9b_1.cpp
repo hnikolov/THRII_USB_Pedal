@@ -78,6 +78,9 @@ String presetData;
 
 UIStates _uistate_prev = UI_home_patch; // To remember amp vs custom patches state
 
+enum presetsMode {P_THRII, P_FACTORY, P_USER};
+presetsMode pMode = P_THRII;
+
 // NOTE: Use F_ID and M_NR iso 0x24 and 0x01, see select_thrii_preset()
 std::array<byte, 29> ask_preset_buf = {0xf0, 0x00, 0x01, 0x0c, 0x24, 0x01, 0x4d, 0x01, 0x02, 0x00, 0x00, 0x0b, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7};
 // Switch to preset #4 (__0x03__)
@@ -332,19 +335,64 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         break;
 
         // Buttons hold ============================================================
-        case 11:  // Toggle between amp and custom patches
-          _uistate = UI_home_patch;
-          *active_patch_id = *presel_patch_id;
-          patch_activate(*presel_patch_id);
-          maskCUpdate = maskAll;
+        case 11: // Cycle between (amp -> user -> factory) presets
+          switch( pMode )
+          {
+            case P_THRII:
+              pMode = P_USER;
+              _uistate = UI_home_patch;
+              factory_presets_active = true;
+              toggle_factory_user_presets();
+              *active_patch_id = *presel_patch_id;
+              patch_activate(*presel_patch_id);
+              break;
+
+            case P_USER:
+              pMode = P_FACTORY;
+              _uistate = UI_home_patch;
+              factory_presets_active = false;
+              toggle_factory_user_presets();
+              *active_patch_id = *presel_patch_id;
+              patch_activate(*presel_patch_id);
+              break;
+              
+            case P_FACTORY: // Note: This check not needed here
+              pMode = P_THRII;
+              select_thrii_preset( nUserPreset );              
+              break;
+          }
+
+          maskCUpdate = maskAll; 
         break;
 
-        case 12: // Toggle between Factory and User presets
-          _uistate = UI_home_patch;
-          toggle_factory_user_presets();
-          *active_patch_id = *presel_patch_id;
-          patch_activate(*presel_patch_id);
-          maskCUpdate = maskAll;
+        case 12: // Cycle between (amp -> factory -> user) presets
+          switch( pMode )
+          {
+            case P_THRII:
+              pMode = P_FACTORY;
+              _uistate = UI_home_patch;
+              factory_presets_active = false;
+              toggle_factory_user_presets();
+              *active_patch_id = *presel_patch_id;
+              patch_activate(*presel_patch_id);
+              break;
+
+            case P_FACTORY:
+              pMode = P_USER;
+              _uistate = UI_home_patch;  
+              factory_presets_active = true;
+              toggle_factory_user_presets();
+              *active_patch_id = *presel_patch_id;
+              patch_activate(*presel_patch_id);      
+              break;
+
+            case P_USER: // Note: This check not needed here
+              pMode = P_THRII;
+              select_thrii_preset( nUserPreset );        
+              break;
+          }
+
+          maskCUpdate = maskAll; 
         break;
 
         case 13: // Select the Edit mode
@@ -459,16 +507,61 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
         break;
 
         // Buttons hold ============================================================
-        case 11: // Toggle between amp and user/factory patches
-          _uistate = UI_home_amp;
-          select_thrii_preset( nUserPreset );
+        case 11: // Cycle between (amp -> user -> factory) presets
+          switch( pMode )
+          {
+            case P_THRII: // Note: This check not needed here
+              pMode = P_USER;
+              factory_presets_active = true;
+              toggle_factory_user_presets();
+              *active_patch_id = *presel_patch_id;
+              patch_activate(*presel_patch_id);
+              break;
+
+            case P_USER:
+              pMode = P_FACTORY;
+              factory_presets_active = false;
+              toggle_factory_user_presets();
+              *active_patch_id = *presel_patch_id;
+              patch_activate(*presel_patch_id);
+              break;
+              
+            case P_FACTORY:
+              pMode = P_THRII;
+              _uistate = UI_home_amp;
+              select_thrii_preset( nUserPreset );              
+              break;
+          }
+
           maskCUpdate = maskAll; 
         break;
 
-        case 12: // Toggle between Factory and User presets
-          toggle_factory_user_presets();
-          *active_patch_id = *presel_patch_id;
-          patch_activate(*presel_patch_id);
+        case 12: // Cycle between (amp -> factory -> user) presets
+          switch( pMode )
+          {
+            case P_THRII: // Note: This check not needed here
+              pMode = P_FACTORY;
+              factory_presets_active = false;
+              toggle_factory_user_presets();
+              *active_patch_id = *presel_patch_id;
+              patch_activate(*presel_patch_id);
+              break;
+
+            case P_FACTORY:
+              pMode = P_USER;
+              factory_presets_active = true;
+              toggle_factory_user_presets();
+              *active_patch_id = *presel_patch_id;
+              patch_activate(*presel_patch_id);      
+              break;
+
+            case P_USER:
+              pMode = P_THRII;
+              _uistate = UI_home_amp;
+              select_thrii_preset( nUserPreset );        
+              break;
+          }
+
           maskCUpdate = maskAll; 
         break;
 

@@ -84,9 +84,9 @@ NOTE: Pin 24 is used in the code to control the TFT backlight brightness via PWM
 | Button | Action | Function                            |
 |--------|--------|-------------------------------------|
 |   1    | Press  |                                     |
-|        | Hold   | Toggle THRII/User(Factory) presets  |
+|        | Hold   | Cycle between THRII -> User -> Factory presets  |
 |   2    | Press  |                                     |
-|        | Hold   | Toggle User/Factory presets         |
+|        | Hold   | Cycle between THRII -> Factory -> User  presets |
 |   3    | Press  | Switch to “Manual” mode             |
 |        | Hold   | Switch to “Edit” mode               |
 |   4    | Press  | TAP Echo/Delay time                 |
@@ -116,9 +116,9 @@ NOTE: Pin 24 is used in the code to control the TFT backlight brightness via PWM
 | Button | Action | Function                            |
 |--------|--------|-------------------------------------|
 |   1    | Press  | Bank up (+5 presets)                |
-|        | Hold   | Toggle THRII/User(Factory) presets  |
+|        | Hold   | Cycle between THRII -> User -> Factory presets  |
 |   2    | Press  | Bank down (-5 presets)              |
-|        | Hold   | Toggle User/Factory presets         |
+|        | Hold   | Cycle between THRII -> Factory -> User  presets |
 |   3    | Press  | Switch to “Manual” mode             |
 |        | Hold   | Switch to “Edit” mode               |
 |   4    | Press  | TAP Echo/Delay time                 |
@@ -147,9 +147,9 @@ NOTE: Pin 24 is used in the code to control the TFT backlight brightness via PWM
 | Button | Action | Function                                       |
 |--------|--------|------------------------------------------------|
 |   1    | Press  | Next preset (+1)                               |
-|        | Hold   | Toggle Collection/Amp/Cabinet                  |
-|   2    | Press  | Previous preset (-1)                           |
 |        | Hold   | Next from selected Collection, Amp, or Cabinet |
+|   2    | Press  | Previous preset (-1)                           |
+|        | Hold   | Toggle Collection/Amp/Cabinet                  |
 |   3    | Press  | Exit “Manual” mode                             |
 |        | Hold   | Switch to “Edit” mode                          |
 |   4    | Press  | TAP Echo/Delay time                            |
@@ -177,17 +177,17 @@ NOTE: Pin 24 is used in the code to control the TFT backlight brightness via PWM
 | Button | Action | Function                                                            |
 |--------|--------|---------------------------------------------------------------------|
 |   1    | Press  | Select Next parameter                                               |
-|   	   | Hold	  | Toggle Collection/Amp/Cabinet                                       |
+|   	 | Hold	  | Next from selected Collection, Amp, or Cabinet                      |
 |   2    | Press  | Select Previous                                                     |
-|   	   | Hold	  | Next from selected Collection, Amp, or Cabinet                      |
+|   	 | Hold	  | Toggle Collection/Amp/Cabinet                                       |
 |   3    | Press  | Exit/Cancel “Edit” mode                                             |
-|   	   | Hold	  | Store the changes (TODO) and exit “Edit” mode                       |
+|   	 | Hold	  | Store the changes (TODO) and exit “Edit” mode                       |
 |   4    | Press  | TAP Echo/Delay time                                                 |
-|   	   | Hold	  | Switch to Tabata/Metronome mode (changes not stored)                |
+|   	 | Hold	  | Switch to Tabata/Metronome mode (changes not stored)                |
 |   5    | Press  | Select Compressor Settings. Press again to toggle (on/off)          |
-|   	   | Hold   |                                                                     |
+|   	 | Hold   |                                                                     |
 |   6    | Press  | Select Amp Unit                                                     |
-|   	   | Hold   | Select Noise Gate Settings. Press and hold again to toggle (on/off) |
+|   	 | Hold   | Select Noise Gate Settings. Press and hold again to toggle (on/off) |
 |   7    | Press  | Select Effect Settings. Press again to toggle (on/off)              |
 |        | Hold   | Select Effect (Chorus/Flanger/Phaser/Tremolo)                       |
 |   8    | Press  | Select Delay Settings. Press again to toggle (on/off)               |
