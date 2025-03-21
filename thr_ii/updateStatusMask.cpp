@@ -59,6 +59,9 @@ uint32_t maskClearTft      = 1 << 21; // Used when switching to Edit mode
 
 uint32_t maskAll           = 0xffffffff;
 
+bool maskInfoBox = false; // Used when showing the info box
+extern uint32_t tick3;    // Timer for switching back to display layout after showing something else for a while
+
 ampSelectModes amp_select_mode = COL; // Currently used in updateStatusMask()
 
 bool bgfill = true;
@@ -222,7 +225,7 @@ uint8_t getSplitPos( String patchname )
 
 void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
 {
-  int x = 00, y = 80, w = 320, h = 95;
+  int x = 0, y = 80, w = 320, h = 95;
   uint16_t fg_colour = fgcolour;
   uint16_t bg_colour = TFT_THRVDARKGREY;
   if( inverted )
@@ -253,6 +256,28 @@ void drawPatchName(uint16_t fgcolour, String patchname, bool inverted = false)
   spr.pushSprite(x, y);
   spr.unloadFont();
   spr.deleteSprite();
+}
+
+void drawInfoBox(String info)
+{
+  int x = 0, y = 80, w = 320, h = 95;
+  uint16_t fg_colour = TFT_THRVDARKGREY;
+  uint16_t bg_colour = TFT_THRCREAM;
+
+  spr.createSprite(w, h); // 16-bit colour needed to show antialiased fonts, do not use palette
+  spr.fillSmoothRoundRect(0, 0, w, h-1, 3, bg_colour, TFT_BLACK);
+  spr.loadFont(AA_FONT_XLARGE);
+
+  spr.setTextDatum(MC_DATUM);
+  spr.setTextColor(fg_colour, bg_colour, bgfill);
+  spr.drawString(info, w/2, h/2);
+
+  spr.pushSprite(x, y);
+  spr.unloadFont();
+  spr.deleteSprite();
+
+  maskInfoBox = true;
+  tick3 = millis();
 }
 
 void drawBarChart(int x, int y, int w, int h, uint16_t bgcolour, uint16_t fgcolour, String label, int barh)

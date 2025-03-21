@@ -49,6 +49,8 @@ extern uint32_t maskClearTft;
 
 extern uint32_t maskAll;
 
+extern void drawInfoBox(String info);
+
 #include "stompBoxes.h"
 extern std::vector <StompBox*> sboxes;
 
@@ -256,7 +258,8 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
         case 3: // Switch to Manual mode
           _uistate = UI_manual;
           _uistate_prev = UI_home_amp;
-          maskCUpdate |= (maskPatchSelMode | maskAmpSelMode);
+          drawInfoBox("Manual mode");
+          // maskCUpdate |= (maskPatchSelMode | maskAmpSelMode); // Triggered by drawInfoBox()
         break;
 
         case 4: // Tap tempo
@@ -340,6 +343,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
           {
             case P_THRII:
               pMode = P_USER;
+              drawInfoBox("User presets");
               _uistate = UI_home_patch;
               factory_presets_active = true;
               toggle_factory_user_presets();
@@ -349,6 +353,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
 
             case P_USER:
               pMode = P_FACTORY;
+              drawInfoBox("Factory presets");
               _uistate = UI_home_patch;
               factory_presets_active = false;
               toggle_factory_user_presets();
@@ -358,11 +363,11 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
               
             case P_FACTORY: // Note: This check not needed here
               pMode = P_THRII;
+              drawInfoBox("THRII presets");
               select_thrii_preset( nUserPreset );              
               break;
           }
-
-          maskCUpdate = maskAll; 
+          // maskCUpdate = maskAll; // Triggered by drawInfoBox()
         break;
 
         case 12: // Cycle between (amp -> factory -> user) presets
@@ -370,6 +375,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
           {
             case P_THRII:
               pMode = P_FACTORY;
+              drawInfoBox("Factory presets");
               _uistate = UI_home_patch;
               factory_presets_active = false;
               toggle_factory_user_presets();
@@ -379,6 +385,7 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
 
             case P_FACTORY:
               pMode = P_USER;
+              drawInfoBox("User presets");
               _uistate = UI_home_patch;  
               factory_presets_active = true;
               toggle_factory_user_presets();
@@ -388,11 +395,11 @@ void handle_home_amp(UIStates &_uistate, uint8_t &button_state)
 
             case P_USER: // Note: This check not needed here
               pMode = P_THRII;
+              drawInfoBox("THRII presets");
               select_thrii_preset( nUserPreset );        
               break;
           }
-
-          maskCUpdate = maskAll; 
+          // maskCUpdate = maskAll; // Triggered by drawInfoBox()
         break;
 
         case 13: // Select the Edit mode
@@ -473,7 +480,8 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
         case 3: // Switch to Manual mode
           _uistate = UI_manual;
           _uistate_prev = UI_home_patch;
-          maskCUpdate |= (maskPatchSelMode | maskAmpSelMode);
+          drawInfoBox("Manual mode");
+          // maskCUpdate |= (maskPatchSelMode | maskAmpSelMode); // Triggered by drawInfoBox()
         break;
 
         case 4: // Tap tempo
@@ -512,6 +520,7 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
           {
             case P_THRII: // Note: This check not needed here
               pMode = P_USER;
+              drawInfoBox("User presets");
               factory_presets_active = true;
               toggle_factory_user_presets();
               *active_patch_id = *presel_patch_id;
@@ -520,6 +529,7 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
 
             case P_USER:
               pMode = P_FACTORY;
+              drawInfoBox("Factory presets");
               factory_presets_active = false;
               toggle_factory_user_presets();
               *active_patch_id = *presel_patch_id;
@@ -528,12 +538,12 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
               
             case P_FACTORY:
               pMode = P_THRII;
+              drawInfoBox("THRII presets");
               _uistate = UI_home_amp;
               select_thrii_preset( nUserPreset );              
               break;
           }
-
-          maskCUpdate = maskAll; 
+          // maskCUpdate = maskAll; // Triggered by drawInfoBox()
         break;
 
         case 12: // Cycle between (amp -> factory -> user) presets
@@ -541,6 +551,7 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
           {
             case P_THRII: // Note: This check not needed here
               pMode = P_FACTORY;
+              drawInfoBox("Factory presets");
               factory_presets_active = false;
               toggle_factory_user_presets();
               *active_patch_id = *presel_patch_id;
@@ -549,6 +560,7 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
 
             case P_FACTORY:
               pMode = P_USER;
+              drawInfoBox("User presets");
               factory_presets_active = true;
               toggle_factory_user_presets();
               *active_patch_id = *presel_patch_id;
@@ -557,12 +569,12 @@ void handle_home_patch(UIStates &_uistate, uint8_t &button_state)
 
             case P_USER:
               pMode = P_THRII;
+              drawInfoBox("THRII presets");
               _uistate = UI_home_amp;
               select_thrii_preset( nUserPreset );        
               break;
           }
-
-          maskCUpdate = maskAll; 
+          // maskCUpdate = maskAll; // Triggered by drawInfoBox()
         break;
 
         case 13: // Switch to Edit mode
@@ -657,7 +669,8 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
 
         case 3: // Switch to previous mode (amp/presets)
           _uistate = _uistate_prev;
-          maskCUpdate |= (maskPatchSelMode | maskAmpSelMode);
+          drawInfoBox("Presets mode");
+          // maskCUpdate |= (maskPatchSelMode | maskAmpSelMode); // Triggered by drawInfoBox()
         break;
 
         case 4: // Tap tempo
@@ -704,32 +717,40 @@ void handle_patch_manual(UIStates &_uistate, uint8_t &button_state)
           {
             case COL:
               THR_Values.next_col();
+              switch(THR_Values.col)
+              {
+                  case CLASSIC:  drawInfoBox("Col: CLASSIC");  break;
+                  case BOUTIQUE: drawInfoBox("Col: BOUTIQUE"); break;
+                  case MODERN:   drawInfoBox("Col: MODERN");   break;
+              }
               TRACE_THR30IIPEDAL(Serial.println("Amp collection switched to: " + String(THR_Values.col));)
             break;
 
             case AMP:
               THR_Values.next_amp();
               TRACE_THR30IIPEDAL(Serial.println("Amp type switched to: " + String(THR_Values.amp));)
+              maskCUpdate |= maskAmpUnit;
             break;
 
             case CAB:
               THR_Values.next_cab();
               TRACE_THR30IIPEDAL(Serial.println("Cabinet switched to: " + String(THR_Values.cab));)
+              maskCUpdate |= maskAmpUnit;
             break;
           }
           THR_Values.createPatch();
-          maskCUpdate |= maskAmpUnit;
+          // maskCUpdate |= maskAmpUnit;
         break;
 
         case 12: // Rotate amp select mode ( COL -> AMP -> CAB -> )
           switch(amp_select_mode)
           {
-              case COL:	amp_select_mode = AMP; break;
-              case AMP:	amp_select_mode = CAB; break;
-              case CAB:	amp_select_mode = COL; break;
+              case COL:	amp_select_mode = AMP; drawInfoBox("Amp type");        break;
+              case AMP:	amp_select_mode = CAB; drawInfoBox("Speaker Cabinet"); break;
+              case CAB:	amp_select_mode = COL; drawInfoBox("Amp collection");  break;
           }
           TRACE_THR30IIPEDAL(Serial.println("Amp Select Mode: " + String(amp_select_mode));)
-          maskCUpdate |= maskAmpSelMode;
+          // maskCUpdate |= maskAmpSelMode; // Triggered by drawInfoBox()
         break;
 
         case 13:
@@ -820,7 +841,8 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
         case 3: // Switch to previous mode (amp/presets) - cancel the edit mode
           last_updated_sbox = RO; // The last sbox: ROOM REVERB
           _uistate = _uistate_prev;
-          maskCUpdate = maskAll;
+          drawInfoBox("Not stored");
+          // maskCUpdate = maskAll; // Triggered by drawInfoBox()
         break;
 
         case 4: // Tap tempo
@@ -959,6 +981,7 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
           //       2) Factory presets should not change on SD Card
           if( _uistate_prev == UI_home_patch )
           {
+            drawInfoBox("Not stored");
             // Store changes in memory (as json) for both, user and factory presets
             presetData = serializePreset( THR_Values, (*active_patch_names)[*active_patch_id - 1], &(*active_json_patchesII)[*active_patch_id - 1] );
             //Serial.println( presetData );
@@ -966,12 +989,17 @@ void handle_edit_mode(UIStates &_uistate, uint8_t &button_state)
             // Writing changes to user presets only
             if( factory_presets_active == false )
             {
+              drawInfoBox("Writing preset...");
               writeToFile( file_paths_user[*active_patch_id - 1], presetData );
             }
           }
+          else
+          {
+              drawInfoBox("Not stored");
+          }
           last_updated_sbox = RO; // The last sbox: ROOM REVERB
           _uistate = _uistate_prev;
-          maskCUpdate = maskAll;
+          // maskCUpdate = maskAll; // Triggered by drawInfoBox()
         break;
 
         case 14:

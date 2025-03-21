@@ -120,6 +120,7 @@ std::array< THR30II_Settings, 5 > thr_user_presets = {{ THR_Values_1, THR_Values
 
 extern uint32_t maskCUpdate; // Set if a value changed and (part of) the display has to be updated
 extern uint32_t maskAll;
+extern bool maskInfoBox;
 extern void updateStatusMask(THR30II_Settings &thrs, uint32_t &maskCUpdate);
 extern void tftUpdateEdit(THR30II_Settings &thrs, uint32_t &maskCUpdate);
 
@@ -201,7 +202,7 @@ UIStates _uistate = UI_home_amp; // TODO: idle state not needed?
 
 uint32_t tick1 = millis(); // Timer for regular mask update
 uint32_t tick2 = millis(); // Timer for sending data set by using the volume knob back to THRII
-//uint32_t tick3 = millis(); // Timer for switching back to display layout after showing something else for a while
+uint32_t tick3 = millis(); // Timer for switching back to display layout after showing something else for a while
 
 ////////////////////////
 // GUI TIMING
@@ -210,7 +211,7 @@ void gui_timing()
 {
   if( millis() - tick1 > 100 ) // Mask update if it was required because of changed values
   {
-    if( _uistate == UI_tabata || _uistate == UI_metronome ) // to avoid GUI issue of changing pars from thrii
+    if( _uistate == UI_tabata || _uistate == UI_metronome ) // To avoid GUI issue of changing parts from thrii
     {
       tmui.update(); // Has to be called regularly
     }
@@ -233,12 +234,17 @@ void gui_timing()
     }
     tick2 = millis(); // Start new waiting period
   }
-/*
-	if( millis() - tick3 > 1500 ) // Switch back to mask or selected patchname after showing something else for a while
+
+	if( millis() - tick3 > 500 ) // Switch back to mask or selected patchname after showing something else for a while
 	{
-    // TODO
+    if( maskInfoBox == true )
+    {
+        maskInfoBox = false;
+        maskCUpdate = maskAll; // 'Close' the info box and redraw all
+    }
+    // tick3 = millis(); // Start new waiting period, done in drawInfoBox()
 	}
-*/
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
